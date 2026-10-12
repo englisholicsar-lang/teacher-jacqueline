@@ -108,15 +108,14 @@
   <!-- Vapi Web SDK Embed Script -->
   <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
   <script>
-    var vapiSDK = null;
+    var vapiInstance = null;
     
-    // Replace with your actual Vapi Public Key and Assistant ID
     const PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
     const ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
     document.getElementById('startCallBtn').addEventListener('click', function() {
-      if (!vapiSDK) {
-        vapiSDK = window.vapiSDK.run({
+      if (!vapiInstance) {
+        vapiInstance = window.vapiSDK.run({
           apiKey: PUBLIC_KEY,
           assistant: ASSISTANT_ID,
           config: {
@@ -124,8 +123,10 @@
             offset: "20px"
           }
         });
-      } else {
-        vapiSDK.start();
+      }
+      
+      if (vapiInstance && typeof vapiInstance.start === 'function') {
+        vapiInstance.start();
       }
     });
   </script>
