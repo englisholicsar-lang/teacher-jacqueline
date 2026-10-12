@@ -35,6 +35,7 @@
       width: 100%;
       height: 260px;
       object-fit: cover;
+      display: block;
     }
     .content {
       padding: 28px 24px;
@@ -60,17 +61,33 @@
     .mic-notice {
       color: #666666;
       font-size: 13px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       background: #f8f9fa;
       padding: 8px 12px;
       border-radius: 8px;
+    }
+    .btn-call {
+      display: block;
+      width: 100%;
+      background-color: #4A8BB8;
+      color: #ffffff;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .btn-call:hover {
+      background-color: #3B759E;
     }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <img class="hero" src="https://i.imgur.com/pslpOpQ.png" alt="Teacher Jacqueline">
+    <img class="hero" src="https://i.imgur.com/pslpOpQ.png" alt="Teacher Jacqueline" loading="eager">
     
     <div class="content">
       <h1>Teacher Jacqueline</h1>
@@ -78,34 +95,42 @@
       
       <p class="description">
         Welcome! Ready for your free 10-minute trial session?<br><br>
-        Practice speaking English naturally with real-time feedback—no app downloads or sign-ups required. Look for the floating voice assistant button below to start our conversation!
+        Practice speaking English naturally with real-time feedback—no app downloads or sign-ups required. Tap below to start our conversation!
       </p>
       
       <div class="mic-notice">
         💡 통화 연결 시 마이크 사용 권한을 [허용]해 주세요!
       </div>
+
+      <button class="btn-call" id="startCallBtn">📞 Start 10-Min Free Trial</button>
     </div>
   </div>
 
-  <!-- Vapi Web SDK Embed Script with Native Button Config -->
-  <script>
-    var vapiSDKOptions = {
-      apiKey: "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3",
-      assistant: "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c",
-      config: {
-        position: "bottom-right",
-        offset: "20px",
-        width: "300px",
-        height: "50px",
-        idle: {
-          title: "📞 Start 10-Min Free Trial",
-          subtitle: "Tap to talk with Jacqueline",
-          color: "#4A8BB8"
-        }
-      }
-    };
-  </script>
+  <!-- Vapi Web SDK Embed Script -->
   <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+  <script>
+    var vapiInstance = null;
+    const PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+    const ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+
+    function startVapiCall() {
+      if (!vapiInstance && window.vapiSDK) {
+        vapiInstance = window.vapiSDK.run({
+          apiKey: PUBLIC_KEY,
+          assistant: ASSISTANT_ID,
+          config: {
+            position: "bottom-right",
+            offset: "20px"
+          }
+        });
+      }
+      if (vapiInstance && typeof vapiInstance.start === 'function') {
+        vapiInstance.start();
+      }
+    }
+
+    document.getElementById('startCallBtn').addEventListener('click', startVapiCall);
+  </script>
 
 </body>
 </html>
