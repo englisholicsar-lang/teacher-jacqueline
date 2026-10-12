@@ -79,8 +79,9 @@
       cursor: pointer;
       transition: background 0.2s ease;
     }
-    .btn-call:hover {
-      background-color: #3B759E;
+    .btn-call:disabled {
+      background-color: #a0a0a0;
+      cursor: not-allowed;
     }
   </style>
 </head>
@@ -112,8 +113,20 @@
     var vapiInstance = null;
     const PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
     const ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+    const btn = document.getElementById('startCallBtn');
+
+    // Check if user already completed trial
+    if (localStorage.getItem('jacqueline_trial_used') === 'true') {
+      btn.disabled = true;
+      btn.innerText = "✓ Trial Session Completed";
+    }
 
     function startVapiCall() {
+      if (localStorage.getItem('jacqueline_trial_used') === 'true') {
+        alert("You have already completed your free 10-minute trial session!");
+        return;
+      }
+
       if (!vapiInstance && window.vapiSDK) {
         vapiInstance = window.vapiSDK.run({
           apiKey: PUBLIC_KEY,
@@ -123,13 +136,21 @@
             offset: "20px"
           }
         });
+
+        // Mark trial as used once call ends
+        vapiInstance.on('call-end', () => {
+          localStorage.setItem('jacqueline_trial_used', 'true');
+          btn.disabled = true;
+          btn.innerText = "✓ Trial Session Completed";
+        });
       }
+
       if (vapiInstance && typeof vapiInstance.start === 'function') {
         vapiInstance.start();
       }
     }
 
-    document.getElementById('startCallBtn').addEventListener('click', startVapiCall);
+    btn.addEventListener('click', startVapiCall);
   </script>
 
 </body>
