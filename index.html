@@ -1,184 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teacher Jacqueline | 1:1 English Practice</title>
-  
-  <!-- Open Graph / KakaoTalk Preview Meta Tags -->
-  <meta property="og:title" content="Teacher Jacqueline">
-  <meta property="og:description" content="1:1 Native English Speaking Practice - 10-Min Free Trial">
-  <meta property="og:image" content="https://i.imgur.com/pslpOpQ.png">
-  <meta property="og:type" content="website">
+  <title>Englishholic - Teacher Jacqueline</title>
+
+  <!-- 1. Kakao SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-Ti2B4Ua20KK13LSc82E3M4Pj5Lks2Oshs3e4u+TksyMthvWzWd+aWJIn+3+E1/N1" crossorigin="anonymous"></script>
+
+  <!-- 2. Vapi Web SDK -->
+  <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #EBF3FA;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f9fc;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      margin: 0;
     }
     .card {
       background: #ffffff;
+      padding: 2.5rem;
       border-radius: 16px;
-      max-width: 420px;
-      width: 100%;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       text-align: center;
-    }
-    .card img.hero {
-      width: 100%;
-      height: 260px;
-      object-fit: cover;
-      display: block;
-    }
-    .content {
-      padding: 28px 24px;
+      max-width: 400px;
+      width: 90%;
     }
     h1 {
-      font-family: Georgia, serif;
-      color: #3B759E;
-      font-size: 32px;
-      margin-bottom: 6px;
+      margin-bottom: 0.5rem;
+      color: #333;
     }
-    .subtitle {
-      color: #555555;
-      font-size: 15px;
-      margin-bottom: 20px;
-      font-weight: 500;
+    p {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
     }
-    .description {
-      color: #444444;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 16px;
-    }
-    .mic-notice {
-      color: #666666;
-      font-size: 13px;
-      margin-bottom: 20px;
-      background: #f8f9fa;
-      padding: 8px 12px;
-      border-radius: 8px;
-    }
-    .btn-call {
-      display: block;
-      width: 100%;
-      background-color: #4A8BB8;
-      color: #ffffff;
-      padding: 16px;
+    .btn-kakao {
+      background-color: #FEE500;
+      color: #000000;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      padding: 14px 24px;
+      font-size: 1rem;
       font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: background-color 0.2s;
     }
-    .btn-call:disabled {
-      background-color: #a0a0a0;
-      cursor: not-allowed;
+    .btn-kakao:hover {
+      background-color: #fada0A;
+    }
+    #status {
+      margin-top: 1.5rem;
+      font-weight: 500;
+      color: #4A5568;
     }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <img class="hero" src="https://i.imgur.com/pslpOpQ.png" alt="Teacher Jacqueline" loading="eager">
+    <h1>Teacher Jacqueline</h1>
+    <p>Practice 1-on-1 English speaking with AI Teacher Jacqueline.</p>
     
-    <div class="content">
-      <h1>Teacher Jacqueline</h1>
-      <div class="subtitle">1:1 Native English Speaking & Practice</div>
-      
-      <p class="description">
-        Welcome! Ready for your free 10-minute trial session?<br><br>
-        Practice speaking English naturally with real-time feedback—no app downloads or sign-ups required. Tap below to start our conversation!
-      </p>
-      
-      <div class="mic-notice">
-        💡 통화 연결 시 마이크 사용 권한을 [허용]해 주세요!
-      </div>
+    <!-- One-Tap Call Button -->
+    <button class="btn-kakao" onclick="startKakaoTrial()">
+      💬 카카오 1초 로그인으로 체험 시작하기
+    </button>
 
-      <button class="btn-call" id="startCallBtn">📞 Start 10-Min Free Trial</button>
-    </div>
+    <div id="status">로그인 후 통화가 연결됩니다.</div>
   </div>
 
-  <!-- Vapi Web SDK Embed Script -->
-  <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
   <script>
-    var vapiInstance = null;
-    var cueTimer = null;
-    const PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
-    const ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
-    const btn = document.getElementById('startCallBtn');
-
-    // Check if user already completed trial
-    if (localStorage.getItem('jacqueline_trial_used') === 'true') {
-      btn.disabled = true;
-      btn.innerText = "✓ Trial Session Completed";
+    // Initialize Kakao SDK with your key
+    if (!Kakao.isInitialized()) {
+      Kakao.init('adad030abdf866a8b3be558c979ddb03');
     }
 
-    function startVapiCall() {
-      if (localStorage.getItem('jacqueline_trial_used') === 'true') {
-        alert("You have already completed your free 10-minute trial session!");
+    // Initialize Vapi SDK (Replace with your Vapi Public Key & Assistant ID)
+    const vapiApiKey = 'YOUR_VAPI_PUBLIC_KEY'; 
+    const assistantId = 'YOUR_VAPI_ASSISTANT_ID';
+    
+    let vapiInstance = null;
+
+    if (window.vapiSDK) {
+      vapiInstance = window.vapiSDK.run({
+        apiKey: vapiApiKey,
+      });
+    }
+
+    // One-Tap Kakao Login Function
+    function startKakaoTrial() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerText = "카카오 인증 진행 중...";
+
+      Kakao.Auth.login({
+        success: function(authObj) {
+          Kakao.API.request({
+            url: '/v2/user/me',
+            success: function(res) {
+              const kakaoUserId = res.id; // Unique Kakao numerical ID
+              console.log("Logged in Kakao User ID:", kakaoUserId);
+              
+              statusDiv.innerText = "인증 완료! 통화 연결 중...";
+
+              // Start the Vapi Call
+              startVapiCall(kakaoUserId);
+            },
+            fail: function(error) {
+              console.error("Failed to fetch Kakao user profile:", error);
+              statusDiv.innerText = "프로필 정보를 가져오지 못했습니다.";
+            }
+          });
+        },
+        fail: function(err) {
+          console.error("Kakao Login failed:", err);
+          statusDiv.innerText = "카카오 로그인에 실패했습니다.";
+        }
+      });
+    }
+
+    // Start Vapi Call & Trigger 9-Minute Cue
+    function startVapiCall(userId) {
+      if (!vapiInstance) {
+        alert("Vapi SDK가 아직 로드되지 않았습니다.");
         return;
       }
 
-      if (!vapiInstance && window.vapiSDK) {
-        vapiInstance = window.vapiSDK.run({
-          apiKey: PUBLIC_KEY,
-          assistant: ASSISTANT_ID,
-          config: {
-            position: "bottom-right",
-            offset: "20px"
-          },
-          // 10-minute hard cutoff safety net (600 seconds)
-          assistantOverrides: {
-            maxDurationSeconds: 600
-          }
-        });
+      // Start Vapi call
+      vapiInstance.start(assistantId);
 
-        // Triggered when call officially starts
-        vapiInstance.on('call-start', () => {
-          // Clear any existing timer just in case
-          if (cueTimer) clearTimeout(cueTimer);
-
-          // Set 9-minute (540,000 ms) timer to inject the wrap-up prompt
-          cueTimer = setTimeout(() => {
-            if (vapiInstance && typeof vapiInstance.send === 'function') {
-              vapiInstance.send({
-                type: 'add-message',
-                message: {
-                  role: 'system',
-                  content: '[SYSTEM ALERT: 9 MINUTES REACHED. INITIATE WRAP-UP NOW. DO NOT ACCEPT NEW TOPICS.]'
-                }
-              });
+      // Set 9-minute (540,000 ms) wrap-up trigger
+      setTimeout(() => {
+        console.log("9-Minute Cue Triggered for Kakao User:", userId);
+        
+        // Send wrap-up instruction prompt to Jacqueline
+        if (vapiInstance) {
+          vapiInstance.send({
+            type: 'add-message',
+            message: {
+              role: 'system',
+              content: 'Please let the user know we have 1 minute remaining in our trial lesson and start wrapping up smoothly.'
             }
-          }, 540000); 
-        });
-
-        // Mark trial as used & clean up timer once call ends
-        vapiInstance.on('call-end', () => {
-          if (cueTimer) {
-            clearTimeout(cueTimer);
-            cueTimer = null;
-          }
-          localStorage.setItem('jacqueline_trial_used', 'true');
-          btn.disabled = true;
-          btn.innerText = "✓ Trial Session Completed";
-        });
-      }
-
-      if (vapiInstance && typeof vapiInstance.start === 'function') {
-        vapiInstance.start();
-      }
+          });
+        }
+      }, 540000); // 9 minutes = 540,000 ms
     }
-
-    btn.addEventListener('click', startVapiCall);
   </script>
 
 </body>
