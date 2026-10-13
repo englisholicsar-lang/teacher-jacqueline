@@ -95,9 +95,21 @@
       width: 100%;
       box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
       transition: transform 0.1s ease;
+      margin-bottom: 10px;
     }
     .btn-kakao:active {
       transform: scale(0.98);
+    }
+    .btn-direct {
+      background-color: #4A5568;
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
     }
     #status {
       margin-top: 1.2rem;
@@ -121,6 +133,10 @@
       💬 카카오 1초 로그인으로 무료 체험
     </button>
 
+    <button class="btn-direct" onclick="startVapiCall()">
+      ⚡ 바로 AI 선생님과 통화 시작하기
+    </button>
+
     <div id="status">로그인 시 바로 통화가 시작됩니다.</div>
   </div>
 
@@ -130,6 +146,15 @@
     window.addEventListener('load', function() {
       if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
         Kakao.init('adad030abdf866a8b3be558c979ddb03');
+      }
+
+      // URL 파라미터 체크 (카카오 리다이렉트 완료 후 처리)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('code')) {
+        document.getElementById('status').innerText = "카카오 인증 완료! 통화를 시작합니다...";
+        setTimeout(() => {
+          startVapiCall();
+        }, 1000);
       }
     });
 
@@ -141,22 +166,23 @@
         return;
       }
 
-      statusDiv.innerText = "카카오 로그인 요청 중...";
+      statusDiv.innerText = "통화 연결 준비 중...";
+
+      // 안전 대책: 팝업 연결이 지연되더라도 2초 후 Vapi 통화 강제 시작
+      setTimeout(() => {
+        startVapiCall();
+      }, 2000);
 
       try {
         Kakao.Auth.login({
           success: function(authObj) {
-            statusDiv.innerText = "인증 완료! AI 통화 연결 중...";
             startVapiCall();
           },
           fail: function(err) {
-            console.error("Kakao Login Error:", err);
-            statusDiv.innerText = "로그인이 취소되었거나 오류가 발생했습니다.";
+            startVapiCall();
           }
         });
-      } catch (err) {
-        console.error("Exec Error:", err);
-        statusDiv.innerText = "로그인 오류 - 통화를 직접 시작합니다...";
+      } catch (e) {
         startVapiCall();
       }
     }
@@ -165,12 +191,11 @@
       const statusDiv = document.getElementById('status');
 
       if (!vapiInstance) {
-        statusDiv.innerText = "통화 모듈 연결 준비 중... 다시 버튼을 눌러주세요.";
-        alert("통화 모듈을 불러오는 중입니다. 3초 후 다시 버튼을 눌러주세요.");
+        statusDiv.innerText = "통화 모듈을 로딩 중입니다. 3초 후 다시 클릭해 주세요.";
         return;
       }
 
-      statusDiv.innerText = "통화 연결 완료! 재클린 선생님과 대화를 시작하세요.";
+      statusDiv.innerText = "🎙️ 통화 연결 완료! Jacqueline 선생님과 대화해 보세요.";
       vapiInstance.start(assistantId);
     }
   </script>
