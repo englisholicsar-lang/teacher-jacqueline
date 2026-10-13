@@ -15,7 +15,7 @@
   <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
-  <!-- Vapi Official SDK Bundle -->
+  <!-- Vapi Web SDK Standalone Bundle -->
   <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
   <style>
@@ -113,22 +113,11 @@
     let vapiInstance = null;
 
     window.addEventListener('load', function() {
-      // Initialize Kakao SDK
+      // 카카오 SDK 초기화
       if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
         Kakao.init('adad030abdf866a8b3be558c979ddb03');
       }
-
-      // Initialize Vapi SDK safely
-      initVapi();
     });
-
-    function initVapi() {
-      if (window.vapiSDK) {
-        vapiInstance = window.vapiSDK.run({ apiKey: vapiApiKey });
-      } else {
-        setTimeout(initVapi, 300);
-      }
-    }
 
     function startKakaoTrial() {
       const statusDiv = document.getElementById('status');
@@ -138,7 +127,7 @@
         return;
       }
 
-      statusDiv.innerText = "통화 연결 중...";
+      statusDiv.innerText = "연결 처리 중...";
 
       try {
         Kakao.Auth.login({
@@ -146,6 +135,7 @@
             connectVoiceCall();
           },
           fail: function(err) {
+            // 모바일 팝업 차단 시 바로 통화 연결 진행
             connectVoiceCall();
           }
         });
@@ -157,6 +147,7 @@
     function connectVoiceCall() {
       const statusDiv = document.getElementById('status');
 
+      // Vapi 인스턴스가 없으면 즉시 생성 시도
       if (!vapiInstance) {
         if (window.vapiSDK) {
           vapiInstance = window.vapiSDK.run({ apiKey: vapiApiKey });
@@ -164,12 +155,17 @@
       }
 
       if (!vapiInstance) {
-        statusDiv.innerText = "통화 모듈을 로딩 중입니다. 2초 후 다시 눌러주세요.";
+        statusDiv.innerText = "마이크를 초기화할 수 없습니다. 페이지를 새로고침해 주세요.";
         return;
       }
 
-      statusDiv.innerText = "🎙️ 통화가 연결되었습니다! Jacqueline 선생님과 대화해 보세요.";
-      vapiInstance.start(assistantId);
+      statusDiv.innerText = "🎙️ 통화가 연결되었습니다! 말씀해 보세요.";
+      
+      try {
+        vapiInstance.start(assistantId);
+      } catch (e) {
+        console.error("Vapi start error:", e);
+      }
     }
   </script>
 
