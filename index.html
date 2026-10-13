@@ -15,8 +15,8 @@
   <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
-  <!-- Vapi Web SDK Standalone Bundle -->
-  <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+  <!-- Vapi Official Web SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
 
   <style>
     body {
@@ -117,6 +117,15 @@
       if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
         Kakao.init('adad030abdf866a8b3be558c979ddb03');
       }
+
+      // Vapi 인스턴스 사전 생성
+      try {
+        if (typeof Vapi !== 'undefined') {
+          vapiInstance = new Vapi(vapiApiKey);
+        }
+      } catch (e) {
+        console.log("Vapi Init Error:", e);
+      }
     });
 
     function startKakaoTrial() {
@@ -127,7 +136,7 @@
         return;
       }
 
-      statusDiv.innerText = "연결 처리 중...";
+      statusDiv.innerText = "통화 연결 중...";
 
       try {
         Kakao.Auth.login({
@@ -135,7 +144,6 @@
             connectVoiceCall();
           },
           fail: function(err) {
-            // 모바일 팝업 차단 시 바로 통화 연결 진행
             connectVoiceCall();
           }
         });
@@ -147,10 +155,12 @@
     function connectVoiceCall() {
       const statusDiv = document.getElementById('status');
 
-      // Vapi 인스턴스가 없으면 즉시 생성 시도
-      if (!vapiInstance) {
-        if (window.vapiSDK) {
-          vapiInstance = window.vapiSDK.run({ apiKey: vapiApiKey });
+      // Vapi 객체 재확인 및 생성
+      if (!vapiInstance && typeof Vapi !== 'undefined') {
+        try {
+          vapiInstance = new Vapi(vapiApiKey);
+        } catch (e) {
+          console.log(e);
         }
       }
 
@@ -159,7 +169,7 @@
         return;
       }
 
-      statusDiv.innerText = "🎙️ 통화가 연결되었습니다! 말씀해 보세요.";
+      statusDiv.innerText = "🎙️ 통화가 연결되었습니다! Jacqueline 선생님과 대화해 보세요.";
       
       try {
         vapiInstance.start(assistantId);
