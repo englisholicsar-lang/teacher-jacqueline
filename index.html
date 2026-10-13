@@ -113,18 +113,16 @@
     let vapiInstance = null;
 
     window.addEventListener('load', function() {
-      // 카카오 SDK 초기화
       if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
         Kakao.init('adad030abdf866a8b3be558c979ddb03');
       }
 
-      // Vapi 인스턴스 사전 생성
       try {
         if (typeof Vapi !== 'undefined') {
           vapiInstance = new Vapi(vapiApiKey);
         }
       } catch (e) {
-        console.log("Vapi Init Error:", e);
+        console.error("Vapi init error:", e);
       }
     });
 
@@ -138,43 +136,42 @@
 
       statusDiv.innerText = "통화 연결 중...";
 
-      try {
-        Kakao.Auth.login({
-          success: function(authObj) {
-            connectVoiceCall();
-          },
-          fail: function(err) {
-            connectVoiceCall();
-          }
-        });
-      } catch (e) {
-        connectVoiceCall();
-      }
-    }
+      // 루프 방지를 위해 카카오 로그인 성공/실패 여부와 관계없이 Vapi 통화 실행을 보장
+      let callStarted = false;
 
-    function connectVoiceCall() {
-      const statusDiv = document.getElementById('status');
+      function triggerCall() {
+        if (callStarted) return;
+        callStarted = true;
 
-      // Vapi 객체 재확인 및 생성
-      if (!vapiInstance && typeof Vapi !== 'undefined') {
-        try {
+        if (!vapiInstance && typeof Vapi !== 'undefined') {
           vapiInstance = new Vapi(vapiApiKey);
-        } catch (e) {
-          console.log(e);
+        }
+
+        if (vapiInstance) {
+          statusDiv.innerText = "🎙️ 통화가 연결되었습니다!";
+          vapiInstance.start(assistantId);
+        } else {
+          statusDiv.innerText = "통화 모듈 로딩 중... 다시 버튼을 눌러주세요.";
         }
       }
 
-      if (!vapiInstance) {
-        statusDiv.innerText = "마이크를 초기화할 수 없습니다. 페이지를 새로고침해 주세요.";
-        return;
-      }
+      // 1.5초 후 무조건 통화 시작 (로그인 콜백 지연 대비)
+      const fallbackTimer = setTimeout(triggerCall, 1500);
 
-      statusDiv.innerText = "🎙️ 통화가 연결되었습니다! Jacqueline 선생님과 대화해 보세요.";
-      
       try {
-        vapiInstance.start(assistantId);
+        Kakao.Auth.login({
+          success: function(authObj) {
+            clearTimeout(fallbackTimer);
+            triggerCall();
+          },
+          fail: function(err) {
+            clearTimeout(fallbackTimer);
+            triggerCall();
+          }
+        });
       } catch (e) {
-        console.error("Vapi start error:", e);
+        clearTimeout(fallbackTimer);
+        triggerCall();
       }
     }
   </script>
