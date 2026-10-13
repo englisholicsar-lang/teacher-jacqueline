@@ -1,128 +1,4 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Englishholic - Teacher Jacqueline</title>
-
-  <!-- KakaoTalk Share / Open Graph Meta Tags -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Teacher Jacqueline - 1:1 AI 영어회화" />
-  <meta property="og:description" content="카카오 1초 로그인으로 Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!" />
-  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" />
-  <meta property="og:image:secure_url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" />
-  <meta property="og:image:width" content="800" />
-  <meta property="og:image:height" content="800" />
-  <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/" />
-
-  <!-- 1. Kakao SDK -->
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-Ti2B4Ua20KK13LSc82E3M4Pj5Lks2Oshs3e4u+TksyMthvWzWd+aWJIn+3+E1/N1" crossorigin="anonymous"></script>
-
-  <!-- 2. Vapi Web SDK -->
-  <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
-
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f4f6f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    .card {
-      background: #ffffff;
-      padding: 2.5rem 2rem;
-      border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-      text-align: center;
-      max-width: 380px;
-      width: 100%;
-    }
-    .avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 1rem;
-      border: 4px solid #EEF2FF;
-    }
-    h1 {
-      font-size: 1.5rem;
-      margin: 0.5rem 0;
-      color: #1A202C;
-    }
-    .subtitle {
-      color: #4A5568;
-      font-size: 0.95rem;
-      margin-bottom: 1.2rem;
-    }
-    .mic-notice {
-      background-color: #EDF2F7;
-      color: #4A5568;
-      font-size: 0.85rem;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-kakao {
-      background-color: #FEE500;
-      color: #000000;
-      border: none;
-      padding: 15px 20px;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
-      transition: transform 0.1s ease;
-    }
-    .btn-kakao:active {
-      transform: scale(0.98);
-    }
-    #status {
-      margin-top: 1.2rem;
-      font-size: 0.88rem;
-      color: #718096;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="card">
-    <!-- Jacqueline Profile Photo -->
-    <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar" onerror="this.src='https://via.placeholder.com/120?text=Jacqueline'">
-    
-    <h1>Teacher Jacqueline</h1>
-    <p class="subtitle">AI 튜터 재클린 선생님과의 1:1 맞춤 영어회화</p>
-
-    <!-- Microphone Notice -->
-    <div class="mic-notice">
-      🎙️ 원활한 통화를 위해 마이크 권한을 허용해 주세요.
-    </div>
-
-    <!-- One-Tap Call Button -->
-    <button class="btn-kakao" onclick="startKakaoTrial()">
-      💬 카카오 1초 로그인으로 무료 체험
-    </button>
-
-    <div id="status">로그인 시 바로 통화가 시작됩니다.</div>
-  </div>
-
-  <script>
+<script>
     // Initialize Kakao SDK
     if (!Kakao.isInitialized()) {
       Kakao.init('adad030abdf866a8b3be558c979ddb03');
@@ -140,34 +16,36 @@
       });
     }
 
-    // One-Tap Kakao Login Function (Redirect Method)
+    // One-Tap Kakao Login Function (Direct Popup Method)
     function startKakaoTrial() {
       const statusDiv = document.getElementById('status');
-      statusDiv.innerText = "카카오 로그인 페이지로 이동 중...";
+      statusDiv.innerText = "카카오 로그인 창을 여는 중...";
 
-      Kakao.Auth.authorize({
-        redirectUri: 'https://englisholicsar-lang.github.io/teacher-jacqueline/'
+      Kakao.Auth.login({
+        success: function(authObj) {
+          statusDiv.innerText = "로그인 성공! 회원 정보 확인 중...";
+          
+          Kakao.API.request({
+            url: '/v2/user/me',
+            success: function(res) {
+              const kakaoUserId = res.id;
+              console.log("Logged in Kakao User ID:", kakaoUserId);
+              
+              statusDiv.innerText = "인증 완료! 통화 연결 중...";
+              startVapiCall(kakaoUserId);
+            },
+            fail: function(error) {
+              console.error("Failed to fetch Kakao user profile:", error);
+              statusDiv.innerText = "프로필 정보를 가져오지 못했습니다.";
+            }
+          });
+        },
+        fail: function(err) {
+          console.error("Kakao Login failed:", err);
+          statusDiv.innerText = "카카오 로그인이 취소되었거나 실패했습니다.";
+        }
       });
     }
-
-    // Check if returning from Kakao login with an authorization code
-    window.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const authCode = urlParams.get('code');
-
-      if (authCode) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.innerText = "인증 완료! 통화 연결 중...";
-        
-        // Clean up the URL query parameters
-        window.history.replaceState({}, document.title, window.location.pathname);
-
-        // Start Vapi call immediately upon successful return
-        setTimeout(() => {
-          startVapiCall('kakao_user');
-        }, 1000);
-      }
-    });
 
     // Start Vapi Call & Trigger 9-Minute Cue
     function startVapiCall(userId) {
@@ -193,6 +71,3 @@
       }, 540000);
     }
   </script>
-
-</body>
-</html>
