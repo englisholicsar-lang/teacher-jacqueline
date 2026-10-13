@@ -135,56 +135,46 @@
           config: {
             position: "bottom-right",
             offset: "20px"
+          },
+          // 10-minute hard cutoff safety net (600 seconds)
+          assistantOverrides: {
+            maxDurationSeconds: 600
           }
         });
 
-        // Start call with 10-min hard limit
-        if (vapiInstance && typeof vapiInstance.start === 'function') {
-          vapiInstance.start({
-            maxDurationSeconds: 600
-          });
-        }
+        // Triggered when call officially starts
+        vapiInstance.on('call-start', () => {
+          // Clear any existing timer just in case
+          if (cueTimer) clearTimeout(cueTimer);
 
-        // 9-MINUTE CUE: Trigger system alert at 540,000ms (9 mins)
-        cueTimer = setTimeout(function() {
-          if (vapiInstance && typeof vapiInstance.send === 'function') {
-            vapiInstance.send({
-              type: 'add-message',
-              message: {
-                role: 'system',
-                content: '[SYSTEM ALERT: 9 MINUTES REACHED. INITIATE WRAP-UP NOW. DO NOT ACCEPT NEW TOPICS.]'
-              }
-            });
-          }
-        }, 540000);
+          // Set 9-minute (540,000 ms) timer to inject the wrap-up prompt
+          cueTimer = setTimeout(() => {
+            if (vapiInstance && typeof vapiInstance.send === 'function') {
+              vapiInstance.send({
+                type: 'add-message',
+                message: {
+                  role: 'system',
+                  content: '[SYSTEM ALERT: 9 MINUTES REACHED. INITIATE WRAP-UP NOW. DO NOT ACCEPT NEW TOPICS.]'
+                }
+              });
+            }
+          }, 540000); 
+        });
 
-        // Clean up & mark trial completed on call end
+        // Mark trial as used & clean up timer once call ends
         vapiInstance.on('call-end', () => {
           if (cueTimer) {
             clearTimeout(cueTimer);
             cueTimer = null;
           }
-          localStorage.getItem('jacqueline_trial_used') === 'true'; // Set trial record
           localStorage.setItem('jacqueline_trial_used', 'true');
           btn.disabled = true;
           btn.innerText = "✓ Trial Session Completed";
         });
-      } else if (vapiInstance && typeof vapiInstance.start === 'function') {
-        vapiInstance.start({
-          maxDurationSeconds: 600
-        });
+      }
 
-        cueTimer = setTimeout(function() {
-          if (vapiInstance && typeof vapiInstance.send === 'function') {
-            vapiInstance.send({
-              type: 'add-message',
-              message: {
-                role: 'system',
-                content: '[SYSTEM ALERT: 9 MINUTES REACHED. INITIATE WRAP-UP NOW. DO NOT ACCEPT NEW TOPICS.]'
-              }
-            });
-          }
-        }, 540000);
+      if (vapiInstance && typeof vapiInstance.start === 'function') {
+        vapiInstance.start();
       }
     }
 
