@@ -7,7 +7,7 @@
 
   <!-- Open Graph Meta Tags -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Teacher Jacqueline - 1:1 AI 영어회화">
+  <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
   <meta property="og:description" content="카카오 1초 로그인으로 Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
   <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
@@ -15,25 +15,8 @@
   <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
-  <!-- Vapi Web SDK Loader -->
-  <script>
-    var vapiInstance = null;
-    (function (d, t) {
-      var g = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
-      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-      g.defer = true;
-      g.async = true;
-      s.parentNode.insertBefore(g, s);
-      g.onload = function () {
-        if (window.vapiSDK) {
-          vapiInstance = window.vapiSDK.run({
-            apiKey: "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3"
-          });
-        }
-      };
-    })(document, "script");
-  </script>
+  <!-- Vapi Official Web SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
 
   <style>
     body {
@@ -95,21 +78,9 @@
       width: 100%;
       box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
       transition: transform 0.1s ease;
-      margin-bottom: 10px;
     }
     .btn-kakao:active {
       transform: scale(0.98);
-    }
-    .btn-direct {
-      background-color: #4A5568;
-      color: #ffffff;
-      border: none;
-      padding: 12px 20px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border-radius: 12px;
-      cursor: pointer;
-      width: 100%;
     }
     #status {
       margin-top: 1.2rem;
@@ -123,7 +94,7 @@
   <div class="card">
     <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar" onerror="this.src='https://via.placeholder.com/120?text=Jacqueline'">
     <h1>Teacher Jacqueline</h1>
-    <p class="subtitle">AI 튜터 재클린 선생님과의 1:1 맞춤 영어회화</p>
+    <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
     <div class="mic-notice">
       🎙️ 원활한 통화를 위해 마이크 권한을 허용해 주세요.
@@ -133,28 +104,23 @@
       💬 카카오 1초 로그인으로 무료 체험
     </button>
 
-    <button class="btn-direct" onclick="startVapiCall()">
-      ⚡ 바로 AI 선생님과 통화 시작하기
-    </button>
-
     <div id="status">로그인 시 바로 통화가 시작됩니다.</div>
   </div>
 
   <script>
+    const vapiApiKey = '6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3';
     const assistantId = '7b61af6b-87fe-47cb-a37b-f047f5b6fe8c';
+    let vapiInstance = null;
 
     window.addEventListener('load', function() {
+      // Initialize Kakao SDK
       if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
         Kakao.init('adad030abdf866a8b3be558c979ddb03');
       }
 
-      // URL 파라미터 체크 (카카오 리다이렉트 완료 후 처리)
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('code')) {
-        document.getElementById('status').innerText = "카카오 인증 완료! 통화를 시작합니다...";
-        setTimeout(() => {
-          startVapiCall();
-        }, 1000);
+      // Initialize Vapi SDK directly using npm standalone web bundle
+      if (typeof Vapi !== 'undefined') {
+        vapiInstance = new Vapi(vapiApiKey);
       }
     });
 
@@ -162,40 +128,37 @@
       const statusDiv = document.getElementById('status');
 
       if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
-        alert("카카오 SDK를 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
+        alert("인증 모듈을 준비하는 중입니다. 2초 후 다시 시도해 주세요.");
         return;
       }
 
-      statusDiv.innerText = "통화 연결 준비 중...";
+      statusDiv.innerText = "통화 연결 중...";
 
-      // 안전 대책: 팝업 연결이 지연되더라도 2초 후 Vapi 통화 강제 시작
-      setTimeout(() => {
-        startVapiCall();
-      }, 2000);
-
-      try {
-        Kakao.Auth.login({
-          success: function(authObj) {
-            startVapiCall();
-          },
-          fail: function(err) {
-            startVapiCall();
-          }
-        });
-      } catch (e) {
-        startVapiCall();
-      }
+      // Trigger Kakao Auth and then immediately start audio stream
+      Kakao.Auth.login({
+        success: function(authObj) {
+          connectVoiceCall();
+        },
+        fail: function(err) {
+          // If popup is blocked on mobile, continue call directly
+          connectVoiceCall();
+        }
+      });
     }
 
-    function startVapiCall() {
+    function connectVoiceCall() {
       const statusDiv = document.getElementById('status');
 
+      if (!vapiInstance && typeof Vapi !== 'undefined') {
+        vapiInstance = new Vapi(vapiApiKey);
+      }
+
       if (!vapiInstance) {
-        statusDiv.innerText = "통화 모듈을 로딩 중입니다. 3초 후 다시 클릭해 주세요.";
+        statusDiv.innerText = "마이크를 연결할 수 없습니다. 페이지를 새로고침해 주세요.";
         return;
       }
 
-      statusDiv.innerText = "🎙️ 통화 연결 완료! Jacqueline 선생님과 대화해 보세요.";
+      statusDiv.innerText = "🎙️ 통화가 연결되었습니다! 말씀해 보세요.";
       vapiInstance.start(assistantId);
     }
   </script>
