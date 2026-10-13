@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Englishholic - Teacher Jacqueline</title>
 
+  <!-- KakaoTalk Share / Open Graph Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://englishholicsar-lang.github.io/teacher-jacqueline/">
+  <meta property="og:title" content="Teacher Jacqueline - 1:1 AI 영어회화">
+  <meta property="og:description" content="카카오 1초 로그인으로 Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
+  <meta property="og:image" content="https://englishholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
+
   <!-- 1. Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-Ti2B4Ua20KK13LSc82E3M4Pj5Lks2Oshs3e4u+TksyMthvWzWd+aWJIn+3+E1/N1" crossorigin="anonymous"></script>
 
@@ -13,81 +20,112 @@
 
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f7f9fc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f4f6f9;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
     }
     .card {
       background: #ffffff;
-      padding: 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
       text-align: center;
-      max-width: 400px;
-      width: 90%;
+      max-width: 380px;
+      width: 100%;
+    }
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      border: 4px solid #EEF2FF;
     }
     h1 {
-      margin-bottom: 0.5rem;
-      color: #333;
+      font-size: 1.5rem;
+      margin: 0.5rem 0;
+      color: #1A202C;
     }
-    p {
-      color: #666;
+    .subtitle {
+      color: #4A5568;
       font-size: 0.95rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.2rem;
+    }
+    .mic-notice {
+      background-color: #EDF2F7;
+      color: #4A5568;
+      font-size: 0.85rem;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
     .btn-kakao {
       background-color: #FEE500;
       color: #000000;
       border: none;
-      padding: 14px 24px;
+      padding: 15px 20px;
       font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
+      font-weight: 700;
+      border-radius: 12px;
       cursor: pointer;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      transition: background-color 0.2s;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
+      transition: transform 0.1s ease;
     }
-    .btn-kakao:hover {
-      background-color: #fada0A;
+    .btn-kakao:active {
+      transform: scale(0.98);
     }
     #status {
-      margin-top: 1.5rem;
-      font-weight: 500;
-      color: #4A5568;
+      margin-top: 1.2rem;
+      font-size: 0.88rem;
+      color: #718096;
     }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h1>Teacher Jacqueline</h1>
-    <p>Practice 1-on-1 English speaking with AI Teacher Jacqueline.</p>
+    <!-- Jacqueline Profile Photo -->
+    <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar" onerror="this.src='https://via.placeholder.com/120?text=Jacqueline'">
     
+    <h1>Teacher Jacqueline</h1>
+    <p class="subtitle">AI 튜터 재클린 선생님과의 1:1 맞춤 영어회화</p>
+
+    <!-- Microphone Notice -->
+    <div class="mic-notice">
+      🎙️ 원활한 통화를 위해 마이크 권한을 허용해 주세요.
+    </div>
+
     <!-- One-Tap Call Button -->
     <button class="btn-kakao" onclick="startKakaoTrial()">
-      💬 카카오 1초 로그인으로 체험 시작하기
+      💬 카카오 1초 로그인으로 무료 체험
     </button>
 
-    <div id="status">로그인 후 통화가 연결됩니다.</div>
+    <div id="status">로그인 시 바로 통화가 시작됩니다.</div>
   </div>
 
   <script>
-    // Initialize Kakao SDK with your key
+    // Initialize Kakao SDK
     if (!Kakao.isInitialized()) {
       Kakao.init('adad030abdf866a8b3be558c979ddb03');
     }
 
-    // Initialize Vapi SDK with your credentials
+    // Initialize Vapi SDK with credentials
     const vapiApiKey = '6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3'; 
     const assistantId = '7b61af6b-87fe-47cb-a37b-f047f5b6fe8c';
     
@@ -109,12 +147,10 @@
           Kakao.API.request({
             url: '/v2/user/me',
             success: function(res) {
-              const kakaoUserId = res.id; // Unique Kakao numerical ID
+              const kakaoUserId = res.id;
               console.log("Logged in Kakao User ID:", kakaoUserId);
               
               statusDiv.innerText = "인증 완료! 통화 연결 중...";
-
-              // Start the Vapi Call
               startVapiCall(kakaoUserId);
             },
             fail: function(error) {
@@ -137,14 +173,11 @@
         return;
       }
 
-      // Start Vapi call
       vapiInstance.start(assistantId);
 
       // Set 9-minute (540,000 ms) wrap-up trigger
       setTimeout(() => {
         console.log("9-Minute Cue Triggered for Kakao User:", userId);
-        
-        // Send wrap-up instruction prompt to Jacqueline
         if (vapiInstance) {
           vapiInstance.send({
             type: 'add-message',
@@ -154,7 +187,7 @@
             }
           });
         }
-      }, 540000); // 9 minutes = 540,000 ms
+      }, 540000);
     }
   </script>
 
