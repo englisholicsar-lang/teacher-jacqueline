@@ -140,34 +140,34 @@
       });
     }
 
-    // One-Tap Kakao Login Function
+    // One-Tap Kakao Login Function (Redirect Method)
     function startKakaoTrial() {
       const statusDiv = document.getElementById('status');
-      statusDiv.innerText = "카카오 인증 진행 중...";
+      statusDiv.innerText = "카카오 로그인 페이지로 이동 중...";
 
-      Kakao.Auth.login({
-        success: function(authObj) {
-          Kakao.API.request({
-            url: '/v2/user/me',
-            success: function(res) {
-              const kakaoUserId = res.id;
-              console.log("Logged in Kakao User ID:", kakaoUserId);
-              
-              statusDiv.innerText = "인증 완료! 통화 연결 중...";
-              startVapiCall(kakaoUserId);
-            },
-            fail: function(error) {
-              console.error("Failed to fetch Kakao user profile:", error);
-              statusDiv.innerText = "프로필 정보를 가져오지 못했습니다.";
-            }
-          });
-        },
-        fail: function(err) {
-          console.error("Kakao Login failed:", err);
-          statusDiv.innerText = "카카오 로그인에 실패했습니다.";
-        }
+      Kakao.Auth.authorize({
+        redirectUri: 'https://englisholicsar-lang.github.io/teacher-jacqueline/'
       });
     }
+
+    // Check if returning from Kakao login with an authorization code
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const authCode = urlParams.get('code');
+
+      if (authCode) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerText = "인증 완료! 통화 연결 중...";
+        
+        // Clean up the URL query parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Start Vapi call immediately upon successful return
+        setTimeout(() => {
+          startVapiCall('kakao_user');
+        }, 1000);
+      }
+    });
 
     // Start Vapi Call & Trigger 9-Minute Cue
     function startVapiCall(userId) {
