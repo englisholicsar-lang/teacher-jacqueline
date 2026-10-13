@@ -10,20 +10,34 @@
   <meta property="og:title" content="Teacher Jacqueline - 1:1 AI 영어회화">
   <meta property="og:description" content="카카오 1초 로그인으로 Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
   <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
-  <meta property="og:image:secure_url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
-  <meta property="og:image:width" content="800">
-  <meta property="og:image:height" content="800">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
 
   <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
-  <!-- Vapi Web SDK -->
-  <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+  <!-- Vapi Web SDK Loader Script -->
+  <script>
+    var vapiInstance = null;
+    (function (d, t) {
+      var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+      g.defer = true;
+      g.async = true;
+      s.parentNode.insertBefore(g, s);
+      g.onload = function () {
+        if (window.vapiSDK) {
+          vapiInstance = window.vapiSDK.run({
+            apiKey: "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3"
+          });
+        }
+      };
+    })(document, "script");
+  </script>
 
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #f4f6f9;
       display: flex;
       flex-direction: column;
@@ -68,10 +82,6 @@
       padding: 10px 14px;
       border-radius: 10px;
       margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
     .btn-kakao {
       background-color: #FEE500;
@@ -83,10 +93,6 @@
       border-radius: 12px;
       cursor: pointer;
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
       transition: transform 0.1s ease;
     }
@@ -104,7 +110,6 @@
 
   <div class="card">
     <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar" onerror="this.src='https://via.placeholder.com/120?text=Jacqueline'">
-    
     <h1>Teacher Jacqueline</h1>
     <p class="subtitle">AI 튜터 재클린 선생님과의 1:1 맞춤 영어회화</p>
 
@@ -120,38 +125,14 @@
   </div>
 
   <script>
-    const vapiApiKey = '6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3'; 
     const assistantId = '7b61af6b-87fe-47cb-a37b-f047f5b6fe8c';
-    let vapiInstance = null;
 
-    // Load Vapi and Kakao SDK
     window.addEventListener('load', function() {
-      if (window.vapiSDK) {
-        vapiInstance = window.vapiSDK.run({ apiKey: vapiApiKey });
-      }
-
       if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
         Kakao.init('adad030abdf866a8b3be558c979ddb03');
       }
-
-      // Check if returning from Kakao login redirect
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      if (code) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.innerText = "인증 완료! 통화 연결 중...";
-        
-        // Clean URL parameter
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Start Vapi Call
-        setTimeout(() => {
-          startVapiCall('kakao_user');
-        }, 1000);
-      }
     });
 
-    // Start Redirect Login Flow
     function startKakaoTrial() {
       const statusDiv = document.getElementById('status');
 
@@ -160,34 +141,26 @@
         return;
       }
 
-      statusDiv.innerText = "카카오 로그인 페이지로 이동 중...";
+      statusDiv.innerText = "로그인 처리 중...";
 
-      Kakao.Auth.authorize({
-        redirectUri: 'https://englisholicsar-lang.github.io/teacher-jacqueline/'
+      Kakao.Auth.login({
+        success: function(authObj) {
+          statusDiv.innerText = "인증 완료! 통화 연결 중...";
+          startVapiCall();
+        },
+        fail: function(err) {
+          statusDiv.innerText = "로그인이 취소되었습니다.";
+        }
       });
     }
 
-    // Start Vapi Call
-    function startVapiCall(userId) {
+    function startVapiCall() {
       if (!vapiInstance) {
-        alert("통화 모듈을 불러오지 못했습니다. 페이지를 새로고침해 주세요.");
+        alert("통화 모듈을 불러오는 중입니다. 3초 후 다시 버튼을 눌러주세요.");
         return;
       }
 
       vapiInstance.start(assistantId);
-
-      // 9-minute cue
-      setTimeout(() => {
-        if (vapiInstance) {
-          vapiInstance.send({
-            type: 'add-message',
-            message: {
-              role: 'system',
-              content: 'Please let the user know we have 1 minute remaining in our trial lesson and start wrapping up smoothly.'
-            }
-          });
-        }
-      }, 540000);
     }
   </script>
 
