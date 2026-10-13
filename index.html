@@ -15,7 +15,7 @@
   <meta property="og:image:height" content="800">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
 
-  <!-- Kakao SDK (헤더에서 동기식 로드) -->
+  <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
   <!-- Vapi Web SDK -->
@@ -124,53 +124,50 @@
     const assistantId = '7b61af6b-87fe-47cb-a37b-f047f5b6fe8c';
     let vapiInstance = null;
 
-    // 초기화 함수
+    // Load Vapi and Kakao SDK
     window.addEventListener('load', function() {
-      // Vapi 초기화
       if (window.vapiSDK) {
         vapiInstance = window.vapiSDK.run({ apiKey: vapiApiKey });
       }
 
-      // Kakao SDK 초기화
-      if (typeof Kakao !== 'undefined') {
-        if (!Kakao.isInitialized()) {
-          Kakao.init('adad030abdf866a8b3be558c979ddb03');
-        }
+      if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
+        Kakao.init('adad030abdf866a8b3be558c979ddb03');
+      }
+
+      // Check if returning from Kakao login redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      if (code) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerText = "인증 완료! 통화 연결 중...";
+        
+        // Clean URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Start Vapi Call
+        setTimeout(() => {
+          startVapiCall('kakao_user');
+        }, 1000);
       }
     });
 
-    // 로그인 진행
+    // Start Redirect Login Flow
     function startKakaoTrial() {
       const statusDiv = document.getElementById('status');
 
       if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
-        alert("카카오 SDK를 로드하는 중입니다. 잠시 후 다시 클릭해 주세요.");
+        alert("카카오 SDK를 로드하는 중입니다. 잠시 후 다시 시도해 주세요.");
         return;
       }
 
-      statusDiv.innerText = "카카오 로그인 창을 여는 중...";
+      statusDiv.innerText = "카카오 로그인 페이지로 이동 중...";
 
-      Kakao.Auth.login({
-        success: function(authObj) {
-          statusDiv.innerText = "로그인 성공! 프로필 확인 중...";
-          Kakao.API.request({
-            url: '/v2/user/me',
-            success: function(res) {
-              statusDiv.innerText = "인증 완료! 통화 연결 중...";
-              startVapiCall(res.id);
-            },
-            fail: function(error) {
-              statusDiv.innerText = "프로필 정보를 가져오지 못했습니다.";
-            }
-          });
-        },
-        fail: function(err) {
-          statusDiv.innerText = "카카오 로그인이 취소되었습니다.";
-        }
+      Kakao.Auth.authorize({
+        redirectUri: 'https://englisholicsar-lang.github.io/teacher-jacqueline/'
       });
     }
 
-    // Vapi 통화 시작
+    // Start Vapi Call
     function startVapiCall(userId) {
       if (!vapiInstance) {
         alert("통화 모듈을 불러오지 못했습니다. 페이지를 새로고침해 주세요.");
@@ -179,7 +176,7 @@
 
       vapiInstance.start(assistantId);
 
-      // 9분 알림 설정
+      // 9-minute cue
       setTimeout(() => {
         if (vapiInstance) {
           vapiInstance.send({
