@@ -111,6 +111,7 @@
   <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
   <script>
     var vapiInstance = null;
+    var cueTimer = null;
     const PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
     const ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
     const btn = document.getElementById('startCallBtn');
@@ -137,16 +138,53 @@
           }
         });
 
-        // Mark trial as used once call ends
+        // Start call with 10-min hard limit
+        if (vapiInstance && typeof vapiInstance.start === 'function') {
+          vapiInstance.start({
+            maxDurationSeconds: 600
+          });
+        }
+
+        // 9-MINUTE CUE: Trigger system alert at 540,000ms (9 mins)
+        cueTimer = setTimeout(function() {
+          if (vapiInstance && typeof vapiInstance.send === 'function') {
+            vapiInstance.send({
+              type: 'add-message',
+              message: {
+                role: 'system',
+                content: '[SYSTEM ALERT: 9 MINUTES REACHED. INITIATE WRAP-UP NOW. DO NOT ACCEPT NEW TOPICS.]'
+              }
+            });
+          }
+        }, 540000);
+
+        // Clean up & mark trial completed on call end
         vapiInstance.on('call-end', () => {
+          if (cueTimer) {
+            clearTimeout(cueTimer);
+            cueTimer = null;
+          }
+          localStorage.getItem('jacqueline_trial_used') === 'true'; // Set trial record
           localStorage.setItem('jacqueline_trial_used', 'true');
           btn.disabled = true;
           btn.innerText = "✓ Trial Session Completed";
         });
-      }
+      } else if (vapiInstance && typeof vapiInstance.start === 'function') {
+        vapiInstance.start({
+          maxDurationSeconds: 600
+        });
 
-      if (vapiInstance && typeof vapiInstance.start === 'function') {
-        vapiInstance.start();
+        cueTimer = setTimeout(function() {
+          if (vapiInstance && typeof vapiInstance.send === 'function') {
+            vapiInstance.send({
+              type: 'add-message',
+              message: {
+                role: 'system',
+                content: '[SYSTEM ALERT: 9 MINUTES REACHED. INITIATE WRAP-UP NOW. DO NOT ACCEPT NEW TOPICS.]'
+              }
+            });
+          }
+        }, 540000);
       }
     }
 
