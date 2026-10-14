@@ -283,23 +283,16 @@
         </button>
     </div>
 
-    <!-- Vapi Web SDK Script -->
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <!-- Vapi Web SDK ESM module via UNPKG -->
+    <script type="module">
+        import Vapi from 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/esm/index.js';
 
-    <script>
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwI7Gu1wnzQIzOQAeqDZRuHK8UgceArMjxwZTg4i9mLRuu8_QTrYCJHmXExsKbY3WRraQ/exec";
         
         const VAPI_PUBLIC_KEY = "YOUR_VAPI_PUBLIC_KEY";       // Replace with your Vapi Public Key
         const VAPI_ASSISTANT_ID = "YOUR_VAPI_ASSISTANT_ID";   // Replace with your Vapi Assistant ID
 
-        let vapi = null;
-
-        // Initialize Vapi SDK when loaded
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.vapiSDK) {
-                vapi = window.vapiSDK;
-            }
-        });
+        const vapi = new Vapi(VAPI_PUBLIC_KEY);
 
         // Device Fingerprinting Helper
         async function getDeviceHash() {
@@ -317,7 +310,8 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        async function startTrialCall() {
+        // Attach function globally so HTML onclick works
+        window.startTrialCall = async function() {
             const btn = document.getElementById("vapi-call-btn");
             btn.disabled = true;
             btn.classList.add("calling");
@@ -344,22 +338,8 @@
                     body: JSON.stringify({ deviceHash: deviceHash })
                 });
 
-                // 3. Start Vapi Call
-                if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
-                    window.vapiSDK.run({
-                        apiKey: VAPI_PUBLIC_KEY,
-                        assistant: VAPI_ASSISTANT_ID
-                    });
-                } else {
-                    // Fallback direct URL or reload if needed
-                    throw new Error("Vapi SDK not initialized");
-                }
-
-                // Reset button after starting
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.classList.remove("calling");
-                }, 4000);
+                // 3. Start Vapi Call directly
+                await vapi.start(VAPI_ASSISTANT_ID);
 
             } catch (err) {
                 console.error("Call launch error:", err);
@@ -367,7 +347,16 @@
                 btn.disabled = false;
                 btn.classList.remove("calling");
             }
-        }
+        };
+
+        // Listen to call events to reset button back to green when call ends
+        vapi.on('call-end', () => {
+            const btn = document.getElementById("vapi-call-btn");
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove("calling");
+            }
+        });
     </script>
 </body>
 </html>
