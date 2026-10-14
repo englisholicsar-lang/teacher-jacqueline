@@ -25,7 +25,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            padding-bottom: 100px;
+            padding-bottom: 110px;
         }
 
         /* Top Decorative Wave */
@@ -34,7 +34,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 180px;
+            height: 220px;
             z-index: 0;
             pointer-events: none;
         }
@@ -45,7 +45,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 140px;
+            height: 160px;
             z-index: 0;
             pointer-events: none;
         }
@@ -53,21 +53,21 @@
         /* Dot Grid Accents */
         .dot-grid {
             position: absolute;
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
-            background-size: 10px 10px;
+            background-size: 12px 12px;
             z-index: 1;
-            opacity: 0.6;
+            opacity: 0.65;
         }
 
         .dot-grid-left {
-            top: 380px;
+            top: 410px;
             left: 15px;
         }
 
         .dot-grid-right {
-            top: 260px;
+            top: 280px;
             right: 15px;
         }
 
@@ -75,7 +75,7 @@
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 24px 20px 40px;
+            padding: 28px 24px 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -86,12 +86,12 @@
 
         /* Logo Header */
         .logo-container {
-            margin-top: 10px;
-            margin-bottom: 24px;
+            margin-top: 12px;
+            margin-bottom: 32px;
         }
 
         .logo-img {
-            max-width: 190px;
+            max-width: 210px;
             height: auto;
             display: block;
         }
@@ -101,29 +101,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .avatar-img {
-            width: 105px;
-            height: 105px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid #ffffff;
-            box-shadow: 0 6px 20px rgba(148, 163, 184, 0.25);
-            margin-bottom: 12px;
+            box-shadow: 0 8px 24px rgba(148, 163, 184, 0.25);
+            margin-bottom: 14px;
         }
 
         .teacher-name {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             color: #0f172a;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
 
         .teacher-subtitle {
-            font-size: 13.5px;
+            font-size: 14px;
             color: #64748b;
             font-weight: 500;
         }
@@ -133,34 +133,34 @@
             width: 100%;
             background: #eef5ff;
             border: 1px solid #dbeafe;
-            border-radius: 14px;
-            padding: 14px 12px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            padding: 16px 14px;
+            margin-bottom: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            box-shadow: 0 2px 8px rgba(219, 234, 254, 0.5);
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(219, 234, 254, 0.5);
         }
 
         .mic-icon {
-            font-size: 22px;
+            font-size: 24px;
             line-height: 1;
         }
 
         .mic-text {
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 700;
             color: #1e40af;
-            line-height: 1.4;
+            line-height: 1.45;
             text-align: center;
         }
 
         /* Instruction Text */
         .instruction-text {
-            font-size: 13.5px;
+            font-size: 14px;
             color: #475569;
-            line-height: 1.5;
+            line-height: 1.6;
             font-weight: 500;
         }
 
@@ -172,7 +172,7 @@
         /* Floating Call Button */
         .floating-btn-container {
             position: fixed;
-            bottom: 28px;
+            bottom: 32px;
             right: 28px;
             z-index: 1000;
         }
@@ -231,6 +231,25 @@
 </head>
 <body>
 
+    <!-- Kakao / In-app Browser Auto-Redirect Script -->
+    <script>
+        (function() {
+            var userAgent = navigator.userAgent.toLowerCase();
+            var currentUrl = window.location.href;
+            
+            // Check if opened inside KakaoTalk, Instagram, Facebook, etc.
+            if (userAgent.indexOf('kakaotalk') !== -1 || userAgent.indexOf('instagram') !== -1 || userAgent.indexOf('fbav') !== -1) {
+                if (userAgent.indexOf('android') !== -1) {
+                    // Android Intent URI to open in external Chrome browser
+                    window.location.href = 'intent://' + currentUrl.replace(/https?:\/\//i, '') + '#Intent;scheme=https;package=com.android.chrome;end;';
+                } else if (userAgent.indexOf('iphone') !== -1 || userAgent.indexOf('ipad') !== -1) {
+                    // iOS Safari fallback redirect trigger
+                    window.location.href = currentUrl;
+                }
+            }
+        })();
+    </script>
+
     <!-- Background Waves -->
     <svg class="bg-wave-top" viewBox="0 0 1440 320" preserveAspectRatio="none">
         <path fill="#dbeafe" fill-opacity="0.7" d="M0,192L60,181.3C120,171,240,150,360,154.7C480,160,600,192,720,192C840,192,960,160,1080,149.3C1200,139,1320,150,1380,154.7L1440,160L1440,0L0,0Z"></path>
@@ -248,7 +267,7 @@
 
         <!-- Logo Header -->
         <div class="logo-container">
-            <img src="logo.png" alt="Englisholic Innovative English" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/190x45?text=Englisholic';">
+            <img src="logo.png" alt="Englisholic Innovative English" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/210x50?text=Englisholic';">
         </div>
 
         <!-- Profile Section -->
@@ -283,7 +302,7 @@
         </button>
     </div>
 
-    <!-- Vapi Web SDK ESM module via UNPKG -->
+    <!-- Vapi Web SDK ESM module -->
     <script type="module">
         import Vapi from 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/esm/index.js';
 
@@ -310,7 +329,6 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Attach function globally so HTML onclick works
         window.startTrialCall = async function() {
             const btn = document.getElementById("vapi-call-btn");
             btn.disabled = true;
@@ -349,7 +367,6 @@
             }
         };
 
-        // Listen to call events to reset button back to green when call ends
         vapi.on('call-end', () => {
             const btn = document.getElementById("vapi-call-btn");
             if (btn) {
