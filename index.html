@@ -51,7 +51,7 @@
       height: 100svh;
       margin: 0;
       padding: 0;
-      overflow: hidden; /* Strict no-scroll lock */
+      overflow: hidden; /* Strict single-screen lock */
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
@@ -120,24 +120,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-evenly;
-      padding: 10px 16px 85px 16px;
+      padding: 10px 16px 85px 16px; /* Prevents floating widget overlap */
     }
 
-    /* Seamless Logo Blending */
+    /* Remade SVG Logo Container */
     .logo-wrapper {
       width: 100%;
       display: flex;
       justify-content: center;
       margin-top: 2px;
     }
-    .brand-logo-img {
-      width: 210px;
-      max-width: 70%;
+    .svg-brand-logo {
+      width: 225px;
+      max-width: 75%;
       height: auto;
-      object-fit: contain;
       display: block;
-      /* Multiply blend mode makes white background invisible against blue waves */
-      mix-blend-mode: multiply;
     }
 
     /* Profile Avatar with Soft Halo Border */
@@ -188,7 +185,7 @@
       margin: 0;
     }
 
-    /* Mic Permission Notice Box */
+    /* Mic Authorization Notice Box */
     .mic-notice {
       background-color: #edf4ff;
       border: 1px solid #c8deff;
@@ -235,14 +232,31 @@
     <path d="M0 220C100 220 180 290 320 270C380 260 450 230 500 220V300H0V220Z" fill="#A8D0FF" fill-opacity="0.85"/>
   </svg>
 
-  <!-- Side Dot Matrix Overlay -->
+  <!-- Side Dot Matrix Patterns -->
   <div class="dot-pattern-left"></div>
   <div class="dot-pattern-right"></div>
 
   <div class="container">
-    <!-- Brand Logo -->
+    <!-- Remade Clean Vector Englisholic Logo (Guaranteed 100% transparent, no checkerboards) -->
     <div class="logo-wrapper">
-      <img src="logo.png" alt="Englisholic Logo" class="brand-logo-img">
+      <svg class="svg-brand-logo" viewBox="0 0 380 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="engBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0d4e92" />
+            <stop offset="100%" stop-color="#062144" />
+          </linearGradient>
+        </defs>
+        <!-- Icon Circle -->
+        <circle cx="52" cy="55" r="46" fill="url(#engBlueGrad)" />
+        <!-- Pillar Graphic -->
+        <path d="M 27 41 Q 52 21 77 41 L 77 47 L 27 47 Z" fill="#ffffff" />
+        <rect x="31" y="51" width="9" height="33" rx="1.5" fill="#ffffff" />
+        <rect x="47" y="51" width="9" height="33" rx="1.5" fill="#ffffff" />
+        <rect x="63" y="51" width="9" height="33" rx="1.5" fill="#ffffff" />
+        <!-- Typography -->
+        <text x="114" y="57" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="37" fill="#0b1a3e" letter-spacing="-0.8">Englisholic</text>
+        <text x="116" y="82" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="18" fill="#0e5399" letter-spacing="0.3">Innovative English</text>
+      </svg>
     </div>
 
     <!-- Teacher Jacqueline Profile Photo -->
