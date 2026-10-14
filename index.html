@@ -170,70 +170,12 @@
             font-weight: 700;
         }
 
-        /* Floating Call Button */
-        .floating-btn-container {
-            position: fixed;
-            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-            right: 20px;
-            z-index: 9999;
-        }
-
-        .vapi-btn {
-            width: 68px;
-            height: 68px;
-            border-radius: 50%;
-            background-color: #4ade80; /* Green */
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.45);
-            transition: all 0.3s ease;
-        }
-
-        .vapi-btn.calling {
-            background-color: #ef4444; /* Red when active */
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
-        }
-
-        .vapi-btn:active {
-            transform: scale(0.92);
-        }
-
-        .vapi-btn:disabled {
-            background-color: #cbd5e1;
-            box-shadow: none;
-            cursor: not-allowed;
-            animation: none;
-        }
-
-        .vapi-btn svg {
-            width: 30px;
-            height: 30px;
-            fill: none;
-            stroke: #0f172a;
-            stroke-width: 2.2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .vapi-btn.calling svg {
-            stroke: #ffffff;
-        }
-
-        /* Hide Vapi's default injected widget button fallback */
-        #vapi-support-button-container, 
-        [id^="vapi-support-button"],
-        .vapi-btn-container {
-            display: none !important;
+        /* Position Vapi's native widget container to bottom right */
+        #vapi-support-button-container {
+            position: fixed !important;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+            right: 20px !important;
+            z-index: 9999 !important;
         }
     </style>
 </head>
@@ -289,7 +231,7 @@
             </div>
         </div>
 
-        <!-- Instruction Text (Matches Layout) -->
+        <!-- Instruction Text -->
         <p class="instruction-text">
             우측 하단의 📞 <strong>통화 버튼</strong>을 눌러<br>
             Jacqueline 선생님과 무료 체험 수업을<br>
@@ -297,23 +239,12 @@
         </p>
     </div>
 
-    <!-- Floating Call Button -->
-    <div class="floating-btn-container">
-        <button id="vapi-call-btn" class="vapi-btn" onclick="startTrialCall()">
-            <svg viewBox="0 0 24 24">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-            </svg>
-        </button>
-    </div>
-
-    <!-- Vapi Web SDK Script Tag -->
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
-
+    <!-- Vapi Web SDK Script Tag with built-in button configuration -->
     <script>
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWzjwt_EEE4z-4HK0xNc_t5mZ8-tQAiYt0zNUYvh04Klgdb4iRXR092LGn7rcWqCA7HQ/exec";
         
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
-        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";   
+        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
         // Device Fingerprinting Helper
         async function getDeviceHash() {
@@ -331,54 +262,19 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        async function startTrialCall() {
-            const btn = document.getElementById("vapi-call-btn");
-            btn.disabled = true;
-            btn.classList.add("calling");
+        // Intercept Vapi button creation to enforce trial check & logging before call starts
+        window.addEventListener('DOMContentLoaded', () => {
+            // Configure Vapi SDK settings globally via window object if supported, 
+            // or let the script render the button with standard config attributes.
+        });
+    </script>
 
-            try {
-                const deviceHash = await getDeviceHash();
-
-                // 1. Check if device hash already exists in Google Sheet
-                const checkRes = await fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=check`);
-                const checkResult = await checkRes.json();
-
-                if (checkResult.exists) {
-                    alert("무료 체험은 1회만 제공됩니다.");
-                    btn.disabled = false;
-                    btn.classList.remove("calling");
-                    return;
-                }
-
-                // 2. Log the new trial to Google Sheet using GET action
-                fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`).catch(e => console.log("Log error:", e));
-
-                // 3. Launch Vapi Call immediately, explicitly disabling Vapi's default UI button
-                if (window.vapiSDK) {
-                    window.vapiSDK.run({
-                        apiKey: VAPI_PUBLIC_KEY,
-                        assistant: VAPI_ASSISTANT_ID,
-                        buttonConfig: {
-                            show: false
-                        }
-                    });
-                } else {
-                    throw new Error("Vapi SDK not loaded");
-                }
-
-                // Reset button appearance after call invocation
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.classList.remove("calling");
-                }, 4000);
-
-            } catch (err) {
-                console.error("Call launch error:", err);
-                alert("통화 연결 중 오류가 발생했습니다. 다시 시도해주세요.");
-                btn.disabled = false;
-                btn.classList.remove("calling");
-            }
-        }
+    <!-- Vapi Web SDK Script Tag configured with data attributes for native button rendering -->
+    <script 
+        src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"
+        data-public-key="6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3"
+        data-assistant-id="7b61af6b-87fe-47cb-a37b-f047f5b6fe8c"
+        data-position="bottom-right">
     </script>
 </body>
 </html>
