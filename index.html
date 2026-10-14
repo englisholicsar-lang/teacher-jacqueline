@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Englisholic - Teacher Jacqueline</title>
 
+  <!-- KakaoTalk In-App Browser Auto-Redirect to Safari/Chrome -->
+  <script>
+    (function () {
+      var userAgent = navigator.userAgent.toLowerCase();
+      if (userAgent.indexOf("kakaotalk") !== -1) {
+        var currentUrl = location.href;
+        if (userAgent.indexOf("android") !== -1) {
+          location.href = "intent://" + currentUrl.replace(/https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+        } else if (userAgent.indexOf("iphone") !== -1 || userAgent.indexOf("ipad") !== -1) {
+          location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(currentUrl);
+        }
+      }
+    })();
+  </script>
+
   <!-- Open Graph Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
@@ -15,7 +30,7 @@
   <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
-  <!-- Vapi Official Floating Widget Loader (Restored Original Working Config) -->
+  <!-- Vapi Official Floating Widget Loader -->
   <script>
     var vapiInstance = null;
     (function (d, t) {
