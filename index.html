@@ -15,33 +15,31 @@
   <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
-  <!-- Vapi Official Floating Widget Loader -->
+  <!-- Vapi Official Floating Widget Loader (Restored Original Working Config) -->
   <script>
     var vapiInstance = null;
-    window.addEventListener('DOMContentLoaded', function() {
-      (function (d, t) {
-        var g = d.createElement(t),
-            s = d.getElementsByTagName(t)[0];
-        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-        g.defer = true;
-        g.async = true;
-        s.parentNode.insertBefore(g, s);
-        g.onload = function () {
-          if (window.vapiSDK) {
-            vapiInstance = window.vapiSDK.run({
-              apiKey: "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3",
-              assistant: "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c",
-              config: {
-                position: "bottom-right",
-                offset: "16px",
-                width: "56px",
-                height: "56px"
-              }
-            });
-          }
-        };
-      })(document, "script");
-    });
+    (function (d, t) {
+      var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+      g.defer = true;
+      g.async = true;
+      s.parentNode.insertBefore(g, s);
+      g.onload = function () {
+        if (window.vapiSDK) {
+          vapiInstance = window.vapiSDK.run({
+            apiKey: "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3",
+            assistant: "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c",
+            config: {
+              position: "bottom-right",
+              offset: "20px",
+              width: "64px",
+              height: "64px"
+            }
+          });
+        }
+      };
+    })(document, "script");
   </script>
 
   <style>
@@ -122,7 +120,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-evenly;
-      padding: 10px 18px 75px 18px;
+      padding: 10px 18px 20px 18px;
     }
 
     /* Brand Logo */
