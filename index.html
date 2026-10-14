@@ -228,6 +228,13 @@
         .vapi-btn.calling svg {
             stroke: #ffffff;
         }
+
+        /* Hide Vapi's default injected widget button so only our custom button shows */
+        #vapi-support-button-container, 
+        [id^="vapi-support-button"],
+        .vapi-btn-container {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
