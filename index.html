@@ -118,16 +118,17 @@
       padding: 30px 20px;
     }
 
+    /* Code-rendered vector logo */
     .logo-wrapper {
       width: 100%;
       display: flex;
       justify-content: center;
+      align-items: center;
       margin-bottom: 1.5rem;
     }
-    .brand-logo-img {
-      width: 210px;
+    .svg-brand-logo {
+      width: 250px;
       height: auto;
-      object-fit: contain;
       display: block;
     }
 
@@ -217,9 +218,26 @@
   <div class="dot-pattern-right"></div>
 
   <div class="container">
-    <!-- Clean Brand Logo -->
+    <!-- Pure SVG Vector Brand Logo (No image file needed!) -->
     <div class="logo-wrapper">
-      <img src="logo.png" alt="Englisholic Logo" class="brand-logo-img" onerror="this.src='LOGO.PNG'">
+      <svg class="svg-brand-logo" viewBox="0 0 320 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pillarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0e5399" />
+            <stop offset="100%" stop-color="#0a2a5e" />
+          </linearGradient>
+        </defs>
+        <!-- Pillar Mark Circle -->
+        <circle cx="50" cy="50" r="44" fill="url(#pillarGrad)" />
+        <!-- Pillar Shapes -->
+        <path d="M 24 38 Q 45 20 70 38 L 70 45 L 24 45 Z" fill="#ffffff" />
+        <rect x="29" y="48" width="8" height="32" rx="2" fill="#ffffff" />
+        <rect x="46" y="48" width="8" height="32" rx="2" fill="#ffffff" />
+        <rect x="63" y="48" width="8" height="32" rx="2" fill="#ffffff" />
+        <!-- Brand Typography -->
+        <text x="108" y="52" font-family="-apple-system, sans-serif" font-weight="700" font-size="31" fill="#1e293b" letter-spacing="-0.5">Englisholic</text>
+        <text x="110" y="74" font-family="-apple-system, sans-serif" font-weight="600" font-size="16" fill="#0f4c81" letter-spacing="0.2">Innovative English</text>
+      </svg>
     </div>
 
     <!-- Teacher Profile -->
