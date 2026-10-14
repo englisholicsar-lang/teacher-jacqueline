@@ -100,7 +100,7 @@
       🎙️ 원활한 통화를 위해 마이크 권한을 허용해 주세요.
     </div>
 
-    <button class="btn-kakao" onclick="startKakaoTrial()">
+    <button class="btn-kakao" onclick="startExperience()">
       💬 카카오 1초 로그인으로 무료 체험
     </button>
 
@@ -126,52 +126,37 @@
       }
     });
 
-    function startKakaoTrial() {
+    function startExperience() {
       const statusDiv = document.getElementById('status');
+      statusDiv.innerText = "🎙️ 통화 연결 중... 마이크를 허용해 주세요.";
 
-      if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
-        alert("인증 모듈을 준비하는 중입니다. 잠시 후 다시 시도해 주세요.");
-        return;
+      // 1. Immediately initialize and start Vapi to satisfy mobile user-gesture requirements
+      if (!vapiInstance && typeof Vapi !== 'undefined') {
+        vapiInstance = new Vapi(vapiApiKey);
       }
 
-      statusDiv.innerText = "통화 연결 중...";
-
-      // 루프 방지를 위해 카카오 로그인 성공/실패 여부와 관계없이 Vapi 통화 실행을 보장
-      let callStarted = false;
-
-      function triggerCall() {
-        if (callStarted) return;
-        callStarted = true;
-
-        if (!vapiInstance && typeof Vapi !== 'undefined') {
-          vapiInstance = new Vapi(vapiApiKey);
-        }
-
-        if (vapiInstance) {
-          statusDiv.innerText = "🎙️ 통화가 연결되었습니다!";
+      if (vapiInstance) {
+        try {
           vapiInstance.start(assistantId);
-        } else {
-          statusDiv.innerText = "통화 모듈 로딩 중... 다시 버튼을 눌러주세요.";
+        } catch (err) {
+          console.error("Vapi start error:", err);
         }
       }
 
-      // 1.5초 후 무조건 통화 시작 (로그인 콜백 지연 대비)
-      const fallbackTimer = setTimeout(triggerCall, 1500);
-
-      try {
-        Kakao.Auth.login({
-          success: function(authObj) {
-            clearTimeout(fallbackTimer);
-            triggerCall();
-          },
-          fail: function(err) {
-            clearTimeout(fallbackTimer);
-            triggerCall();
-          }
-        });
-      } catch (e) {
-        clearTimeout(fallbackTimer);
-        triggerCall();
+      // 2. Trigger Kakao login in the background without blocking the audio stream
+      if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
+        try {
+          Kakao.Auth.login({
+            success: function(authObj) {
+              console.log("Kakao login success");
+            },
+            fail: function(err) {
+              console.log("Kakao login skipped/failed");
+            }
+          });
+        } catch (e) {
+          console.log("Kakao auth error:", e);
+        }
       }
     }
   </script>
