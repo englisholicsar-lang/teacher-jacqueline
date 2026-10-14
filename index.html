@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Englisholic - Teacher Jacqueline</title>
 
-  <!-- KakaoTalk In-App Browser Auto-Redirect -->
+  <!-- 카카오톡 인앱 브라우저 외부 브라우저(크롬/사파리)로 자동 연결 -->
   <script>
     (function () {
       var userAgent = navigator.userAgent.toLowerCase();
@@ -24,13 +24,13 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
   <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=11">
+  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=13">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
 
   <!-- Kakao SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
-  <!-- Vapi Official Floating Widget Loader -->
+  <!-- Vapi 공식 플로팅 위젯 로더 -->
   <script>
     var vapiInstance = null;
     (function (d, t) {
@@ -79,7 +79,7 @@
       position: relative;
     }
 
-    /* Soft Background Waves */
+    /* 상단 배경 웨이브 */
     .bg-wave-top {
       position: absolute;
       top: 0;
@@ -90,6 +90,7 @@
       opacity: 0.85;
       pointer-events: none;
     }
+    /* 하단 배경 웨이브 */
     .bg-wave-bottom {
       position: absolute;
       bottom: 0;
@@ -101,11 +102,11 @@
       pointer-events: none;
     }
 
-    /* Side Dot Matrix Patterns */
+    /* 측면 도트 패턴 */
     .dot-pattern-left {
       position: absolute;
       left: 10px;
-      top: 38%;
+      top: 36%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -117,7 +118,7 @@
     .dot-pattern-right {
       position: absolute;
       right: 10px;
-      top: 26%;
+      top: 25%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -127,37 +128,37 @@
       pointer-events: none;
     }
 
-    /* Main Container - Balanced Distribution */
+    /* 메인 컨테이너 - 두 번째 버전의 균형감 유지 + 하단 여백 확보 */
     .container {
       position: relative;
       z-index: 2;
       width: 100%;
       max-width: 340px;
       height: 100%;
-      max-height: 520px; /* Constrains total layout height to prevent overlap */
+      max-height: 540px; /* 전체 높이를 적절히 제한하여 빈 공간을 없애고 꽉 찬 느낌 유지 */
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between; /* Fills height naturally without leaving big gaps */
-      padding: 10px 18px 20px 18px;
+      justify-content: space-between;
+      padding: 12px 18px 42px 18px; /* 하단 패딩을 주어 폰트가 버튼 영역을 침범하지 않도록 방어 */
     }
 
-    /* Brand Logo */
+    /* 브랜드 로고 */
     .logo-wrapper {
       width: 100%;
       display: flex;
       justify-content: center;
     }
     .brand-logo-img {
-      width: 170px;
-      max-width: 62%;
+      width: 165px;
+      max-width: 60%;
       height: auto;
       object-fit: contain;
       display: block;
     }
 
-    /* Teacher Avatar */
+    /* 아바타 프로필 */
     .avatar-wrapper {
       position: relative;
     }
@@ -173,8 +174,8 @@
       z-index: -1;
     }
     .avatar {
-      width: 115px;
-      height: 115px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       object-fit: cover;
       border: 3.5px solid #ffffff;
@@ -183,7 +184,7 @@
       background-color: #e2e8f0;
     }
 
-    /* Typography */
+    /* 타이틀 그룹 */
     .text-group {
       display: flex;
       flex-direction: column;
@@ -191,7 +192,7 @@
       width: 100%;
     }
     h1 {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: #0b1a3e;
       margin: 0 0 3px 0;
@@ -199,19 +200,19 @@
       white-space: nowrap;
     }
     .subtitle {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 400;
       color: #475569;
       margin: 0;
       white-space: nowrap;
     }
 
-    /* Mic Notice Card */
+    /* 마이크 안내 박스 */
     .mic-notice {
       background-color: #edf4ff;
       border: 1px solid #d0e3ff;
       color: #1e3a8a;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 500;
       padding: 9px 12px;
       border-radius: 12px;
@@ -235,17 +236,17 @@
       text-align: center;
     }
 
-    /* Bottom Instructions Text */
+    /* 하단 안내 문구 - 폰트와 전화 버튼 간격 확보 및 터치 통과 처리 */
     .guide-text {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: #334155;
       line-height: 1.35;
-      margin: 0 0 12px 0; /* Creates explicit buffer above phone button */
+      margin: 0;
       text-align: center;
-      pointer-events: none;
+      pointer-events: none; /* 텍스트 영역이 터치를 가로채지 않고 버튼으로 전달되도록 설정 */
     }
 
-    /* Ensure Vapi widget iframe stays on top */
+    /* Vapi 위젯 항상 최상단 유지 */
     iframe[id*="vapi"], div[class*="vapi"], #vapi-widget-container {
       z-index: 999999 !important;
       pointer-events: auto !important;
@@ -254,40 +255,40 @@
 </head>
 <body>
 
-  <!-- Top Wave Background -->
+  <!-- 상단 웨이브 -->
   <svg class="bg-wave-top" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M150 0C250 80 380 40 500 120V0H150Z" fill="#D2E5FF" fill-opacity="0.75"/>
     <path d="M220 0C320 60 420 30 500 90V0H220Z" fill="#B9D7FF" fill-opacity="0.85"/>
   </svg>
 
-  <!-- Bottom Wave Background -->
+  <!-- 하단 웨이브 -->
   <svg class="bg-wave-bottom" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 180C120 180 220 280 400 240C450 228 480 210 500 200V300H0V180Z" fill="#D2E5FF" fill-opacity="0.75"/>
     <path d="M0 220C100 220 180 290 320 270C380 260 450 230 500 220V300H0V220Z" fill="#A8D0FF" fill-opacity="0.85"/>
   </svg>
 
-  <!-- Side Dot Matrix Patterns -->
+  <!-- 도트 패턴 -->
   <div class="dot-pattern-left"></div>
   <div class="dot-pattern-right"></div>
 
   <div class="container">
-    <!-- Brand Logo -->
+    <!-- 브랜드 로고 -->
     <div class="logo-wrapper">
       <img src="logo.png" alt="Englisholic Logo" class="brand-logo-img">
     </div>
 
-    <!-- Teacher Jacqueline Profile Photo -->
+    <!-- 선생님 프로필 아바타 -->
     <div class="avatar-wrapper">
       <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar" loading="eager" decoding="sync">
     </div>
 
-    <!-- Title & Subtitle -->
+    <!-- 이름 및 소개 -->
     <div class="text-group">
       <h1>Teacher Jacqueline</h1>
       <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
     </div>
 
-    <!-- Mic Notice Box -->
+    <!-- 마이크 권한 안내 박스 -->
     <div class="mic-notice">
       <span class="mic-icon">🎙️</span>
       <div class="mic-notice-text">
@@ -295,7 +296,7 @@
       </div>
     </div>
 
-    <!-- Bottom Guide Text -->
+    <!-- 하단 가이드 문구 -->
     <p class="guide-text">
       우측 하단의 📞 <b>통화 버튼</b>을 눌러<br>
       Jacqueline 선생님과 무료 체험 수업을<br>시작하세요!
