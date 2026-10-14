@@ -47,9 +47,9 @@
             assistant: "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c",
             config: {
               position: "bottom-right",
-              offset: "20px",
-              width: "64px",
-              height: "64px"
+              offset: "16px",
+              width: "60px",
+              height: "60px"
             }
           });
         }
@@ -73,7 +73,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start; /* Aligns content toward top to free bottom area */
+      justify-content: flex-start;
       background: #f4f8ff;
       position: relative;
     }
@@ -104,24 +104,26 @@
     .dot-pattern-left {
       position: absolute;
       left: 10px;
-      top: 40%;
+      top: 36%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
       background-size: 10px 10px;
       z-index: 0;
       opacity: 0.6;
+      pointer-events: none;
     }
     .dot-pattern-right {
       position: absolute;
       right: 10px;
-      top: 28%;
+      top: 24%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
       background-size: 10px 10px;
       z-index: 0;
       opacity: 0.6;
+      pointer-events: none;
     }
 
     .container {
@@ -134,9 +136,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start; /* Compact layout towards top */
-      gap: 14px; /* Even vertical gap between elements */
-      padding: 10px 18px 90px 18px; /* Large bottom padding clearance for floating button */
+      justify-content: flex-start;
+      gap: 8px; /* Compact spacing to lift all middle elements upwards */
+      padding: 6px 18px 110px 18px; /* Large bottom clearance reserved for the floating call button */
+      pointer-events: none; /* Prevents container box from blocking taps to underlying widgets */
+    }
+
+    /* Enable interaction for interactive components */
+    .container * {
+      pointer-events: auto;
     }
 
     /* Brand Logo */
@@ -144,11 +152,11 @@
       width: 100%;
       display: flex;
       justify-content: center;
-      margin-top: 5px;
+      margin-top: 2px;
     }
     .brand-logo-img {
-      width: 175px;
-      max-width: 65%;
+      width: 155px;
+      max-width: 58%;
       height: auto;
       object-fit: contain;
       display: block;
@@ -157,22 +165,22 @@
     /* Teacher Avatar with Soft Halo Glow */
     .avatar-wrapper {
       position: relative;
-      margin-top: 2px;
+      margin-top: 0px;
     }
     .avatar-wrapper::before {
       content: '';
       position: absolute;
-      top: -7px;
-      left: -7px;
-      right: -7px;
-      bottom: -7px;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(186, 219, 254, 0.65) 0%, rgba(219, 234, 254, 0.15) 70%);
       z-index: -1;
     }
     .avatar {
-      width: 115px;
-      height: 115px;
+      width: 105px;
+      height: 105px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #ffffff;
@@ -187,9 +195,10 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
+      margin-top: 2px;
     }
     h1 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: #0b1a3e;
       margin: 0 0 2px 0;
@@ -197,7 +206,7 @@
       white-space: nowrap;
     }
     .subtitle {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 400;
       color: #475569;
       margin: 0;
@@ -209,9 +218,9 @@
       background-color: #edf4ff;
       border: 1px solid #d0e3ff;
       color: #1e3a8a;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 500;
-      padding: 9px 12px;
+      padding: 8px 12px;
       border-radius: 12px;
       width: 100%;
       box-sizing: border-box;
@@ -221,10 +230,11 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
+      margin-top: 4px;
     }
 
     .mic-icon {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       line-height: 1;
       flex-shrink: 0;
     }
@@ -235,11 +245,12 @@
 
     /* Bottom Instructions Text */
     .guide-text {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: #334155;
       line-height: 1.35;
-      margin: 0;
+      margin: 4px 0 0 0;
       text-align: center;
+      pointer-events: none; /* Disables touch hitboxes on instruction text */
     }
   </style>
 </head>
