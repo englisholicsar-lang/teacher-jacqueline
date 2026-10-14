@@ -32,9 +32,9 @@
             assistant: "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c",
             config: {
               position: "bottom-right",
-              offset: "24px",
-              width: "68px",
-              height: "68px"
+              offset: "15px",
+              width: "60px",
+              height: "60px"
             }
           });
         }
@@ -47,17 +47,18 @@
       box-sizing: border-box;
     }
     html, body {
-      height: 100%;
+      height: 100vh;
+      height: 100svh;
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow: hidden; /* Strict lock: zero scrolling */
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       background: #f1f6ff;
       position: relative;
     }
@@ -68,9 +69,9 @@
       top: 0;
       right: 0;
       width: 100%;
-      max-width: 500px;
+      max-width: 450px;
       z-index: 0;
-      opacity: 0.85;
+      opacity: 0.8;
       pointer-events: none;
     }
     .bg-wave-bottom {
@@ -78,63 +79,60 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      max-width: 500px;
+      max-width: 450px;
       z-index: 0;
-      opacity: 0.85;
+      opacity: 0.8;
       pointer-events: none;
     }
 
     /* Side Dot Pattern Overlay */
     .dot-pattern-left {
       position: absolute;
-      left: 14px;
-      top: 42%;
-      width: 42px;
-      height: 90px;
+      left: 10px;
+      top: 40%;
+      width: 35px;
+      height: 70px;
       background-image: radial-gradient(#c2ddff 2.5px, transparent 2.5px);
-      background-size: 11px 11px;
+      background-size: 10px 10px;
       z-index: 0;
-      opacity: 0.65;
+      opacity: 0.6;
     }
     .dot-pattern-right {
       position: absolute;
-      right: 14px;
-      top: 30%;
-      width: 42px;
-      height: 90px;
+      right: 10px;
+      top: 32%;
+      width: 35px;
+      height: 70px;
       background-image: radial-gradient(#c2ddff 2.5px, transparent 2.5px);
-      background-size: 11px 11px;
+      background-size: 10px 10px;
       z-index: 0;
-      opacity: 0.65;
+      opacity: 0.6;
     }
 
     .container {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 380px;
+      max-width: 360px;
       height: 100%;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-evenly;
-      padding: 20px 20px 30px 20px;
+      padding: 8px 14px;
     }
 
-    /* Header Logo */
+    /* Embedded Vector Logo (Guaranteed 100% transparent background) */
     .logo-wrapper {
       width: 100%;
       display: flex;
       justify-content: center;
-      margin-top: 10px;
     }
-    .brand-logo-img {
-      width: 230px;
+    .svg-brand-logo {
+      width: 210px;
       height: auto;
-      object-fit: contain;
       display: block;
-      mix-blend-mode: multiply;
     }
 
     /* Profile Avatar with Halo Ring */
@@ -144,21 +142,21 @@
     .avatar-wrapper::before {
       content: '';
       position: absolute;
-      top: -12px;
-      left: -12px;
-      right: -12px;
-      bottom: -12px;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(186, 219, 254, 0.6) 0%, rgba(219, 234, 254, 0.1) 70%);
       z-index: -1;
     }
     .avatar {
-      width: 165px;
-      height: 165px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       object-fit: cover;
-      border: 4px solid #ffffff;
-      box-shadow: 0 10px 25px rgba(11, 26, 62, 0.08);
+      border: 3px solid #ffffff;
+      box-shadow: 0 8px 20px rgba(11, 26, 62, 0.08);
       display: block;
       background-color: #e2e8f0;
     }
@@ -167,16 +165,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
     }
     h1 {
-      font-size: 2.1rem;
+      font-size: 1.55rem;
       font-weight: 800;
       color: #0b1a3e;
-      margin: 0 0 0.4rem 0;
-      letter-spacing: -0.6px;
+      margin: 0 0 2px 0;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
     }
     .subtitle {
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       font-weight: 500;
       color: #334155;
       margin: 0;
@@ -185,33 +185,28 @@
     /* Mic Access Notice Box */
     .mic-notice {
       background-color: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(6px);
       border: 1px solid #d0e3ff;
       color: #1e3a8a;
-      font-size: 0.98rem;
+      font-size: 0.82rem;
       font-weight: 500;
-      padding: 16px 20px;
-      border-radius: 18px;
+      padding: 10px 14px;
+      border-radius: 12px;
       width: 100%;
       box-sizing: border-box;
-      line-height: 1.45;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+      line-height: 1.35;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-    }
-
-    .mic-icon {
-      font-size: 1.4rem;
+      gap: 8px;
     }
 
     .guide-text {
-      font-size: 1rem;
+      font-size: 0.82rem;
       color: #475569;
-      line-height: 1.55;
+      line-height: 1.4;
       margin: 0;
-      padding-bottom: 10px;
     }
   </style>
 </head>
@@ -234,9 +229,23 @@
   <div class="dot-pattern-right"></div>
 
   <div class="container">
-    <!-- Brand Logo -->
+    <!-- Pure SVG Vector Brand Logo (Zero checkerboard background issues ever) -->
     <div class="logo-wrapper">
-      <img src="logo.png" alt="Englisholic Logo" class="brand-logo-img">
+      <svg class="svg-brand-logo" viewBox="0 0 320 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pillarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0e5399" />
+            <stop offset="100%" stop-color="#0a2a5e" />
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="44" fill="url(#pillarGrad)" />
+        <path d="M 24 38 Q 45 20 70 38 L 70 45 L 24 45 Z" fill="#ffffff" />
+        <rect x="29" y="48" width="8" height="32" rx="2" fill="#ffffff" />
+        <rect x="46" y="48" width="8" height="32" rx="2" fill="#ffffff" />
+        <rect x="63" y="48" width="8" height="32" rx="2" fill="#ffffff" />
+        <text x="108" y="52" font-family="-apple-system, sans-serif" font-weight="700" font-size="31" fill="#1e293b" letter-spacing="-0.5">Englisholic</text>
+        <text x="110" y="74" font-family="-apple-system, sans-serif" font-weight="600" font-size="16" fill="#0f4c81" letter-spacing="0.2">Innovative English</text>
+      </svg>
     </div>
 
     <!-- Teacher Jacqueline Profile Photo -->
@@ -252,14 +261,14 @@
 
     <!-- Mic Authorization Banner -->
     <div class="mic-notice">
-      <span class="mic-icon">🎙️</span>
-      <span>원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
+      <span>🎙️</span>
+      <span>원활한 통화를 위해 마이크 권한을 허용해 주세요.</span>
     </div>
 
     <!-- Call Instructions -->
     <p class="guide-text">
       우측 하단의 📞 <b>통화 버튼</b>을 눌러<br>
-      Jacqueline 선생님과 무료 체험 수업을<br>시작하세요!
+      Jacqueline 선생님과 무료 체험 수업을 시작하세요!
     </p>
   </div>
 
