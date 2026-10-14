@@ -13,19 +13,19 @@
         }
 
         html, body {
-            height: 100%;
             width: 100%;
-            overflow: hidden;
+            min-height: 100vh;
             background-color: #f4f8ff;
             color: #1e293b;
+            overflow-x: hidden;
         }
 
         body {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
             position: relative;
+            padding-bottom: 100px; /* Space for floating button */
         }
 
         /* Top Decorative Wave */
@@ -41,7 +41,7 @@
 
         /* Bottom Decorative Wave */
         .bg-wave-bottom {
-            position: absolute;
+            position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
@@ -62,25 +62,23 @@
         }
 
         .dot-grid-left {
-            top: 42%;
-            left: 10px;
+            top: 380px;
+            left: 15px;
         }
 
         .dot-grid-right {
-            top: 30%;
-            right: 10px;
+            top: 260px;
+            right: 15px;
         }
 
         /* Main Container */
         .container {
             width: 100%;
             max-width: 420px;
-            height: 100%;
-            padding: 20px 20px 30px;
+            padding: 24px 20px 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-around;
             text-align: center;
             position: relative;
             z-index: 2;
@@ -88,7 +86,8 @@
 
         /* Logo Header */
         .logo-container {
-            margin-top: 5px;
+            margin-top: 10px;
+            margin-bottom: 24px;
         }
 
         .logo-img {
@@ -102,6 +101,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-bottom: 20px;
         }
 
         .avatar-img {
@@ -135,6 +135,7 @@
             border: 1px solid #dbeafe;
             border-radius: 14px;
             padding: 14px 12px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -168,12 +169,12 @@
             font-weight: 700;
         }
 
-        /* Floating Call Button */
-        .btn-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* Floating Call Button (Bottom Right) */
+        .floating-btn-container {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 1000;
         }
 
         .vapi-btn {
@@ -239,7 +240,7 @@
         <path fill="#bfdbfe" fill-opacity="0.6" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,224C960,203,1056,149,1152,138.7C1248,128,1344,160,1392,176L1440,192L1440,320L0,320Z"></path>
     </svg>
 
-    <!-- Main Content -->
+    <!-- Main Content Container -->
     <div class="container">
         <!-- Dot Accent Grids -->
         <div class="dot-grid dot-grid-left"></div>
@@ -271,15 +272,15 @@
             Jacqueline 선생님과 무료 체험 수업을<br>
             시작하세요!
         </p>
+    </div>
 
-        <!-- Floating Call Button -->
-        <div class="btn-wrapper">
-            <button id="vapi-call-btn" class="vapi-btn" onclick="startTrialCall()">
-                <svg viewBox="0 0 24 24">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                </svg>
-            </button>
-        </div>
+    <!-- Floating Call Button (Always visible bottom-right) -->
+    <div class="floating-btn-container">
+        <button id="vapi-call-btn" class="vapi-btn" onclick="startTrialCall()">
+            <svg viewBox="0 0 24 24">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+        </button>
     </div>
 
     <!-- Vapi Web SDK Script Tag Configuration -->
@@ -288,7 +289,6 @@
         const publicKey = "YOUR_VAPI_PUBLIC_KEY";    // Replace with your Vapi Public Key
         const assistantId = "YOUR_VAPI_ASSISTANT_ID"; // Replace with your Vapi Assistant ID
 
-        // Initialize Vapi SDK configuration via script attributes
         window.vapiConfig = {
             apiKey: publicKey,
             assistant: assistantId
@@ -349,8 +349,9 @@
                         assistant: assistantId
                     });
                 } else {
-                    // Fallback if window.vapiSDK exists differently
-                    window.location.reload();
+                    alert("Vapi SDK가 로드되지 않았습니다. 인터넷 연결을 확인해주세요.");
+                    btn.disabled = false;
+                    btn.classList.remove("calling");
                     return;
                 }
 
@@ -361,7 +362,6 @@
                         btn.classList.remove("calling");
                     });
                 } else {
-                    // Safety timeout to reset button after call concludes
                     setTimeout(() => {
                         btn.disabled = false;
                         btn.classList.remove("calling");
