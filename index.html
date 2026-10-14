@@ -5,11 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Englisholic - Teacher Jacqueline</title>
 
+  <!-- KakaoTalk In-App Browser Auto-Redirect -->
+  <script>
+    (function () {
+      var userAgent = navigator.userAgent.toLowerCase();
+      if (userAgent.indexOf("kakaotalk") !== -1) {
+        var currentUrl = location.href;
+        if (userAgent.indexOf("android") !== -1) {
+          location.href = "intent://" + currentUrl.replace(/https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+        } else if (userAgent.indexOf("iphone") !== -1 || userAgent.indexOf("ipad") !== -1) {
+          location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(currentUrl);
+        }
+      }
+    })();
+  </script>
+
   <!-- Open Graph Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
   <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=7">
+  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=8">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
 
   <!-- Kakao SDK -->
@@ -32,7 +47,7 @@
             assistant: "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c",
             config: {
               position: "bottom-right",
-              offset: "16px",
+              offset: "18px",
               width: "60px",
               height: "60px"
             }
@@ -47,8 +62,8 @@
       box-sizing: border-box;
     }
     html, body {
-      height: 100%;
-      min-height: 100svh;
+      height: 100vh;
+      height: 100svh;
       margin: 0;
       padding: 0;
       overflow: hidden;
@@ -60,9 +75,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
       position: relative;
-      padding-top: 12px;
     }
 
     /* Soft Background Waves */
@@ -91,7 +105,7 @@
     .dot-pattern-left {
       position: absolute;
       left: 10px;
-      top: 28%;
+      top: 40%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -103,7 +117,7 @@
     .dot-pattern-right {
       position: absolute;
       right: 10px;
-      top: 18%;
+      top: 28%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -113,19 +127,20 @@
       pointer-events: none;
     }
 
-    /* Main Container - Pushed UP away from bottom-right button */
+    /* Outer Container - Proportional Spacing */
     .container {
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 320px;
+      max-width: 340px;
+      height: 100%;
+      max-height: 560px; /* Constrains total height so elements don't drop into button zone */
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding: 0 16px;
-      margin-top: 5px;
+      justify-content: space-between; /* Evenly distributes spacing throughout vertical screen */
+      padding: 12px 18px 24px 18px;
     }
 
     /* Brand Logo */
@@ -133,11 +148,10 @@
       width: 100%;
       display: flex;
       justify-content: center;
-      margin-bottom: 6px;
     }
     .brand-logo-img {
-      width: 140px;
-      max-width: 50%;
+      width: 165px;
+      max-width: 60%;
       height: auto;
       object-fit: contain;
       display: block;
@@ -146,25 +160,24 @@
     /* Teacher Avatar */
     .avatar-wrapper {
       position: relative;
-      margin-bottom: 8px;
     }
     .avatar-wrapper::before {
       content: '';
       position: absolute;
-      top: -5px;
-      left: -5px;
-      right: -5px;
-      bottom: -5px;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(186, 219, 254, 0.65) 0%, rgba(219, 234, 254, 0.15) 70%);
       z-index: -1;
     }
     .avatar {
-      width: 90px;
-      height: 90px;
+      width: 112px;
+      height: 112px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid #ffffff;
+      border: 3.5px solid #ffffff;
       box-shadow: 0 6px 18px rgba(11, 26, 62, 0.08);
       display: block;
       background-color: #e2e8f0;
@@ -176,46 +189,44 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      margin-bottom: 8px;
     }
     h1 {
-      font-size: 1.2rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: #0b1a3e;
-      margin: 0 0 2px 0;
+      margin: 0 0 3px 0;
       letter-spacing: -0.4px;
       white-space: nowrap;
     }
     .subtitle {
-      font-size: 0.74rem;
+      font-size: 0.78rem;
       font-weight: 400;
       color: #475569;
       margin: 0;
       white-space: nowrap;
     }
 
-    /* Mic Notice Box */
+    /* Mic Notice Card */
     .mic-notice {
       background-color: #edf4ff;
       border: 1px solid #d0e3ff;
       color: #1e3a8a;
-      font-size: 0.72rem;
+      font-size: 0.76rem;
       font-weight: 500;
-      padding: 6px 10px;
-      border-radius: 10px;
+      padding: 8px 12px;
+      border-radius: 12px;
       width: 100%;
       box-sizing: border-box;
-      line-height: 1.3;
+      line-height: 1.35;
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
     }
 
     .mic-icon {
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       line-height: 1;
       flex-shrink: 0;
     }
@@ -224,14 +235,13 @@
       text-align: center;
     }
 
-    /* Bottom Instructions Text */
+    /* Bottom Instructions Text - Margin Clearance for Button */
     .guide-text {
-      font-size: 0.72rem;
+      font-size: 0.76rem;
       color: #334155;
-      line-height: 1.3;
-      margin: 0;
+      line-height: 1.35;
+      margin: 0 0 35px 0; /* Padding offset lifts text safely above green call button */
       text-align: center;
-      /* Pass clicks through text area so Chrome never intercepts taps destined for the floating button */
       pointer-events: none;
     }
 
