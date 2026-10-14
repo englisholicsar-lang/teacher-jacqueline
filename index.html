@@ -24,7 +24,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
   <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=8">
+  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=9">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
 
   <!-- Kakao SDK -->
@@ -75,8 +75,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       position: relative;
+      padding-top: 2vh;
     }
 
     /* Soft Background Waves */
@@ -105,7 +106,7 @@
     .dot-pattern-left {
       position: absolute;
       left: 10px;
-      top: 40%;
+      top: 35%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -117,7 +118,7 @@
     .dot-pattern-right {
       position: absolute;
       right: 10px;
-      top: 28%;
+      top: 25%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -127,20 +128,19 @@
       pointer-events: none;
     }
 
-    /* Outer Container - Proportional Spacing */
+    /* Main Container - Balanced Upper/Middle Flow */
     .container {
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 340px;
-      height: 100%;
-      max-height: 560px; /* Constrains total height so elements don't drop into button zone */
+      max-width: 330px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between; /* Evenly distributes spacing throughout vertical screen */
-      padding: 12px 18px 24px 18px;
+      justify-content: flex-start;
+      gap: 16px; /* Proportional gap between sections */
+      padding: 0 18px;
     }
 
     /* Brand Logo */
@@ -150,8 +150,8 @@
       justify-content: center;
     }
     .brand-logo-img {
-      width: 165px;
-      max-width: 60%;
+      width: 160px;
+      max-width: 58%;
       height: auto;
       object-fit: contain;
       display: block;
@@ -173,8 +173,8 @@
       z-index: -1;
     }
     .avatar {
-      width: 112px;
-      height: 112px;
+      width: 108px;
+      height: 108px;
       border-radius: 50%;
       object-fit: cover;
       border: 3.5px solid #ffffff;
@@ -191,7 +191,7 @@
       width: 100%;
     }
     h1 {
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: #0b1a3e;
       margin: 0 0 3px 0;
@@ -213,7 +213,7 @@
       color: #1e3a8a;
       font-size: 0.76rem;
       font-weight: 500;
-      padding: 8px 12px;
+      padding: 9px 12px;
       border-radius: 12px;
       width: 100%;
       box-sizing: border-box;
@@ -235,17 +235,17 @@
       text-align: center;
     }
 
-    /* Bottom Instructions Text - Margin Clearance for Button */
+    /* Bottom Instructions Text - Clean Margin Clearance */
     .guide-text {
       font-size: 0.76rem;
       color: #334155;
       line-height: 1.35;
-      margin: 0 0 35px 0; /* Padding offset lifts text safely above green call button */
+      margin: 0 0 75px 0; /* Creates an exclusive 75px empty safe-zone above the button */
       text-align: center;
-      pointer-events: none;
+      pointer-events: none; /* Prevents text hitbox from intercepting taps */
     }
 
-    /* Vapi widget iframe layer override */
+    /* Ensure Vapi widget iframe stays on top */
     iframe[id*="vapi"], div[class*="vapi"], #vapi-widget-container {
       z-index: 999999 !important;
       pointer-events: auto !important;
