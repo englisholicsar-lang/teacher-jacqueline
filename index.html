@@ -25,7 +25,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            padding-bottom: 100px; /* Space for floating button */
+            padding-bottom: 100px;
         }
 
         /* Top Decorative Wave */
@@ -169,7 +169,7 @@
             font-weight: 700;
         }
 
-        /* Floating Call Button (Bottom Right) */
+        /* Floating Call Button */
         .floating-btn-container {
             position: fixed;
             bottom: 28px;
@@ -192,7 +192,7 @@
         }
 
         .vapi-btn.calling {
-            background-color: #ef4444; /* Red when active/connecting */
+            background-color: #ef4444; /* Red when active */
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
             animation: pulse 1.5s infinite;
         }
@@ -225,7 +225,7 @@
         }
 
         .vapi-btn.calling svg {
-            stroke: #ffffff; /* White icon on red button */
+            stroke: #ffffff;
         }
     </style>
 </head>
@@ -274,7 +274,7 @@
         </p>
     </div>
 
-    <!-- Floating Call Button (Always visible bottom-right) -->
+    <!-- Floating Call Button -->
     <div class="floating-btn-container">
         <button id="vapi-call-btn" class="vapi-btn" onclick="startTrialCall()">
             <svg viewBox="0 0 24 24">
@@ -283,21 +283,23 @@
         </button>
     </div>
 
-    <!-- Vapi Web SDK Script Tag Configuration -->
-    <script>
-        var vapiInstance = null;
-        const publicKey = "YOUR_VAPI_PUBLIC_KEY";    // Replace with your Vapi Public Key
-        const assistantId = "YOUR_VAPI_ASSISTANT_ID"; // Replace with your Vapi Assistant ID
-
-        window.vapiConfig = {
-            apiKey: publicKey,
-            assistant: assistantId
-        };
-    </script>
+    <!-- Vapi Web SDK Script -->
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <script>
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwI7Gu1wnzQIzOQAeqDZRuHK8UgceArMjxwZTg4i9mLRuu8_QTrYCJHmXExsKbY3WRraQ/exec";
+        
+        const VAPI_PUBLIC_KEY = "YOUR_VAPI_PUBLIC_KEY";       // Replace with your Vapi Public Key
+        const VAPI_ASSISTANT_ID = "YOUR_VAPI_ASSISTANT_ID";   // Replace with your Vapi Assistant ID
+
+        let vapi = null;
+
+        // Initialize Vapi SDK when loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.vapiSDK) {
+                vapi = window.vapiSDK;
+            }
+        });
 
         // Device Fingerprinting Helper
         async function getDeviceHash() {
@@ -342,31 +344,22 @@
                     body: JSON.stringify({ deviceHash: deviceHash })
                 });
 
-                // 3. Start Vapi Voice Call using SDK
-                if (window.vapiSDK) {
-                    vapiInstance = window.vapiSDK.run({
-                        apiKey: publicKey,
-                        assistant: assistantId
+                // 3. Start Vapi Call
+                if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                    window.vapiSDK.run({
+                        apiKey: VAPI_PUBLIC_KEY,
+                        assistant: VAPI_ASSISTANT_ID
                     });
                 } else {
-                    alert("Vapi SDK가 로드되지 않았습니다. 인터넷 연결을 확인해주세요.");
-                    btn.disabled = false;
-                    btn.classList.remove("calling");
-                    return;
+                    // Fallback direct URL or reload if needed
+                    throw new Error("Vapi SDK not initialized");
                 }
 
-                // Listen for call ending to reset button state back to green
-                if (vapiInstance && typeof vapiInstance.on === 'function') {
-                    vapiInstance.on('call-end', () => {
-                        btn.disabled = false;
-                        btn.classList.remove("calling");
-                    });
-                } else {
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.classList.remove("calling");
-                    }, 8000);
-                }
+                // Reset button after starting
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.classList.remove("calling");
+                }, 4000);
 
             } catch (err) {
                 console.error("Call launch error:", err);
