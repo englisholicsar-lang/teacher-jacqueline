@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Englishholic - Teacher Jacqueline</title>
+  <title>Englisholic - Teacher Jacqueline</title>
 
   <!-- Open Graph Meta Tags (with Kakao cache buster) -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
   <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=2">
+  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=4">
   <meta property="og:image:width" content="800">
   <meta property="og:image:height" content="800">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
@@ -35,8 +35,8 @@
             config: {
               position: "bottom-right",
               offset: "20px",
-              width: "50px",
-              height: "50px"
+              width: "65px",
+              height: "65px"
             }
           });
         }
@@ -47,7 +47,8 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f4f6f9;
+      /* Light gradient background matching the reference image */
+      background: linear-gradient(180deg, #f0f6ff 0%, #ffffff 50%, #f4f8ff 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -57,59 +58,133 @@
       padding: 20px;
       box-sizing: border-box;
     }
-    .card {
-      background: #ffffff;
-      padding: 2.5rem 2rem;
-      border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-      text-align: center;
-      max-width: 380px;
+    .container {
       width: 100%;
+      max-width: 420px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+    /* Brand Header matching reference image */
+    .brand-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+    .brand-icon-circle {
+      width: 56px;
+      height: 56px;
+      background: radial-gradient(circle, #1e40af 0%, #1e3a8a 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+    }
+    .brand-icon-circle svg {
+      width: 32px;
+      height: 32px;
+      fill: #ffffff;
+    }
+    .brand-text-group {
+      text-align: left;
+    }
+    .brand-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #111827;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+    .brand-subtitle {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4b5563;
+      letter-spacing: 0.2px;
+    }
+    /* Teacher Avatar */
     .avatar {
-      width: 120px;
-      height: 120px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       object-fit: cover;
-      margin-bottom: 1rem;
-      border: 4px solid #EEF2FF;
+      margin-bottom: 1.2rem;
+      border: 5px solid #ffffff;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     }
+    /* Typography */
     h1 {
-      font-size: 1.5rem;
-      margin: 0.5rem 0;
-      color: #1A202C;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #111827;
+      margin: 0 0 0.4rem 0;
+      letter-spacing: -0.5px;
     }
     .subtitle {
-      color: #4A5568;
-      font-size: 0.95rem;
-      margin-bottom: 1.2rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #4b5563;
+      margin-bottom: 2rem;
     }
+    /* Mic Notice Box */
     .mic-notice {
-      background-color: #EDF2F7;
-      color: #4A5568;
-      font-size: 0.85rem;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
+      background: rgba(239, 246, 255, 0.9);
+      border: 1px solid #dbeafe;
+      color: #1e3a8a;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 16px 20px;
+      border-radius: 16px;
+      margin-bottom: 1.8rem;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+    /* Guide Instruction */
     .guide-text {
-      font-size: 0.9rem;
-      color: #4A5568;
-      line-height: 1.5;
+      font-size: 0.95rem;
+      color: #4b5563;
+      line-height: 1.6;
+      font-weight: 400;
+      padding: 0 10px;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar" onerror="this.src='https://via.placeholder.com/120?text=Jacqueline'">
+  <div class="container">
+    <!-- Brand Header -->
+    <div class="brand-header">
+      <div class="brand-icon-circle">
+        <!-- Pillar Icon matching reference logo -->
+        <svg viewBox="0 0 24 24">
+          <path d="M4 3h16v2H4V3zm2 4h12v2H6V7zm1 4h10v2H7v-2zm-1 4h12v2H6v-2zm-2 4h16v2H4v-2z"/>
+        </svg>
+      </div>
+      <div class="brand-text-group">
+        <div class="brand-title">Englisholic</div>
+        <div class="brand-subtitle">Innovative English</div>
+      </div>
+    </div>
+
+    <!-- Teacher Profile -->
+    <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar" onerror="this.src='https://via.placeholder.com/140?text=Jacqueline'">
     <h1>Teacher Jacqueline</h1>
     <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
+    <!-- Mic Permission Notice -->
     <div class="mic-notice">
       🎙️ 원활한 통화를 위해 마이크 권한을 허용해 주세요.
     </div>
 
+    <!-- Instruction Text -->
     <p class="guide-text">
       우측 하단의 📞 <b>통화 버튼</b>을 눌러 Jacqueline 선생님과 무료 체험 수업을 시작하세요!
     </p>
