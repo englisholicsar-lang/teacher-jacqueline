@@ -156,7 +156,7 @@
             text-align: center;
         }
 
-        /* Instruction Text Layout */
+        /* Instruction Text Exact Layout */
         .instruction-text {
             font-size: 14px;
             color: #475569;
@@ -182,7 +182,7 @@
             width: 68px;
             height: 68px;
             border-radius: 50%;
-            background-color: #4ade80;
+            background-color: #4ade80; /* Green */
             border: none;
             cursor: pointer;
             display: flex;
@@ -193,7 +193,7 @@
         }
 
         .vapi-btn.calling {
-            background-color: #ef4444;
+            background-color: #ef4444; /* Red when active */
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
             animation: pulse 1.5s infinite;
         }
@@ -229,7 +229,7 @@
             stroke: #ffffff;
         }
 
-        /* Hide Vapi's default injected button */
+        /* Hide Vapi's default injected widget button fallback */
         #vapi-support-button-container, 
         [id^="vapi-support-button"],
         .vapi-btn-container {
@@ -289,7 +289,7 @@
             </div>
         </div>
 
-        <!-- Instruction Text -->
+        <!-- Instruction Text (Matches Layout) -->
         <p class="instruction-text">
             우측 하단의 📞 <strong>통화 버튼</strong>을 눌러<br>
             Jacqueline 선생님과 무료 체험 수업을<br>
@@ -353,11 +353,14 @@
                 // 2. Log the new trial to Google Sheet using GET action
                 fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`).catch(e => console.log("Log error:", e));
 
-                // 3. Launch Vapi Call immediately using official script SDK
+                // 3. Launch Vapi Call immediately, explicitly disabling Vapi's default UI button
                 if (window.vapiSDK) {
                     window.vapiSDK.run({
                         apiKey: VAPI_PUBLIC_KEY,
-                        assistant: VAPI_ASSISTANT_ID
+                        assistant: VAPI_ASSISTANT_ID,
+                        buttonConfig: {
+                            show: false
+                        }
                     });
                 } else {
                     throw new Error("Vapi SDK not loaded");
