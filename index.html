@@ -170,7 +170,7 @@
             font-weight: 700;
         }
 
-        /* Position Vapi's native widget container to bottom right */
+        /* Position Vapi's native button container perfectly in the bottom right corner */
         #vapi-support-button-container {
             position: fixed !important;
             bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
@@ -239,7 +239,7 @@
         </p>
     </div>
 
-    <!-- Vapi Web SDK Script Tag with built-in button configuration -->
+    <!-- Vapi Web SDK Script Tag with Google Sheets Trial Check Interceptor -->
     <script>
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWzjwt_EEE4z-4HK0xNc_t5mZ8-tQAiYt0zNUYvh04Klgdb4iRXR092LGn7rcWqCA7HQ/exec";
         
@@ -262,14 +262,44 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Intercept Vapi button creation to enforce trial check & logging before call starts
+        // Intercept Vapi SDK initialization to enforce trial limit check before allowing the call
         window.addEventListener('DOMContentLoaded', () => {
-            // Configure Vapi SDK settings globally via window object if supported, 
-            // or let the script render the button with standard config attributes.
+            // Wait for vapiSDK to load and override its run method to include our Sheet check
+            const checkInterval = setInterval(() => {
+                if (window.vapiSDK && window.vapiSDK.run) {
+                    clearInterval(checkInterval);
+                    const originalRun = window.vapiSDK.run;
+                    
+                    window.vapiSDK.run = async function(options) {
+                        try {
+                            const deviceHash = await getDeviceHash();
+
+                            // 1. Check if device hash already exists in Google Sheet
+                            const checkRes = await fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=check`);
+                            const checkResult = await checkRes.json();
+
+                            if (checkResult.exists) {
+                                alert("무료 체험은 1회만 제공됩니다.");
+                                return; // Block the call from starting
+                            }
+
+                            // 2. Log the new trial to Google Sheet
+                            fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`).catch(e => console.log("Log error:", e));
+
+                            // 3. Proceed with original Vapi call launch
+                            return originalRun.apply(this, arguments);
+                        } catch (err) {
+                            console.error("Trial check error:", err);
+                            // Fallback to launching call if check fails
+                            return originalRun.apply(this, arguments);
+                        }
+                    };
+                }
+            }, 100);
         });
     </script>
 
-    <!-- Vapi Web SDK Script Tag configured with data attributes for native button rendering -->
+    <!-- Official Vapi Web SDK script tag that renders the native 형광초록 button -->
     <script 
         src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"
         data-public-key="6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3"
