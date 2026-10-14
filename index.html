@@ -5,26 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Englisholic - Teacher Jacqueline</title>
 
-  <!-- KakaoTalk In-App Browser Auto-Redirect to Safari/Chrome -->
-  <script>
-    (function () {
-      var userAgent = navigator.userAgent.toLowerCase();
-      if (userAgent.indexOf("kakaotalk") !== -1) {
-        var currentUrl = location.href;
-        if (userAgent.indexOf("android") !== -1) {
-          location.href = "intent://" + currentUrl.replace(/https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
-        } else if (userAgent.indexOf("iphone") !== -1 || userAgent.indexOf("ipad") !== -1) {
-          location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(currentUrl);
-        }
-      }
-    })();
-  </script>
-
   <!-- Open Graph Meta Tags -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
   <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=5">
+  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=7">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
 
   <!-- Kakao SDK -->
@@ -62,21 +47,22 @@
       box-sizing: border-box;
     }
     html, body {
-      height: 100vh;
-      height: 100svh;
+      height: 100%;
+      min-height: 100svh;
       margin: 0;
       padding: 0;
       overflow: hidden;
-    }
-    body {
+      background: #f4f8ff;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      background: #f4f8ff;
       position: relative;
-      padding-top: 15px; /* Fixed distance from top header */
+      padding-top: 12px;
     }
 
     /* Soft Background Waves */
@@ -105,7 +91,7 @@
     .dot-pattern-left {
       position: absolute;
       left: 10px;
-      top: 32%;
+      top: 28%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -117,7 +103,7 @@
     .dot-pattern-right {
       position: absolute;
       right: 10px;
-      top: 20%;
+      top: 18%;
       width: 36px;
       height: 70px;
       background-image: radial-gradient(#c2ddff 2.2px, transparent 2.2px);
@@ -127,18 +113,19 @@
       pointer-events: none;
     }
 
+    /* Main Container - Pushed UP away from bottom-right button */
     .container {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       width: 100%;
-      max-width: 340px;
+      max-width: 320px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      gap: 12px; /* Tight, fixed gap between elements */
-      padding: 0 18px;
+      padding: 0 16px;
+      margin-top: 5px;
     }
 
     /* Brand Logo */
@@ -146,19 +133,20 @@
       width: 100%;
       display: flex;
       justify-content: center;
+      margin-bottom: 6px;
     }
     .brand-logo-img {
-      width: 150px;
-      max-width: 55%;
+      width: 140px;
+      max-width: 50%;
       height: auto;
       object-fit: contain;
       display: block;
     }
 
-    /* Teacher Avatar with Soft Halo Glow */
+    /* Teacher Avatar */
     .avatar-wrapper {
       position: relative;
-      margin-top: 2px;
+      margin-bottom: 8px;
     }
     .avatar-wrapper::before {
       content: '';
@@ -172,8 +160,8 @@
       z-index: -1;
     }
     .avatar {
-      width: 100px; /* Reduced avatar size slightly to save vertical space */
-      height: 100px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #ffffff;
@@ -188,9 +176,10 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
+      margin-bottom: 8px;
     }
     h1 {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 800;
       color: #0b1a3e;
       margin: 0 0 2px 0;
@@ -198,34 +187,35 @@
       white-space: nowrap;
     }
     .subtitle {
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 400;
       color: #475569;
       margin: 0;
       white-space: nowrap;
     }
 
-    /* Mic Notice Card */
+    /* Mic Notice Box */
     .mic-notice {
       background-color: #edf4ff;
       border: 1px solid #d0e3ff;
       color: #1e3a8a;
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       font-weight: 500;
-      padding: 8px 12px;
-      border-radius: 12px;
+      padding: 6px 10px;
+      border-radius: 10px;
       width: 100%;
       box-sizing: border-box;
-      line-height: 1.35;
+      line-height: 1.3;
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
 
     .mic-icon {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       line-height: 1;
       flex-shrink: 0;
     }
@@ -236,16 +226,19 @@
 
     /* Bottom Instructions Text */
     .guide-text {
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       color: #334155;
-      line-height: 1.35;
+      line-height: 1.3;
       margin: 0;
       text-align: center;
+      /* Pass clicks through text area so Chrome never intercepts taps destined for the floating button */
+      pointer-events: none;
     }
 
-    /* Ensure Vapi widget iframe always stays on top of all text/HTML layers */
-    iframe[id*="vapi"], div[class*="vapi"] {
-      z-index: 99999 !important;
+    /* Vapi widget iframe layer override */
+    iframe[id*="vapi"], div[class*="vapi"], #vapi-widget-container {
+      z-index: 999999 !important;
+      pointer-events: auto !important;
     }
   </style>
 </head>
