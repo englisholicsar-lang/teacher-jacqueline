@@ -5,15 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Englishholic - Teacher Jacqueline</title>
 
-  <!-- Open Graph Meta Tags -->
+  <!-- Open Graph Meta Tags (with Kakao cache buster) -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
   <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
+  <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png?v=2">
+  <meta property="og:image:width" content="800">
+  <meta property="og:image:height" content="800">
   <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
 
-  <!-- Vapi Official Web SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
+  <!-- Kakao SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+
+  <!-- Vapi Official Floating Widget Loader -->
+  <script>
+    var vapiInstance = null;
+    (function (d, t) {
+      var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+      g.defer = true;
+      g.async = true;
+      s.parentNode.insertBefore(g, s);
+      g.onload = function () {
+        if (window.vapiSDK) {
+          vapiInstance = window.vapiSDK.run({
+            apiKey: "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3",
+            assistant: "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c",
+            config: {
+              position: "bottom-right",
+              offset: "20px",
+              width: "50px",
+              height: "50px"
+            }
+          });
+        }
+      };
+    })(document, "script");
+  </script>
 
   <style>
     body {
@@ -63,26 +92,10 @@
       border-radius: 10px;
       margin-bottom: 1.5rem;
     }
-    .btn-start {
-      background-color: #FEE500;
-      color: #000000;
-      border: none;
-      padding: 15px 20px;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      width: 100%;
-      box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
-      transition: transform 0.1s ease;
-    }
-    .btn-start:active {
-      transform: scale(0.98);
-    }
-    #status {
-      margin-top: 1.2rem;
-      font-size: 0.88rem;
-      color: #718096;
+    .guide-text {
+      font-size: 0.9rem;
+      color: #4A5568;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -97,48 +110,17 @@
       🎙️ 원활한 통화를 위해 마이크 권한을 허용해 주세요.
     </div>
 
-    <button class="btn-start" onclick="startTrialCall()">
-      💬 무료 체험 통화 시작하기
-    </button>
-
-    <div id="status">버튼을 누르면 통화가 시작됩니다.</div>
+    <p class="guide-text">
+      우측 하단의 📞 <b>통화 버튼</b>을 눌러 Jacqueline 선생님과 무료 체험 수업을 시작하세요!
+    </p>
   </div>
 
   <script>
-    const vapiApiKey = '6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3';
-    const assistantId = '7b61af6b-87fe-47cb-a37b-f047f5b6fe8c';
-    let vapiInstance = null;
-
     window.addEventListener('load', function() {
-      try {
-        if (typeof Vapi !== 'undefined') {
-          vapiInstance = new Vapi(vapiApiKey);
-        }
-      } catch (e) {
-        console.error("Vapi init error:", e);
+      if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
+        Kakao.init('adad030abdf866a8b3be558c979ddb03');
       }
     });
-
-    function startTrialCall() {
-      const statusDiv = document.getElementById('status');
-      statusDiv.innerText = "🎙️ 마이크 연결 중...";
-
-      if (!vapiInstance && typeof Vapi !== 'undefined') {
-        vapiInstance = new Vapi(vapiApiKey);
-      }
-
-      if (vapiInstance) {
-        try {
-          vapiInstance.start(assistantId);
-          statusDiv.innerText = "🎙️ 통화가 연결되었습니다! 대화를 시작하세요.";
-        } catch (err) {
-          console.error("Vapi start error:", err);
-          statusDiv.innerText = "통화 연결 실패. 다시 시도해 주세요.";
-        }
-      } else {
-        statusDiv.innerText = "통화 모듈 로딩 중... 잠시 후 다시 시도해 주세요.";
-      }
-    }
   </script>
 
 </body>
