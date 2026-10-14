@@ -226,13 +226,6 @@
         .vapi-btn.calling svg {
             stroke: #ffffff; /* White icon on red button */
         }
-
-        /* Hides Vapi's default popup/widget button */
-        .vapi-btn-container,
-        [class*="vapi-btn"],
-        iframe[src*="vapi"] {
-            display: none !important;
-        }
     </style>
 </head>
 <body>
@@ -289,13 +282,22 @@
         </div>
     </div>
 
-    <!-- Vapi SDK -->
+    <!-- Vapi Web SDK Script Tag Configuration -->
+    <script>
+        var vapiInstance = null;
+        const publicKey = "YOUR_VAPI_PUBLIC_KEY";    // Replace with your Vapi Public Key
+        const assistantId = "YOUR_VAPI_ASSISTANT_ID"; // Replace with your Vapi Assistant ID
+
+        // Initialize Vapi SDK configuration via script attributes
+        window.vapiConfig = {
+            apiKey: publicKey,
+            assistant: assistantId
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <script>
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwI7Gu1wnzQIzOQAeqDZRuHK8UgceArMjxwZTg4i9mLRuu8_QTrYCJHmXExsKbY3WRraQ/exec";
-        
-        let vapiInstance = null;
 
         // Device Fingerprinting Helper
         async function getDeviceHash() {
@@ -340,30 +342,30 @@
                     body: JSON.stringify({ deviceHash: deviceHash })
                 });
 
-                // 3. Start Vapi Voice Call
-                if (!window.vapiSDK) {
-                    alert("Vapi SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.");
-                    btn.disabled = false;
-                    btn.classList.remove("calling");
+                // 3. Start Vapi Voice Call using SDK
+                if (window.vapiSDK) {
+                    vapiInstance = window.vapiSDK.run({
+                        apiKey: publicKey,
+                        assistant: assistantId
+                    });
+                } else {
+                    // Fallback if window.vapiSDK exists differently
+                    window.location.reload();
                     return;
                 }
 
-                vapiInstance = window.vapiSDK.run({
-                    apiKey: "YOUR_VAPI_PUBLIC_KEY",     // Paste your Vapi Public Key
-                    assistant: "YOUR_VAPI_ASSISTANT_ID"  // Paste your Vapi Assistant ID
-                });
-
-                // Listen for call ending to reset button state
+                // Listen for call ending to reset button state back to green
                 if (vapiInstance && typeof vapiInstance.on === 'function') {
                     vapiInstance.on('call-end', () => {
                         btn.disabled = false;
                         btn.classList.remove("calling");
                     });
                 } else {
-                    // Fallback reset timer if SDK event isn't direct
+                    // Safety timeout to reset button after call concludes
                     setTimeout(() => {
                         btn.disabled = false;
-                    }, 5000);
+                        btn.classList.remove("calling");
+                    }, 8000);
                 }
 
             } catch (err) {
