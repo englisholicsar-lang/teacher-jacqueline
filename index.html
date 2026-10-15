@@ -266,7 +266,7 @@
             }
         }
 
-        function handleAuthClick() {
+        async function handleAuthClick() {
             // 1. Check local storage lock
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
@@ -282,34 +282,25 @@
                 authContainer.style.display = "none";
             }
 
-            // Helper function to trigger Vapi call
-            function startCall() {
-                const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
-                if (vapiBtn) {
-                    vapiBtn.click();
-                }
-            }
-
-            // 4. Send log request to Google Apps Script via Image beacon
+            // 4. Send log request synchronously via fetch mode no-cors
             const deviceHash = getDeviceHashSync();
             const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
             
-            const img = new Image();
-            let called = false;
-
-            const proceed = () => {
-                if (!called) {
-                    called = true;
-                    startCall();
+            try {
+                // Send fetch request and await response completion before opening Vapi
+                await fetch(logUrl, { method: 'GET', mode: 'no-cors' });
+            } catch (e) {
+                // Fallback attempt with sendBeacon if fetch fails
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon(logUrl);
                 }
-            };
+            }
 
-            // Wait for image network request completion or 300ms fallback timeout
-            img.onload = proceed;
-            img.onerror = proceed;
-            img.src = logUrl;
-
-            setTimeout(proceed, 300);
+            // 5. Trigger Vapi widget call
+            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+            if (vapiBtn) {
+                vapiBtn.click();
+            }
         }
     </script>
 
