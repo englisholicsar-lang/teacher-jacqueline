@@ -304,35 +304,54 @@
             const container = document.getElementById("iframe-container");
             container.innerHTML = ""; // Clear previous calls
 
+            let resolved = false;
+
+            function proceedToCall() {
+                if (resolved) return;
+                resolved = true;
+                window.removeEventListener("message", handleMessage);
+
+                // Hide shield button and start Vapi Call
+                authBtn.style.display = "none";
+
+                if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+                    window.vapiSDK.run({
+                        apiKey: VAPI_PUBLIC_KEY,
+                        assistant: VAPI_ASSISTANT_ID
+                    });
+                } else {
+                    alert("통화 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+                }
+            }
+
             // Listener for postMessage response from hidden iframe
             function handleMessage(event) {
                 if (event.data && event.data.status) {
-                    window.removeEventListener("message", handleMessage);
-
                     if (event.data.status === "EXISTS") {
+                        if (resolved) return;
+                        resolved = true;
+                        window.removeEventListener("message", handleMessage);
                         alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
                         authBtn.style.display = "flex";
                         authBtn.disabled = false;
                         return;
                     }
-
-                    // Status is SUCCESS -> Start Vapi Call
-                    authBtn.style.display = "none";
-
-                    if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-                        window.vapiSDK.run({
-                            apiKey: VAPI_PUBLIC_KEY,
-                            assistant: VAPI_ASSISTANT_ID
-                        });
-                    } else {
-                        alert("통화 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+                    if (event.data.status === "SUCCESS") {
+                        proceedToCall();
                     }
                 }
             }
 
             window.addEventListener("message", handleMessage);
 
-            // Create sandboxed iframe to perform background check without redirecting top window
+            // Fallback timer: if iframe takes more than 1.5s in Kakao WebView, proceed anyway
+            setTimeout(() => {
+                if (!resolved) {
+                    proceedToCall();
+                }
+            }, 1500);
+
+            // Create sandboxed iframe to perform background check
             const iframe = document.createElement("iframe");
             iframe.style.display = "none";
             iframe.src = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}`;
