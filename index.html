@@ -332,29 +332,16 @@
         }
 
         function startVapiCall() {
-            // If instance doesn't exist yet, try to create it right now on click
-            if (!activeVapiInstance && window.vapiSDK && typeof window.vapiSDK.run === "function") {
-                activeVapiInstance = window.vapiSDK.run({
-                    apiKey: VAPI_PUBLIC_KEY,
-                    assistant: VAPI_ASSISTANT_ID
-                });
-            }
-
-            // If we have a valid instance with .start(), invoke it
-            if (activeVapiInstance && typeof activeVapiInstance.start === "function") {
-                activeVapiInstance.start();
-            } else {
-                // Last-ditch check: if window.vapiSDK became available just now
-                if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+            if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+                if (!activeVapiInstance) {
                     activeVapiInstance = window.vapiSDK.run({
                         apiKey: VAPI_PUBLIC_KEY,
                         assistant: VAPI_ASSISTANT_ID
                     });
-                    if (activeVapiInstance && typeof activeVapiInstance.start === "function") {
-                        activeVapiInstance.start();
-                        return;
-                    }
+                } else if (typeof activeVapiInstance.start === "function") {
+                    activeVapiInstance.start();
                 }
+            } else {
                 alert("통화 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
             }
         }
