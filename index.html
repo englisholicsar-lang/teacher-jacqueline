@@ -281,25 +281,19 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        async function verifyAndInitializeCall() {
+        function verifyAndInitializeCall() {
             // Hide shield button
             document.getElementById("auth-btn").style.display = "none";
 
-            try {
-                // Get device hash
-                const deviceHash = await getDeviceHash();
-                const targetUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&action=log`;
+            // Fire-and-forget background image ping to log data reliably in mobile WebViews
+            getDeviceHash().then(deviceHash => {
+                const img = new Image();
+                img.src = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&action=log&t=${Date.now()}`;
+            }).catch(err => {
+                console.error("Hash generation error:", err);
+            });
 
-                // Reliable fetch log request for mobile WebViews
-                await fetch(targetUrl, {
-                    method: "GET",
-                    mode: "no-cors"
-                });
-            } catch (err) {
-                console.error("Logging failed:", err);
-            }
-
-            // Initialize Vapi widget
+            // Initialize Vapi widget immediately
             if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
                 window.vapiSDK.run({
                     apiKey: VAPI_PUBLIC_KEY,
