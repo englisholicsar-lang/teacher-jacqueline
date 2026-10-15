@@ -239,7 +239,9 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        if (new URLSearchParams(window.location.search).get("reset") === "true") {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get("reset") === "true") {
             localStorage.removeItem("englisholic_trial_used");
         }
 
@@ -265,43 +267,22 @@
             }
         }
 
-        async function handleAuthClick() {
+        function handleAuthClick() {
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
                 return;
             }
 
-            const btn = document.getElementById("auth-btn");
-            if (btn) btn.disabled = true;
-
-            const deviceHash = getDeviceHashSync();
-            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
-
-            // Force logging execution before lock & call trigger
-            try {
-                await fetch(logUrl, { method: 'GET', mode: 'no-cors' });
-            } catch (e) {
-                // Fallback via Image object
-                await new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                    img.src = logUrl;
-                    setTimeout(resolve, 500);
-                });
-            }
-
             localStorage.setItem("englisholic_trial_used", "true");
 
-            const authContainer = document.getElementById("auth-container");
-            if (authContainer) {
-                authContainer.style.display = "none";
-            }
+            const deviceHash = getDeviceHashSync();
+            window.location.href = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}`;
+        }
 
-            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
-            if (vapiBtn) {
-                vapiBtn.click();
-            }
+        // Trigger Vapi on return from logging redirect
+        if (urlParams.get("autostart") === "true") {
+            const authContainer = document.getElementById("auth-container");
+            if (authContainer) authContainer.style.display = "none";
         }
     </script>
 
@@ -313,6 +294,13 @@
                     apiKey: VAPI_PUBLIC_KEY,
                     assistant: VAPI_ASSISTANT_ID
                 });
+
+                if (new URLSearchParams(window.location.search).get("autostart") === "true") {
+                    setTimeout(() => {
+                        const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+                        if (vapiBtn) vapiBtn.click();
+                    }, 500);
+                }
             }
         });
     </script>
