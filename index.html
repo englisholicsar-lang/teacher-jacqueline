@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Englisholic</title>
     
-    <!-- Standard Vapi Web SDK UMD Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.umd.js"></script>
+    <!-- Vapi Official Web SDK Loader -->
+    <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
         * {
@@ -221,11 +221,6 @@
             color: #ffffff;
         }
 
-        .call-btn.active-call {
-            background-color: #ef4444 !important;
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45) !important;
-        }
-
         .call-btn:active {
             transform: scale(0.92);
         }
@@ -312,8 +307,7 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        let vapiInstance = null;
-        let isCallActive = false;
+        let vapiWidget = null;
 
         async function getDeviceHash() {
             const rawIdentifier = [
@@ -361,37 +355,18 @@
         }
 
         function startVapiCall() {
-            const callBtn = document.getElementById("call-btn");
-
-            // Instantiate Vapi object directly from the global constructor
-            if (!vapiInstance && window.Vapi) {
-                vapiInstance = new window.Vapi(VAPI_PUBLIC_KEY);
-
-                vapiInstance.on("call-start", () => {
-                    callBtn.classList.add("active-call");
-                    isCallActive = true;
-                });
-
-                vapiInstance.on("call-end", () => {
-                    callBtn.classList.remove("active-call");
-                    isCallActive = false;
-                });
-
-                vapiInstance.on("error", (e) => {
-                    console.error("Vapi call error:", e);
-                    callBtn.classList.remove("active-call");
-                    isCallActive = false;
-                });
-            }
-
-            if (vapiInstance) {
-                if (!isCallActive) {
-                    vapiInstance.start(VAPI_ASSISTANT_ID);
-                } else {
-                    vapiInstance.stop();
+            // Check for vapiSDK runner or trigger fallback initialization
+            if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+                if (!vapiWidget) {
+                    vapiWidget = window.vapiSDK.run({
+                        apiKey: VAPI_PUBLIC_KEY,
+                        assistant: VAPI_ASSISTANT_ID
+                    });
+                } else if (vapiWidget && typeof vapiWidget.start === "function") {
+                    vapiWidget.start();
                 }
             } else {
-                alert("통화 모듈을 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+                alert("통화 연결 모듈을 불러오는 중입니다. 2~3초 후 다시 눌러주세요.");
             }
         }
     </script>
