@@ -12,9 +12,6 @@
     <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     
-    <!-- Vapi Official HTML Script Tag Loader -->
-    <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
-
     <style>
         * {
             box-sizing: border-box;
@@ -39,16 +36,16 @@
             padding-bottom: 120px;
         }
 
-        /* Clean positioning for Vapi widget */
+        /* Standardize Vapi button position */
         #vapi-support-btn,
         [class*="vapi-btn-container"] {
             position: fixed !important;
             bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
             right: 20px !important;
             left: auto !important;
-            width: auto !important;
-            height: auto !important;
-            z-index: 99999 !important;
+            width: 68px !important;
+            height: 68px !important;
+            z-index: 88888 !important;
         }
 
         .bg-wave-top {
@@ -180,11 +177,12 @@
             text-align: center;
         }
 
+        /* Floating Shield Overlay Button placed directly over Vapi location */
         .floating-btn-container {
             position: fixed;
             bottom: calc(30px + env(safe-area-inset-bottom, 0px));
             right: 20px;
-            z-index: 9999;
+            z-index: 999999;
         }
 
         .auth-btn {
@@ -198,17 +196,12 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 8px 24px rgba(96, 165, 250, 0.45);
-            transition: all 0.3s ease;
+            transition: transform 0.15s ease;
             color: #ffffff;
         }
 
-        .auth-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
         .auth-btn:active {
-            transform: scale(0.92);
+            transform: scale(0.90);
         }
 
         .auth-btn svg {
@@ -257,8 +250,9 @@
         </p>
     </div>
 
-    <div class="floating-btn-container">
-        <button id="auth-btn" class="auth-btn" onclick="verifyAndInitializeCall()">
+    <!-- Shield Overlay Button -->
+    <div class="floating-btn-container" id="auth-container">
+        <button id="auth-btn" class="auth-btn" onclick="handleAuthClick()">
             <svg viewBox="0 0 24 24">
                 <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                 <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
@@ -293,35 +287,55 @@
             }
         }
 
-        function verifyAndInitializeCall() {
-            const authBtn = document.getElementById("auth-btn");
-            const deviceHash = getDeviceHashSync();
+        // On Page Load: Check if trial was already used
+        window.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("englisholic_trial_used") === "true") {
+                // Keep shield visible to block access on future visits
+                console.log("Trial already used on this device.");
+            }
+        });
 
-            // 1. Check local device lock first (Instant block)
+        function handleAuthClick() {
+            // Check trial limit
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
                 return;
             }
 
-            // 2. Mark local storage immediately
+            // Mark local storage lock immediately
             localStorage.setItem("englisholic_trial_used", "true");
 
-            // 3. Send silent background logging ping to Google Sheets (bypasses CORS/iframe blocks)
+            // Silent background log to Google Sheets
+            const deviceHash = getDeviceHashSync();
             const ping = new Image();
             ping.src = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
 
-            // 4. Instantly hide auth button and start Vapi Call
-            authBtn.style.display = "none";
+            // Remove Shield Overlay completely to reveal underlying Vapi button
+            const authContainer = document.getElementById("auth-container");
+            if (authContainer) {
+                authContainer.style.display = "none";
+            }
 
-            if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-                window.vapiSDK.run({
+            // Programmatically trigger Vapi widget if already loaded
+            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+            if (vapiBtn) {
+                vapiBtn.click();
+            }
+        }
+    </script>
+
+    <!-- Load Vapi SDK officially at page body end so it initializes cleanly in Kakao -->
+    <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <script>
+        var vapiInstance = null;
+        window.addEventListener('load', function() {
+            if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                vapiInstance = window.vapiSDK.run({
                     apiKey: VAPI_PUBLIC_KEY,
                     assistant: VAPI_ASSISTANT_ID
                 });
-            } else {
-                alert("통화 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
             }
-        }
+        });
     </script>
 </body>
 </html>
