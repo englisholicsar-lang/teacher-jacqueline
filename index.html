@@ -33,12 +33,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: 30px 20px;
+            justify-content: center; /* Center cleanly vertically */
+            padding: 12px 20px;
             color: var(--primary-navy);
         }
 
-        /* SVG Background Wave Graphics */
+        /* Background SVG Curves */
         .bg-wave-top {
             position: absolute;
             top: 0;
@@ -63,26 +63,26 @@
             opacity: 0.8;
         }
 
-        /* Dot Pattern Accents */
+        /* Background Dot Accent Patterns */
         .dot-pattern-left {
             position: absolute;
-            top: 380px;
-            left: 15px;
-            width: 60px;
-            height: 100px;
+            top: 280px;
+            left: 10px;
+            width: 45px;
+            height: 80px;
             background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 12px 12px;
+            background-size: 10px 10px;
             z-index: 0;
         }
 
         .dot-pattern-right {
             position: absolute;
-            top: 220px;
-            right: 15px;
-            width: 60px;
-            height: 100px;
+            top: 150px;
+            right: 10px;
+            width: 45px;
+            height: 80px;
             background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 12px 12px;
+            background-size: 10px 10px;
             z-index: 0;
         }
 
@@ -97,26 +97,26 @@
             text-align: center;
         }
 
-        /* Logo Styling */
+        /* 1. Prominent Englisholic Logo */
         .logo-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 24px;
+            margin-bottom: 12px;
         }
 
         .logo-img {
-            height: 52px;
+            height: 75px; /* Enlarged logo */
             width: auto;
             object-fit: contain;
         }
 
-        /* Teacher Avatar Profile */
+        /* 2. Compact Teacher Jacqueline Photo */
         .avatar-container {
             position: relative;
-            width: 165px;
-            height: 165px;
-            margin-bottom: 20px;
+            width: 115px; /* Scaled down photo */
+            height: 115px;
+            margin-bottom: 8px;
         }
 
         .avatar-img {
@@ -124,70 +124,72 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #ffffff;
-            box-shadow: 0 10px 25px rgba(12, 42, 74, 0.15), 0 0 0 12px rgba(255, 255, 255, 0.4);
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
         }
 
-        /* Titles */
+        /* 3. Scaled-Down Typography */
         .title {
-            font-size: 30px;
+            font-size: 22px; /* Smaller title */
             font-weight: 800;
             color: #0c2a4a;
-            margin-bottom: 6px;
-            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+            letter-spacing: -0.3px;
         }
 
         .subtitle {
-            font-size: 16px;
+            font-size: 13.5px; /* Smaller subtitle */
             font-weight: 600;
             color: #4a637d;
-            margin-bottom: 22px;
+            margin-bottom: 12px;
         }
 
-        /* Mic Info Box */
+        /* 4. Shorter 2-Line Mic Permission Box */
         .info-box {
             width: 100%;
             background-color: var(--box-bg);
             border: 1px solid var(--box-border);
-            border-radius: 18px;
-            padding: 16px 18px;
+            border-radius: 14px;
+            padding: 10px 14px; /* Shorter vertical padding */
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 12px rgba(12, 42, 74, 0.03);
+            margin-bottom: 14px;
+            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
         }
 
         .info-box-icon {
-            font-size: 26px;
+            font-size: 24px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
         }
 
         .info-box-text {
-            font-size: 15px;
+            font-size: 13.5px;
             font-weight: 700;
             color: #1a3c61;
-            line-height: 1.35;
-            text-align: center;
+            line-height: 1.28;
+            text-align: left; /* Left aligned relative to icon to keep height tight */
         }
 
-        /* Yellow Button */
+        /* 5. Yellow Kakao Button */
         .kakao-btn {
             width: 100%;
             background-color: var(--kakao-yellow);
             color: #000000;
             border: none;
-            padding: 18px 20px;
-            border-radius: 18px;
-            font-size: 18px;
+            padding: 15px 18px;
+            border-radius: 14px;
+            font-size: 16.5px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(254, 229, 0, 0.5);
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             transition: transform 0.1s ease;
         }
 
@@ -196,9 +198,10 @@
         }
 
         .kakao-btn-icon {
-            font-size: 22px;
+            font-size: 19px;
         }
 
+        /* Page 2 Visibility Container */
         #vapi-container {
             display: none;
             width: 100%;
@@ -209,12 +212,12 @@
             background-color: #25d366;
             color: #ffffff;
             border: none;
-            padding: 18px 20px;
-            border-radius: 18px;
-            font-size: 18px;
+            padding: 15px 18px;
+            border-radius: 14px;
+            font-size: 16.5px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
             margin-top: 10px;
         }
     </style>
@@ -235,34 +238,34 @@
     <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
         
-        <!-- Logo Header -->
+        <!-- Large Englisholic Logo -->
         <div class="logo-wrapper">
             <img src="logo.png" alt="Englisholic Logo" class="logo-img">
         </div>
 
-        <!-- Teacher Avatar -->
+        <!-- Compact Jacqueline Photo -->
         <div class="avatar-container">
             <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
         </div>
 
-        <!-- Title Block -->
+        <!-- Scaled Titles -->
         <h1 class="title">Teacher Jacqueline</h1>
         <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
-        <!-- Mic Permission Card -->
+        <!-- Compact 2-Line Mic Permission Box -->
         <div class="info-box">
             <span class="info-box-icon">🎙️</span>
             <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
         </div>
 
-        <!-- Yellow Kakao Start Button -->
+        <!-- Yellow Start Button -->
         <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
             <span class="kakao-btn-icon">💬</span>
             <span id="btn-text-content">무료 체험 통화 시작하기</span>
         </button>
     </div>
 
-    <!-- PAGE 2/3: TRIAL CALL -->
+    <!-- PAGE 2/3: TRIAL CALL (PRESERVED LOGIC) -->
     <div id="vapi-container" class="container">
         <div class="logo-wrapper">
             <img src="logo.png" alt="Englisholic Logo" class="logo-img">
