@@ -238,7 +238,7 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        // Admin Reset Check
+        // Admin reset via ?reset=true
         if (new URLSearchParams(window.location.search).get("reset") === "true") {
             try { localStorage.removeItem("englisholic_trial_used"); } catch(e) {}
         }
@@ -265,38 +265,28 @@
             }
         }
 
-        // Send non-blocking background log
-        function sendLogToBeacon() {
-            const deviceHash = getDeviceHashSync();
-            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
-            
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon(logUrl);
-            } else {
-                fetch(logUrl, { method: 'GET', mode: 'no-cors' }).catch(() => {});
-            }
-        }
-
         function handleAuthClick() {
-            // Check trial restriction
+            // 1. Instant local check (This is what successfully locked it before)
+            if (localStorage.getItem("englisholic_trial_used") === "true") {
+                alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
+                return;
+            }
+
+            // 2. Lock it immediately
+            localStorage.setItem("englisholic_trial_used", "true");
+
+            // 3. Fire-and-forget background log (non-blocking so it never stalls the button)
             try {
-                if (localStorage.getItem("englisholic_trial_used") === "true") {
-                    alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
-                    return;
-                }
-            } catch(e) {}
+                const deviceHash = getDeviceHashSync();
+                const script = document.createElement("script");
+                script.src = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
+                document.body.appendChild(script);
+            } catch (e) {}
 
-            // Save trial state locally
-            try { localStorage.setItem("englisholic_trial_used", "true"); } catch(e) {}
-
-            // Send non-blocking log beacon to Google Sheets
-            sendLogToBeacon();
-
-            // Hide shield button container
+            // 4. Hide shield and launch Vapi call instantly
             const authContainer = document.getElementById("auth-container");
             if (authContainer) authContainer.style.display = "none";
 
-            // Trigger Vapi Widget Call
             const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
             if (vapiBtn) {
                 vapiBtn.click();
