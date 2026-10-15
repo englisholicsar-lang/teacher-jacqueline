@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Jacqueline - 1:1 영어회화</title>
 
-    <!-- KakaoTalk & Social Open Graph Metadata -->
+    <!-- KakaoTalk & Social Open Graph Metadata (Updated with exact repository path) -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
     <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-    <meta property="og:image" content="https://englisholicsar-lang.github.io/jacqueline.png">
-    <meta property="og:url" content="https://englisholicsar-lang.github.io">
+    <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
+    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     
     <!-- Vapi Official Web SDK Loader -->
     <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
@@ -327,6 +327,18 @@
 
         let vapiWidget = null;
 
+        // Pre-initialize Vapi in the background immediately so it's ready when clicked
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+                    vapiWidget = window.vapiSDK.run({
+                        apiKey: VAPI_PUBLIC_KEY,
+                        assistant: VAPI_ASSISTANT_ID
+                    });
+                }
+            }, 1000);
+        });
+
         async function getDeviceHash() {
             const rawIdentifier = [
                 navigator.userAgent,
@@ -373,15 +385,13 @@
         }
 
         function startVapiCall() {
-            if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-                if (!vapiWidget) {
-                    vapiWidget = window.vapiSDK.run({
-                        apiKey: VAPI_PUBLIC_KEY,
-                        assistant: VAPI_ASSISTANT_ID
-                    });
-                } else if (vapiWidget && typeof vapiWidget.start === "function") {
-                    vapiWidget.start();
-                }
+            if (vapiWidget && typeof vapiWidget.start === "function") {
+                vapiWidget.start();
+            } else if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+                vapiWidget = window.vapiSDK.run({
+                    apiKey: VAPI_PUBLIC_KEY,
+                    assistant: VAPI_ASSISTANT_ID
+                });
             } else {
                 alert("통화 연결 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
             }
