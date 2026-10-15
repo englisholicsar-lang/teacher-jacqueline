@@ -4,117 +4,252 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Jacqueline - Free Trial</title>
+    
+    <!-- Vapi Web SDK -->
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+
     <style>
         :root {
-            --primary-color: #4A90E2;
-            --kakao-yellow: #FEE500;
-            --vapi-green: #25D366;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --bg-color-top: #e8f3fe;
+            --bg-color-bottom: #f2f7fd;
+            --primary-navy: #0d2847;
+            --sub-navy: #1f3a58;
+            --text-muted: #556b82;
+            --box-bg: #eaf3ff;
+            --box-border: #d2e4f9;
+            --kakao-yellow: #fee500;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            background: var(--bg-gradient);
+            background: linear-gradient(180deg, var(--bg-color-top) 0%, var(--bg-color-bottom) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 24px 20px;
+            color: var(--primary-navy);
         }
 
-        .card {
-            background: #ffffff;
-            padding: 32px 24px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            max-width: 380px;
-            width: 100%;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
+            padding-top: 10px;
         }
 
-        .avatar {
-            width: 80px;
-            height: 80px;
+        /* Englisholic Logo Header */
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: radial-gradient(circle at center, #0066b2 0%, #0d2847 100%);
             border-radius: 50%;
-            background-color: #e0e0e0;
-            margin: 0 auto 16px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: bold;
         }
 
-        h2 {
-            margin: 0 0 10px 0;
-            font-size: 22px;
-            color: #2c3e50;
+        .logo-text {
+            text-align: left;
         }
 
-        p {
-            font-size: 15px;
-            color: #666666;
-            line-height: 1.5;
-            margin: 0 0 24px 0;
+        .logo-text-main {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0d2847;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
         }
 
-        .btn {
-            border: none;
-            padding: 16px 20px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
+        .logo-text-sub {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f3a58;
+            letter-spacing: 0.2px;
+        }
+
+        /* Teacher Profile Avatar */
+        .avatar-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-img {
             width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ffffff;
+            box-shadow: 0 8px 20px rgba(13, 40, 71, 0.12);
+        }
+
+        /* Titles */
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0d2847;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a637d;
+            margin-bottom: 24px;
+        }
+
+        /* Permission Notice Box */
+        .info-box {
+            width: 100%;
+            background-color: var(--box-bg);
+            border: 1px solid var(--box-border);
+            border-radius: 16px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .info-box-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .info-box-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2b4865;
+            line-height: 1.35;
+            text-align: center;
+        }
+
+        /* Kakao Action Button */
+        .kakao-btn {
+            width: 100%;
+            background-color: var(--kakao-yellow);
+            color: #000000;
+            border: none;
+            padding: 18px 24px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(254, 229, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             transition: transform 0.1s ease, box-shadow 0.2s ease;
         }
 
-        .btn:active {
+        .kakao-btn:active {
             transform: scale(0.98);
         }
 
-        .kakao-btn {
-            background-color: var(--kakao-yellow);
-            color: #000000;
-            box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
+        .kakao-btn-icon {
+            font-size: 20px;
+        }
+
+        /* Section Visibility Switches */
+        #vapi-container {
+            display: none;
+            width: 100%;
         }
 
         .call-btn {
-            background-color: var(--vapi-green);
+            width: 100%;
+            background-color: #25d366;
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-        }
-
-        #vapi-container {
-            display: none;
+            border: none;
+            padding: 18px 24px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.4);
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Kakao Auth Gate Card -->
-    <div id="auth-container" class="card">
-        <div class="avatar">👩‍🏫</div>
-        <h2>Teacher Jacqueline 1회 무료 체험</h2>
-        <p id="status-text">무료 체험 진행을 위해 카카오 계정으로 본인 인증을 진행해 주세요.</p>
-        <button id="login-btn" class="btn kakao-btn" onclick="startKakaoAuth()">
-            <span>💬</span> 카카오로 1초 만에 시작하기
+    <!-- PAGE 1: KAKAO GATE SECTION -->
+    <div id="auth-container" class="container">
+        <!-- Logo Header -->
+        <div class="logo-wrapper">
+            <div class="logo-icon">🏛️</div>
+            <div class="logo-text">
+                <div class="logo-text-main">Englisholic</div>
+                <div class="logo-text-sub">Innovative English</div>
+            </div>
+        </div>
+
+        <!-- Teacher Avatar -->
+        <div class="avatar-container">
+            <img class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Teacher Jacqueline">
+        </div>
+
+        <!-- Titles -->
+        <h1 class="title">Teacher Jacqueline</h1>
+        <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+
+        <!-- Mic Permission Box -->
+        <div class="info-box">
+            <span class="info-box-icon">🎙️</span>
+            <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
+        </div>
+
+        <!-- Yellow Start Button -->
+        <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
+            <span class="kakao-btn-icon">💬</span>
+            <span id="btn-text-content">무료 체험 통화 시작하기</span>
         </button>
     </div>
 
-    <!-- Active Trial Card -->
-    <div id="vapi-container" class="card">
-        <div class="avatar">🎙️</div>
-        <h2>Teacher Jacqueline과의 영어 대화</h2>
-        <p id="call-status">아래 버튼을 눌러 통화를 시작하세요!</p>
-        <button id="start-call-btn" class="btn call-btn" onclick="startVapiCall()">
+    <!-- PAGE 2 / 3: TRIAL SECTION (PRESERVED) -->
+    <div id="vapi-container" class="container">
+        <div class="logo-wrapper">
+            <div class="logo-icon">🏛️</div>
+            <div class="logo-text">
+                <div class="logo-text-main">Englisholic</div>
+                <div class="logo-text-sub">Innovative English</div>
+            </div>
+        </div>
+
+        <div class="avatar-container">
+            <img class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Teacher Jacqueline">
+        </div>
+
+        <h1 class="title">Teacher Jacqueline</h1>
+        <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
+
+        <button id="start-call-btn" class="call-btn" onclick="startVapiCall()">
             📞 통화 시작하기
         </button>
     </div>
@@ -141,8 +276,7 @@
             const authCode = urlParams.get('code');
 
             if (authCode) {
-                document.getElementById("status-text").innerText = "인증 정보를 확인 중입니다...";
-                document.getElementById("login-btn").style.display = "none";
+                document.getElementById("btn-text-content").innerText = "인증 확인 중...";
                 
                 var userId = "kakao_code_" + authCode.substring(0, 15);
                 
@@ -151,10 +285,10 @@
                     .then(data => {
                         if (data.status === "ALREADY_USED") {
                             alert("이미 무료 체험을 사용하셨습니다.");
-                            document.getElementById("status-text").innerText = "무료 체험이 종료되었습니다.";
+                            document.getElementById("btn-text-content").innerText = "무료 체험 종료됨";
                         } else {
                             document.getElementById("auth-container").style.display = "none";
-                            document.getElementById("vapi-container").style.display = "block";
+                            document.getElementById("vapi-container").style.display = "flex";
                         }
                     })
                     .catch(err => {
