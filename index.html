@@ -2,306 +2,126 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Teacher Jacqueline - 1:1 영어회화</title>
-
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
-    <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
-    <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
-    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Jacqueline - Free Trial</title>
     
+    <!-- Kakao SDK -->
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        html, body {
-            width: 100%;
-            min-height: 100vh;
-            background-color: #f4f8ff;
-            color: #1e293b;
-            overflow-x: hidden;
-        }
-
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            position: relative;
-            padding-bottom: 120px;
-        }
-
-        #vapi-support-btn,
-        [class*="vapi-btn-container"],
-        [class*="vapi-btn"] {
-            position: fixed !important;
-            bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
-            right: 20px !important;
-            left: auto !important;
-            width: 68px !important;
-            height: 68px !important;
-            border-radius: 50% !important;
-            overflow: hidden !important;
-            z-index: 88888 !important;
-        }
-
-        .bg-wave-top {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .bg-wave-bottom {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 140px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 420px;
-            padding: 20px 20px 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .logo-container {
-            margin-top: 10px;
-            margin-bottom: 24px;
-        }
-
-        .logo-img {
-            max-width: 210px;
-            height: auto;
-            display: block;
-        }
-
-        .profile-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .avatar-img {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #ffffff;
-            box-shadow: 0 8px 24px rgba(148, 163, 184, 0.25);
-            margin-bottom: 14px;
-        }
-
-        .teacher-name {
-            font-size: 26px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 6px;
-            letter-spacing: -0.5px;
-        }
-
-        .teacher-subtitle {
-            font-size: 14px;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .mic-notice-card {
-            width: 100%;
-            background: #eef5ff;
-            border: 1px solid #dbeafe;
-            border-radius: 16px;
-            padding: 14px 12px;
-            margin-bottom: 20px;
-            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(219, 234, 254, 0.5);
+            min-height: 100vh;
+            background-color: #f9f9f9;
         }
 
-        .mic-text {
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #1e40af;
-            line-height: 1.4;
+        .auth-card {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
+            max-width: 360px;
+            width: 100%;
         }
 
-        .instruction-text {
-            font-size: 14px;
-            color: #475569;
-            line-height: 1.6;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        .floating-btn-container {
-            position: fixed;
-            bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-            right: 20px;
-            width: 68px;
-            height: 68px;
-            z-index: 999999;
-        }
-
-        .auth-btn {
-            width: 68px;
-            height: 68px;
-            border-radius: 50%;
-            background-color: #60a5fa;
+        .kakao-btn {
+            background-color: #FEE500;
+            color: #000000;
             border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 24px rgba(96, 165, 250, 0.45);
-            transition: transform 0.15s ease;
-            color: #ffffff;
+            gap: 8px;
         }
 
-        .auth-btn:active {
-            transform: scale(0.90);
-        }
-
-        .auth-btn svg {
-            width: 32px;
-            height: 32px;
-            fill: none;
-            stroke: #ffffff;
-            stroke-width: 2;
+        .kakao-btn:hover {
+            background-color: #fada0A;
         }
     </style>
 </head>
 <body>
 
-    <svg class="bg-wave-top" viewBox="0 0 1440 320" preserveAspectRatio="none">
-        <path fill="#dbeafe" fill-opacity="0.7" d="M0,192L60,181.3C120,171,240,150,360,154.7C480,160,600,192,720,192C840,192,960,160,1080,149.3C1200,139,1320,150,1380,154.7L1440,160L1440,0L0,0Z"></path>
-    </svg>
-
-    <svg class="bg-wave-bottom" viewBox="0 0 1440 320" preserveAspectRatio="none">
-        <path fill="#bfdbfe" fill-opacity="0.6" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,224C960,203,1056,149,1152,138.7C1248,128,1344,160,1392,176L1440,192L1440,320L0,320Z"></path>
-    </svg>
-
-    <div class="container">
-        <div class="logo-container">
-            <img src="logo.png" alt="Englisholic Innovative English" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/210x50?text=Englisholic';">
-        </div>
-
-        <div class="profile-card">
-            <img src="jacqueline.png" alt="Teacher Jacqueline" class="avatar-img">
-            <h1 class="teacher-name">Teacher Jacqueline</h1>
-            <p class="teacher-subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
-        </div>
-
-        <div class="mic-notice-card">
-            <span class="mic-icon">🎙️</span>
-            <div class="mic-text">
-                원활한 통화를 위해 마이크 권한을<br>허용해 주세요.
-            </div>
-        </div>
-
-        <p class="instruction-text">
-            <span style="color:#60a5fa; font-weight:bold;">🛡️ 인증</span> 버튼을 누르면 통화 버튼이 생성됩니다.<br>
-            Jacqueline 선생님과 바로 대화해보세요!
-        </p>
-    </div>
-
-    <div class="floating-btn-container" id="auth-container">
-        <button id="auth-btn" class="auth-btn" onclick="handleAuthClick()">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
+    <div id="auth-container" class="auth-card">
+        <h2>Teacher Jacqueline 1회 무료 체험</h2>
+        <p>무료 체험 진행을 위해 카카오 계정으로 본인 인증을 진행해 주세요.</p>
+        <button class="kakao-btn" onclick="handleAuthClick()">
+            카카오로 1초 만에 시작하기
         </button>
     </div>
 
     <script>
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjhHqPyqzV5JKJRoO-xlhu3jb_VCqnKAZ8-ukixS6p0t6Hf6iu52A/exec";
-        const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
-        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+        // Your Google Apps Script Web App URL
+        const GAS_WEB_APP_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
 
-        // Force clear for testing (Remove this line once testing is complete)
-        try { localStorage.removeItem("englisholic_trial_used"); } catch(e) {}
-
-        function getDeviceHashSync() {
-            try {
-                const str = [
-                    navigator.userAgent,
-                    screen.width + "x" + screen.height,
-                    screen.colorDepth,
-                    new Date().getTimezoneOffset(),
-                    navigator.language
-                ].join("|");
-
-                let hash = 0;
-                for (let i = 0; i < str.length; i++) {
-                    const char = str.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash |= 0;
-                }
-                return "dev_" + Math.abs(hash).toString(16);
-            } catch (e) {
-                return "kakao_fallback_" + Date.now();
-            }
-        }
+        // Initialize Kakao SDK with your registered Main Web Key
+        Kakao.init('4800b51cb8a7d1862dc4b2725633ea69');
 
         function handleAuthClick() {
-            // 1. Instant local check
-            if (localStorage.getItem("englisholic_trial_used") === "true") {
-                alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
+            if (!Kakao.isInitialized()) {
+                alert("카카오 SDK 로드에 실패했습니다. 페이지를 새로고침해 주세요.");
                 return;
             }
 
-            // 2. Lock it immediately
-            localStorage.setItem("englisholic_trial_used", "true");
-
-            // 3. Fire-and-forget background log
-            try {
-                const deviceHash = getDeviceHashSync();
-                const script = document.createElement("script");
-                script.src = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
-                document.body.appendChild(script);
-            } catch (e) {}
-
-            // 4. Hide shield and launch Vapi call instantly
-            const authContainer = document.getElementById("auth-container");
-            if (authContainer) authContainer.style.display = "none";
-
-            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
-            if (vapiBtn) {
-                vapiBtn.click();
-            }
+            // 1. Trigger Kakao Login Popup
+            Kakao.Auth.login({
+                success: function(authObj) {
+                    // 2. Fetch Kakao User Profile / Unique ID
+                    Kakao.API.request({
+                        url: '/v2/user/me',
+                        success: function(res) {
+                            const kakaoUserId = "kakao_" + res.id;
+                            checkAndRegisterTrial(kakaoUserId);
+                        },
+                        fail: function(error) {
+                            alert("사용자 정보를 가져오지 못했습니다.");
+                        }
+                    });
+                },
+                fail: function(err) {
+                    alert("카카오 로그인이 취소되었거나 실패했습니다.");
+                }
+            });
         }
-    </script>
 
-    <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
-    <script>
-        window.addEventListener('load', function() {
-            if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
-                window.vapiSDK.run({
-                    apiKey: VAPI_PUBLIC_KEY,
-                    assistant: VAPI_ASSISTANT_ID
+        function checkAndRegisterTrial(userId) {
+            // 3. Query Google Sheets Backend with Kakao User ID
+            fetch(`${GAS_WEB_APP_URL}?userId=${encodeURIComponent(userId)}&t=${Date.now()}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "ALREADY_USED") {
+                        alert("이미 무료 체험을 사용하셨습니다. (1인 1회 제한)");
+                    } else if (data.status === "SUCCESS") {
+                        // Unlocks trial session
+                        const authContainer = document.getElementById("auth-container");
+                        if (authContainer) authContainer.style.display = "none";
+
+                        // Launch Vapi Call
+                        const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+                        if (vapiBtn) {
+                            vapiBtn.click();
+                        } else {
+                            alert("인증 완료! Vapi 통화가 시작됩니다.");
+                        }
+                    }
+                })
+                .catch(err => {
+                    alert("인증 서버 통신 중 오류가 발생했습니다.");
                 });
-            }
-        });
+        }
     </script>
 </body>
 </html>
