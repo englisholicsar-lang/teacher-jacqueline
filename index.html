@@ -276,25 +276,40 @@
             // 2. Set local trial flag
             localStorage.setItem("englisholic_trial_used", "true");
 
-            // 3. Unblockable GET parameter logging to Google Sheets
-            const deviceHash = getDeviceHashSync();
-            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
-            
-            // Image beacon guarantee: Works across all WebViews and browsers
-            const img = new Image();
-            img.src = logUrl;
-
-            // 4. Hide shield overlay
+            // 3. Hide shield overlay immediately
             const authContainer = document.getElementById("auth-container");
             if (authContainer) {
                 authContainer.style.display = "none";
             }
 
-            // 5. Trigger Vapi widget
-            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
-            if (vapiBtn) {
-                vapiBtn.click();
+            // Helper function to trigger Vapi call
+            function startCall() {
+                const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+                if (vapiBtn) {
+                    vapiBtn.click();
+                }
             }
+
+            // 4. Send log request to Google Apps Script via Image beacon
+            const deviceHash = getDeviceHashSync();
+            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
+            
+            const img = new Image();
+            let called = false;
+
+            const proceed = () => {
+                if (!called) {
+                    called = true;
+                    startCall();
+                }
+            };
+
+            // Wait for image network request completion or 300ms fallback timeout
+            img.onload = proceed;
+            img.onerror = proceed;
+            img.src = logUrl;
+
+            setTimeout(proceed, 300);
         }
     </script>
 
