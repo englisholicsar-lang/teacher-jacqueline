@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Englisholic</title>
     
-    <!-- Vapi Core Web SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
+    <!-- Vapi Official HTML Web SDK Tag -->
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
         * {
@@ -234,6 +234,11 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+
+        /* Hide Vapi default injected button to keep UI clean */
+        .vapi-btn, #vapi-support-btn {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -291,7 +296,7 @@
         <button id="auth-btn" class="auth-btn" onclick="verifyAndShowPhone()">
             <svg viewBox="0 0 24 24">
                 <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
             </svg>
         </button>
 
