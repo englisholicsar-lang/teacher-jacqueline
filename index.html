@@ -25,7 +25,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            padding-bottom: 140px; /* Extra padding so text never overlaps floating button */
+            padding-bottom: 140px;
         }
 
         /* Top Decorative Wave */
@@ -156,7 +156,7 @@
             text-align: center;
         }
 
-        /* Instruction Text (Clean line breaks to avoid button touch) */
+        /* Instruction Text */
         .instruction-text {
             font-size: 13.5px;
             color: #475569;
@@ -171,7 +171,7 @@
             font-weight: 700;
         }
 
-        /* Floating Button Container */
+        /* Floating Shield Button Container */
         .floating-btn-container {
             position: fixed;
             bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -213,10 +213,19 @@
             cursor: not-allowed;
         }
 
-        /* Hide Vapi call widget initially */
-        #vapi-support-button-container, 
-        div[id*="vapi"] {
-            display: none !important;
+        /* Hide Vapi Widget initially using visibility & opacity (NO !important display rule) */
+        #vapi-support-button-container {
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        /* Class added after verification to bring Vapi button into view */
+        #vapi-support-button-container.vapi-visible {
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
     </style>
 </head>
@@ -268,7 +277,7 @@
             </div>
         </div>
 
-        <!-- Instruction Text (Formatted to prevent text-touching issue) -->
+        <!-- Instruction Text -->
         <p class="instruction-text">
             <span style="color:#60a5fa; font-weight:bold;">🛡️ 인증</span> 후 생성되는 📞 <strong>통화 버튼</strong>을 눌러<br>
             Jacqueline 선생님과<br>바로 대화해보세요!
@@ -323,11 +332,17 @@
                 // 2. Log trial
                 fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`).catch(e => console.log("Log error:", e));
 
-                // 3. Hide shield button
+                // 3. Hide light blue shield button
                 document.getElementById("auth-container").style.display = "none";
 
-                // 4. Reveal Vapi Widget using broad selector search
-                revealVapiWidget();
+                // 4. Reveal Vapi Call Widget
+                const vapiContainer = document.getElementById("vapi-support-button-container");
+                if (vapiContainer) {
+                    vapiContainer.classList.add("vapi-visible");
+                } else {
+                    // Fallback search if ID slightly differs
+                    document.querySelectorAll('[id*="vapi"]').forEach(el => el.classList.add("vapi-visible"));
+                }
 
                 alert("인증되었습니다! 생성된 통화 버튼을 눌러주세요.");
 
@@ -336,16 +351,6 @@
                 alert("인증 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
                 authBtn.disabled = false;
             }
-        }
-
-        function revealVapiWidget() {
-            // Locate all possible Vapi elements injected by SDK
-            const vapiTargets = document.querySelectorAll('#vapi-support-button-container, [class*="vapi"], [id*="vapi"]');
-            vapiTargets.forEach(el => {
-                el.style.setProperty("display", "block", "important");
-                el.style.setProperty("visibility", "visible", "important");
-                el.style.setProperty("opacity", "1", "important");
-            });
         }
     </script>
 
