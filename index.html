@@ -239,9 +239,7 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        const urlParams = new URLSearchParams(window.location.search);
-
-        if (urlParams.get("reset") === "true") {
+        if (new URLSearchParams(window.location.search).get("reset") === "true") {
             localStorage.removeItem("englisholic_trial_used");
         }
 
@@ -267,22 +265,52 @@
             }
         }
 
+        let isLogging = false;
+
+        function startVapiCall() {
+            const authContainer = document.getElementById("auth-container");
+            if (authContainer) authContainer.style.display = "none";
+
+            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+            if (vapiBtn) vapiBtn.click();
+        }
+
+        // Global JSONP Callback
+        window.onLogSuccess = function(response) {
+            isLogging = false;
+            startVapiCall();
+        };
+
         function handleAuthClick() {
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
                 return;
             }
 
+            if (isLogging) return;
+            isLogging = true;
+
             localStorage.setItem("englisholic_trial_used", "true");
 
+            // Create JSONP script tag to bypass CORS in KakaoTalk WebView
             const deviceHash = getDeviceHashSync();
-            window.location.href = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}`;
-        }
+            const script = document.createElement("script");
+            script.src = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&callback=onLogSuccess&t=${Date.now()}`;
+            
+            // Fallback timeout in case of network lag
+            script.onerror = function() {
+                isLogging = false;
+                startVapiCall();
+            };
 
-        // Trigger Vapi on return from logging redirect
-        if (urlParams.get("autostart") === "true") {
-            const authContainer = document.getElementById("auth-container");
-            if (authContainer) authContainer.style.display = "none";
+            document.body.appendChild(script);
+
+            setTimeout(() => {
+                if (isLogging) {
+                    isLogging = false;
+                    startVapiCall();
+                }
+            }, 1000);
         }
     </script>
 
@@ -294,13 +322,6 @@
                     apiKey: VAPI_PUBLIC_KEY,
                     assistant: VAPI_ASSISTANT_ID
                 });
-
-                if (new URLSearchParams(window.location.search).get("autostart") === "true") {
-                    setTimeout(() => {
-                        const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
-                        if (vapiBtn) vapiBtn.click();
-                    }, 500);
-                }
             }
         });
     </script>
