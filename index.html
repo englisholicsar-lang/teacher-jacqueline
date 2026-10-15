@@ -33,12 +33,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Center cleanly vertically */
-            padding: 12px 20px;
+            justify-content: flex-start;
+            padding: 12px 20px 24px 20px;
             color: var(--primary-navy);
         }
 
-        /* Background SVG Curves */
+        /* SVG Background Wave Graphics */
         .bg-wave-top {
             position: absolute;
             top: 0;
@@ -63,10 +63,10 @@
             opacity: 0.8;
         }
 
-        /* Background Dot Accent Patterns */
+        /* Background Accent Dots */
         .dot-pattern-left {
             position: absolute;
-            top: 280px;
+            top: 220px;
             left: 10px;
             width: 45px;
             height: 80px;
@@ -77,7 +77,7 @@
 
         .dot-pattern-right {
             position: absolute;
-            top: 150px;
+            top: 90px;
             right: 10px;
             width: 45px;
             height: 80px;
@@ -97,24 +97,25 @@
             text-align: center;
         }
 
-        /* 1. Prominent Englisholic Logo */
+        /* 1. Englisholic Logo Header */
         .logo-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
+            margin-top: 4px;
+            margin-bottom: 10px;
         }
 
         .logo-img {
-            height: 75px; /* Enlarged logo */
+            height: 75px;
             width: auto;
             object-fit: contain;
         }
 
-        /* 2. Compact Teacher Jacqueline Photo */
+        /* 2. Jacqueline Photo */
         .avatar-container {
             position: relative;
-            width: 115px; /* Scaled down photo */
+            width: 115px;
             height: 115px;
             margin-bottom: 8px;
         }
@@ -128,9 +129,9 @@
             box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
         }
 
-        /* 3. Scaled-Down Typography */
+        /* 3. Titles with Extra Bottom Margin to Push Upper Group Up */
         .title {
-            font-size: 22px; /* Smaller title */
+            font-size: 22px;
             font-weight: 800;
             color: #0c2a4a;
             margin-bottom: 2px;
@@ -138,19 +139,19 @@
         }
 
         .subtitle {
-            font-size: 13.5px; /* Smaller subtitle */
+            font-size: 13.5px;
             font-weight: 600;
             color: #4a637d;
-            margin-bottom: 12px;
+            margin-bottom: 36px; /* Increased margin creates separation from boxes */
         }
 
-        /* 4. Shorter 2-Line Mic Permission Box */
+        /* 4. Mic Permission Box (Stays in lower position) */
         .info-box {
             width: 100%;
             background-color: var(--box-bg);
             border: 1px solid var(--box-border);
             border-radius: 14px;
-            padding: 10px 14px; /* Shorter vertical padding */
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -171,7 +172,7 @@
             font-weight: 700;
             color: #1a3c61;
             line-height: 1.28;
-            text-align: left; /* Left aligned relative to icon to keep height tight */
+            text-align: left;
         }
 
         /* 5. Yellow Kakao Button */
@@ -238,34 +239,31 @@
     <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
         
-        <!-- Large Englisholic Logo -->
+        <!-- Upper Group (Logo, Avatar, Titles) -->
         <div class="logo-wrapper">
             <img src="logo.png" alt="Englisholic Logo" class="logo-img">
         </div>
 
-        <!-- Compact Jacqueline Photo -->
         <div class="avatar-container">
             <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
         </div>
 
-        <!-- Scaled Titles -->
         <h1 class="title">Teacher Jacqueline</h1>
         <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
-        <!-- Compact 2-Line Mic Permission Box -->
+        <!-- Lower Group (Blue Mic Box & Yellow Button) -->
         <div class="info-box">
             <span class="info-box-icon">🎙️</span>
             <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
         </div>
 
-        <!-- Yellow Start Button -->
         <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
             <span class="kakao-btn-icon">💬</span>
             <span id="btn-text-content">무료 체험 통화 시작하기</span>
         </button>
     </div>
 
-    <!-- PAGE 2/3: TRIAL CALL (PRESERVED LOGIC) -->
+    <!-- PAGE 2/3: TRIAL CALL -->
     <div id="vapi-container" class="container">
         <div class="logo-wrapper">
             <img src="logo.png" alt="Englisholic Logo" class="logo-img">
