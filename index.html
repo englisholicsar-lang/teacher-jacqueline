@@ -25,7 +25,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            padding-bottom: 140px;
+            padding-bottom: 100px;
         }
 
         /* Top Decorative Wave */
@@ -34,7 +34,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 200px;
+            height: 180px;
             z-index: 0;
             pointer-events: none;
         }
@@ -45,7 +45,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 140px;
+            height: 120px;
             z-index: 0;
             pointer-events: none;
         }
@@ -62,20 +62,20 @@
         }
 
         .dot-grid-left {
-            top: 260px;
+            top: 240px;
             left: 12px;
         }
 
         .dot-grid-right {
-            top: 240px;
+            top: 220px;
             right: 12px;
         }
 
-        /* Main Container */
+        /* Main Container - Shifted up slightly for ideal spacing */
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 20px 20px 20px;
+            padding: 10px 20px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -86,12 +86,12 @@
 
         /* Logo Header */
         .logo-container {
-            margin-top: 10px;
-            margin-bottom: 24px;
+            margin-top: 6px;
+            margin-bottom: 16px;
         }
 
         .logo-img {
-            max-width: 210px;
+            max-width: 190px;
             height: auto;
             display: block;
         }
@@ -101,29 +101,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
 
         .avatar-img {
-            width: 110px;
-            height: 110px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid #ffffff;
             box-shadow: 0 8px 24px rgba(148, 163, 184, 0.25);
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
 
         .teacher-name {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             color: #0f172a;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             letter-spacing: -0.5px;
         }
 
         .teacher-subtitle {
-            font-size: 14px;
+            font-size: 13.5px;
             color: #64748b;
             font-weight: 500;
         }
@@ -133,37 +133,36 @@
             width: 100%;
             background: #eef5ff;
             border: 1px solid #dbeafe;
-            border-radius: 16px;
-            padding: 14px 12px;
-            margin-bottom: 20px;
+            border-radius: 14px;
+            padding: 12px 10px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             box-shadow: 0 4px 12px rgba(219, 234, 254, 0.5);
         }
 
         .mic-icon {
-            font-size: 22px;
+            font-size: 20px;
             line-height: 1;
         }
 
         .mic-text {
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 700;
             color: #1e40af;
             line-height: 1.4;
             text-align: center;
         }
 
-        /* Instruction Text */
+        /* Instruction Text - Clean & Compact */
         .instruction-text {
-            font-size: 13.5px;
+            font-size: 13px;
             color: #475569;
-            line-height: 1.6;
+            line-height: 1.5;
             font-weight: 500;
             text-align: center;
-            padding: 0 10px;
         }
 
         .instruction-text strong {
@@ -171,7 +170,7 @@
             font-weight: 700;
         }
 
-        /* Floating Shield Button Container */
+        /* Floating Button Container (Bottom Right Corner) */
         .floating-btn-container {
             position: fixed;
             bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -179,7 +178,7 @@
             z-index: 9999;
         }
 
-        /* Light Blue Shield Button */
+        /* Light Blue Shield Verification Button */
         .auth-btn {
             width: 68px;
             height: 68px;
@@ -213,19 +212,34 @@
             cursor: not-allowed;
         }
 
-        /* Hide Vapi Widget initially using visibility & opacity (NO !important display rule) */
-        #vapi-support-button-container {
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+        /* Vibrant Green Phone Call Button (Initially Hidden, replaces shield perfectly) */
+        .call-btn {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            border: none;
+            cursor: pointer;
+            display: none; /* Revealed immediately upon successful auth */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.45);
+            transition: all 0.3s ease;
+            color: #ffffff;
         }
 
-        /* Class added after verification to bring Vapi button into view */
-        #vapi-support-button-container.vapi-visible {
-            visibility: visible !important;
-            opacity: 1 !important;
-            pointer-events: auto !important;
+        .call-btn:active {
+            transform: scale(0.92);
+        }
+
+        .call-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
     </style>
 </head>
@@ -277,25 +291,35 @@
             </div>
         </div>
 
-        <!-- Instruction Text -->
+        <!-- Instruction Text (Option 3) -->
         <p class="instruction-text">
             <span style="color:#60a5fa; font-weight:bold;">🛡️ 인증</span> 후 생성되는 📞 <strong>통화 버튼</strong>을 눌러<br>
-            Jacqueline 선생님과<br>바로 대화해보세요!
+            Jacqueline 선생님과 바로 대화해보세요!
         </p>
     </div>
 
-    <!-- Floating Shield Verification Button -->
-    <div class="floating-btn-container" id="auth-container">
+    <!-- Floating Action Button Container (Bottom-Right) -->
+    <div class="floating-btn-container">
+        <!-- 1. Shield Verification Button -->
         <button id="auth-btn" class="auth-btn" onclick="verifyAndShowPhone()">
             <svg viewBox="0 0 24 24">
                 <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                 <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </button>
+
+        <!-- 2. Custom Vibrant Green Call Button -->
+        <button id="call-btn" class="call-btn" onclick="startVapiCall()">
+            <svg viewBox="0 0 24 24">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+        </button>
     </div>
 
     <script>
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWzjwt_EEE4z-4HK0xNc_t5mZ8-tQAiYt0zNUYvh04Klgdb4iRXR092LGn7rcWqCA7HQ/exec";
+        const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
+        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
         async function getDeviceHash() {
             const rawIdentifier = [
@@ -332,17 +356,9 @@
                 // 2. Log trial
                 fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`).catch(e => console.log("Log error:", e));
 
-                // 3. Hide light blue shield button
-                document.getElementById("auth-container").style.display = "none";
-
-                // 4. Reveal Vapi Call Widget
-                const vapiContainer = document.getElementById("vapi-support-button-container");
-                if (vapiContainer) {
-                    vapiContainer.classList.add("vapi-visible");
-                } else {
-                    // Fallback search if ID slightly differs
-                    document.querySelectorAll('[id*="vapi"]').forEach(el => el.classList.add("vapi-visible"));
-                }
+                // 3. Hide shield button and display the custom call button in the exact same spot
+                authBtn.style.display = "none";
+                document.getElementById("call-btn").style.display = "flex";
 
                 alert("인증되었습니다! 생성된 통화 버튼을 눌러주세요.");
 
@@ -352,14 +368,20 @@
                 authBtn.disabled = false;
             }
         }
+
+        function startVapiCall() {
+            if (window.vapiSDK) {
+                window.vapiSDK.run({
+                    apiKey: VAPI_PUBLIC_KEY,
+                    assistant: VAPI_ASSISTANT_ID
+                });
+            } else {
+                alert("통화 연결 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+            }
+        }
     </script>
 
     <!-- Official Vapi Web SDK script tag -->
-    <script 
-        src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"
-        data-public-key="6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3"
-        data-assistant-id="7b61af6b-87fe-47cb-a37b-f047f5b6fe8c"
-        data-position="bottom-right">
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 </body>
 </html>
