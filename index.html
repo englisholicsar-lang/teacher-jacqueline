@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Jacqueline - Free Trial</title>
-    
-    <!-- Kakao SDK -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
-
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -42,14 +39,6 @@
             cursor: pointer;
             width: 100%;
             margin-top: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .kakao-btn:hover {
-            background-color: #fada0A;
         }
     </style>
 </head>
@@ -57,58 +46,42 @@
 
     <div id="auth-container" class="auth-card">
         <h2>Teacher Jacqueline 1회 무료 체험</h2>
-        <p>무료 체험 진행을 위해 카카오 계정으로 본인 인증을 진행해 주세요.</p>
-        <button class="kakao-btn" onclick="handleAuthClick()">
+        <p id="status-text">무료 체험 진행을 위해 카카오 계정으로 본인 인증을 진행해 주세요.</p>
+        <button id="login-btn" class="kakao-btn" onclick="handleAuthClick()">
             카카오로 1초 만에 시작하기
         </button>
     </div>
 
     <script>
-        // Google Apps Script Web App Deployment URL
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjhHqPyqzV5JKJRoO-xlhu3jb_VCqnKAz8-ukixS6p0t6Hf6iu52A/exec";
         const REDIRECT_URI = "https://englisholicsar-lang.github.io/teacher-jacqueline/";
 
-        // Initialize Kakao SDK with Main Web Key
+        // Initialize Kakao SDK
         Kakao.init('4800b51cb8a7d1862dc4b2725633ea69');
 
-        // Check if returning from OAuth redirect
-        window.onload = function() {
+        // Check for returning Kakao Auth Code in URL
+        window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const authCode = urlParams.get('code');
-            
+
             if (authCode) {
-                document.getElementById("auth-container").innerHTML = "<p>인증 확인 중입니다...</p>";
-                checkAndRegisterTrial("kakao_user_session");
+                document.getElementById("status-text").innerText = "인증 정보를 확인 중입니다...";
+                document.getElementById("login-btn").style.display = "none";
+
+                // Register session using the returned authorization code
+                checkAndRegisterTrial("kakao_code_" + authCode.substring(0, 15));
             }
-        };
+        });
 
         function handleAuthClick() {
             if (!Kakao.isInitialized()) {
-                alert("카카오 SDK 로드에 실패했습니다. 페이지를 새로고침해 주세요.");
+                alert("카카오 SDK 로드에 실패했습니다.");
                 return;
             }
 
-            // Native KakaoTalk login trigger
-            Kakao.Auth.login({
-                throughTalk: true,
-                success: function(authObj) {
-                    Kakao.API.request({
-                        url: '/v2/user/me',
-                        success: function(res) {
-                            const kakaoUserId = "kakao_" + res.id;
-                            checkAndRegisterTrial(kakaoUserId);
-                        },
-                        fail: function(error) {
-                            alert("사용자 정보를 가져오지 못했습니다.");
-                        }
-                    });
-                },
-                fail: function(err) {
-                    // Fallback to authorize redirect if popup mode fails
-                    Kakao.Auth.authorize({
-                        redirectUri: REDIRECT_URI
-                    });
-                }
+            // Execute full authorization redirect flow for WebView compatibility
+            Kakao.Auth.authorize({
+                redirectUri: REDIRECT_URI
             });
         }
 
@@ -118,6 +91,7 @@
                 .then(data => {
                     if (data.status === "ALREADY_USED") {
                         alert("이미 무료 체험을 사용하셨습니다. (1인 1회 제한)");
+                        document.getElementById("status-text").innerText = "무료 체험이 이미 종료되었습니다.";
                     } else if (data.status === "SUCCESS") {
                         const authContainer = document.getElementById("auth-container");
                         if (authContainer) authContainer.style.display = "none";
