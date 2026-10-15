@@ -177,7 +177,7 @@
             text-align: center;
         }
 
-        /* Floating Shield Overlay Button placed directly over Vapi location */
+        /* Floating Shield Overlay Button */
         .floating-btn-container {
             position: fixed;
             bottom: calc(30px + env(safe-area-inset-bottom, 0px));
@@ -245,3 +245,40 @@
         </div>
 
         <p class="instruction-text">
+            <span style="color:#60a5fa; font-weight:bold;">🛡️ 인증</span> 버튼을 누르면 통화 버튼이 생성됩니다.<br>
+            Jacqueline 선생님과 바로 대화해보세요!
+        </p>
+    </div>
+
+    <!-- Shield Overlay Button -->
+    <div class="floating-btn-container" id="auth-container">
+        <button id="auth-btn" class="auth-btn" onclick="handleAuthClick()">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjhHqPyqzV5JKJRoO-xlhu3jb_VCqnKAZ8-ukixS6p0t6Hf6iu52A/exec";
+        const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
+        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+
+        function getDeviceHashSync() {
+            try {
+                const str = [
+                    navigator.userAgent,
+                    screen.width + "x" + screen.height,
+                    screen.colorDepth,
+                    new Date().getTimezoneOffset(),
+                    navigator.language
+                ].join("|");
+
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0;
+                }
+                return "dev_" + Math.abs(hash).toString(16);
