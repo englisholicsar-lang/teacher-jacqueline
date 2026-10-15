@@ -34,7 +34,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 12px 20px 24px 20px;
+            padding: 0px 20px 20px 20px; /* Reduced top padding to 0 */
             color: var(--primary-navy);
         }
 
@@ -77,7 +77,7 @@
 
         .dot-pattern-right {
             position: absolute;
-            top: 90px;
+            top: 80px;
             right: 10px;
             width: 45px;
             height: 80px;
@@ -97,13 +97,20 @@
             text-align: center;
         }
 
-        /* 1. Englisholic Logo Header */
+        /* Upper Section Group (Logo, Avatar, Name, Subtitle) */
+        .upper-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 6px; /* Small cushion below screen top edge */
+        }
+
         .logo-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .logo-img {
@@ -112,7 +119,6 @@
             object-fit: contain;
         }
 
-        /* 2. Jacqueline Photo */
         .avatar-container {
             position: relative;
             width: 115px;
@@ -129,7 +135,6 @@
             box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
         }
 
-        /* 3. Titles with Extra Bottom Margin to Push Upper Group Up */
         .title {
             font-size: 22px;
             font-weight: 800;
@@ -142,10 +147,17 @@
             font-size: 13.5px;
             font-weight: 600;
             color: #4a637d;
-            margin-bottom: 36px; /* Increased margin creates separation from boxes */
         }
 
-        /* 4. Mic Permission Box (Stays in lower position) */
+        /* Lower Section Group (Pushed down to leave a gap above) */
+        .bottom-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 42px; /* Increased top margin creates clear separation */
+        }
+
         .info-box {
             width: 100%;
             background-color: var(--box-bg);
@@ -156,7 +168,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
         }
 
@@ -175,7 +187,6 @@
             text-align: left;
         }
 
-        /* 5. Yellow Kakao Button */
         .kakao-btn {
             width: 100%;
             background-color: var(--kakao-yellow);
@@ -202,7 +213,7 @@
             font-size: 19px;
         }
 
-        /* Page 2 Visibility Container */
+        /* Page 2 Container */
         #vapi-container {
             display: none;
             width: 100%;
@@ -225,7 +236,7 @@
 </head>
 <body>
 
-    <!-- Background Graphics -->
+    <!-- Background Wave Graphics -->
     <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/>
     </svg>
@@ -239,28 +250,32 @@
     <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
         
-        <!-- Upper Group (Logo, Avatar, Titles) -->
-        <div class="logo-wrapper">
-            <img src="logo.png" alt="Englisholic Logo" class="logo-img">
+        <!-- Upper Group (Higher Up Near Top Wave) -->
+        <div class="upper-group">
+            <div class="logo-wrapper">
+                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
+            </div>
+
+            <div class="avatar-container">
+                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
+            </div>
+
+            <h1 class="title">Teacher Jacqueline</h1>
+            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
         </div>
 
-        <div class="avatar-container">
-            <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
+        <!-- Lower Group (Separated by 42px Gap) -->
+        <div class="bottom-group">
+            <div class="info-box">
+                <span class="info-box-icon">🎙️</span>
+                <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
+            </div>
+
+            <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
+                <span class="kakao-btn-icon">💬</span>
+                <span id="btn-text-content">무료 체험 통화 시작하기</span>
+            </button>
         </div>
-
-        <h1 class="title">Teacher Jacqueline</h1>
-        <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
-
-        <!-- Lower Group (Blue Mic Box & Yellow Button) -->
-        <div class="info-box">
-            <span class="info-box-icon">🎙️</span>
-            <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
-        </div>
-
-        <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
-            <span class="kakao-btn-icon">💬</span>
-            <span id="btn-text-content">무료 체험 통화 시작하기</span>
-        </button>
     </div>
 
     <!-- PAGE 2/3: TRIAL CALL -->
