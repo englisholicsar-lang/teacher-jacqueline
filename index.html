@@ -238,10 +238,8 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        // Admin reset via ?reset=true
-        if (new URLSearchParams(window.location.search).get("reset") === "true") {
-            try { localStorage.removeItem("englisholic_trial_used"); } catch(e) {}
-        }
+        // Force clear for testing (Remove this line once testing is complete)
+        try { localStorage.removeItem("englisholic_trial_used"); } catch(e) {}
 
         function getDeviceHashSync() {
             try {
@@ -266,7 +264,7 @@
         }
 
         function handleAuthClick() {
-            // 1. Instant local check (This is what successfully locked it before)
+            // 1. Instant local check
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
                 return;
@@ -275,7 +273,7 @@
             // 2. Lock it immediately
             localStorage.setItem("englisholic_trial_used", "true");
 
-            // 3. Fire-and-forget background log (non-blocking so it never stalls the button)
+            // 3. Fire-and-forget background log
             try {
                 const deviceHash = getDeviceHashSync();
                 const script = document.createElement("script");
