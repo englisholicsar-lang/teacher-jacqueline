@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Jacqueline - 1:1 영어회화</title>
 
-    <!-- KakaoTalk Open Graph Meta Tags (Absolute URLs for Kakao Scraper) -->
+    <!-- KakaoTalk Open Graph Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
     <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
     <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png">
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     
-    <!-- Vapi Official HTML Script Tag Loader -->
-    <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <!-- Vapi Official Standalone Web SDK (For Custom Buttons) -->
+    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.umd.js"></script>
 
     <style>
         * {
@@ -37,16 +37,6 @@
             align-items: center;
             position: relative;
             padding-bottom: 120px;
-        }
-
-        /* Hide default injected Vapi floating elements */
-        .vapi-btn, 
-        #vapi-support-btn, 
-        [class*="vapi-btn"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
         }
 
         .bg-wave-top {
@@ -232,6 +222,11 @@
             color: #ffffff;
         }
 
+        .call-btn.active-call {
+            background-color: #ef4444 !important;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45) !important;
+        }
+
         .call-btn:active {
             transform: scale(0.92);
         }
@@ -292,7 +287,7 @@
             </svg>
         </button>
 
-        <button id="call-btn" class="call-btn" onclick="startVapiCall()">
+        <button id="call-btn" class="call-btn" onclick="toggleVapiCall()">
             <svg viewBox="0 0 24 24">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
             </svg>
@@ -304,7 +299,31 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        let activeVapiInstance = null;
+        let vapi = null;
+        let isCallActive = false;
+
+        // Initialize Vapi instance on DOM load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.Vapi) {
+                vapi = new window.Vapi(VAPI_PUBLIC_KEY);
+
+                vapi.on('call-start', () => {
+                    isCallActive = true;
+                    document.getElementById("call-btn").classList.add("active-call");
+                });
+
+                vapi.on('call-end', () => {
+                    isCallActive = false;
+                    document.getElementById("call-btn").classList.remove("active-call");
+                });
+
+                vapi.on('error', (e) => {
+                    console.error("Vapi error:", e);
+                    isCallActive = false;
+                    document.getElementById("call-btn").classList.remove("active-call");
+                });
+            }
+        });
 
         async function getDeviceHash() {
             const rawIdentifier = [
@@ -331,17 +350,16 @@
             });
         }
 
-        function startVapiCall() {
-            if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-                if (!activeVapiInstance) {
-                    activeVapiInstance = window.vapiSDK.run({
-                        apiKey: VAPI_PUBLIC_KEY,
-                        assistant: VAPI_ASSISTANT_ID
-                    });
-                }
-                
-                if (activeVapiInstance && typeof activeVapiInstance.start === "function") {
-                    activeVapiInstance.start();
+        function toggleVapiCall() {
+            if (!vapi && window.Vapi) {
+                vapi = new window.Vapi(VAPI_PUBLIC_KEY);
+            }
+
+            if (vapi) {
+                if (!isCallActive) {
+                    vapi.start(VAPI_ASSISTANT_ID);
+                } else {
+                    vapi.stop();
                 }
             } else {
                 alert("통화 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
