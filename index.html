@@ -10,13 +10,11 @@
 
     <style>
         :root {
-            --bg-color-top: #e8f3fe;
-            --bg-color-bottom: #f2f7fd;
-            --primary-navy: #0d2847;
-            --sub-navy: #1f3a58;
-            --text-muted: #556b82;
-            --box-bg: #eaf3ff;
-            --box-border: #d2e4f9;
+            --bg-base: #f0f6ff;
+            --primary-navy: #0e2a47;
+            --sub-text: #4a637d;
+            --box-bg: #eaf3fe;
+            --box-border: #d4e5f9;
             --kakao-yellow: #fee500;
         }
 
@@ -29,45 +27,88 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             min-height: 100vh;
-            background: linear-gradient(180deg, var(--bg-color-top) 0%, var(--bg-color-bottom) 100%);
+            background-color: var(--bg-base);
+            position: relative;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 24px 20px;
+            padding: 30px 20px;
             color: var(--primary-navy);
         }
 
-        .container {
+        /* SVG Background Curves */
+        .bg-wave-top {
+            position: absolute;
+            top: 0;
+            right: 0;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
+            height: auto;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .bg-wave-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Dot Pattern Accents */
+        .dot-pattern-left {
+            position: absolute;
+            top: 380px;
+            left: 15px;
+            width: 60px;
+            height: 100px;
+            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
+            background-size: 12px 12px;
+            z-index: 0;
+        }
+
+        .dot-pattern-right {
+            position: absolute;
+            top: 220px;
+            right: 15px;
+            width: 60px;
+            height: 100px;
+            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
+            background-size: 12px 12px;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding-top: 10px;
         }
 
-        /* Englisholic Logo Header */
+        /* Logo Header */
         .logo-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
-        .logo-icon {
-            width: 52px;
-            height: 52px;
-            background: radial-gradient(circle at center, #0066b2 0%, #0d2847 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-size: 26px;
-            font-weight: bold;
+        .logo-svg {
+            width: 56px;
+            height: 56px;
         }
 
         .logo-text {
@@ -75,25 +116,25 @@
         }
 
         .logo-text-main {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 800;
-            color: #0d2847;
-            line-height: 1.1;
+            color: #0c2a4a;
+            line-height: 1.05;
             letter-spacing: -0.5px;
         }
 
         .logo-text-sub {
             font-size: 13px;
-            font-weight: 600;
-            color: #1f3a58;
-            letter-spacing: 0.2px;
+            font-weight: 700;
+            color: #0c2a4a;
+            letter-spacing: 0.1px;
         }
 
-        /* Teacher Profile Avatar */
+        /* Teacher Avatar Profile */
         .avatar-container {
             position: relative;
-            width: 160px;
-            height: 160px;
+            width: 165px;
+            height: 165px;
             margin-bottom: 20px;
         }
 
@@ -103,14 +144,14 @@
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid #ffffff;
-            box-shadow: 0 8px 20px rgba(13, 40, 71, 0.12);
+            box-shadow: 0 10px 25px rgba(12, 42, 74, 0.15), 0 0 0 12px rgba(255, 255, 255, 0.4);
         }
 
-        /* Titles */
+        /* Title & Subtitle */
         .title {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 800;
-            color: #0d2847;
+            color: #0c2a4a;
             margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
@@ -119,53 +160,54 @@
             font-size: 16px;
             font-weight: 600;
             color: #4a637d;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
 
-        /* Permission Notice Box */
+        /* Mic Info Box */
         .info-box {
             width: 100%;
             background-color: var(--box-bg);
             border: 1px solid var(--box-border);
-            border-radius: 16px;
-            padding: 16px 20px;
+            border-radius: 18px;
+            padding: 16px 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(12, 42, 74, 0.03);
         }
 
         .info-box-icon {
-            font-size: 24px;
+            font-size: 26px;
             flex-shrink: 0;
         }
 
         .info-box-text {
             font-size: 15px;
             font-weight: 700;
-            color: #2b4865;
+            color: #1a3c61;
             line-height: 1.35;
             text-align: center;
         }
 
-        /* Kakao Action Button */
+        /* Yellow Button */
         .kakao-btn {
             width: 100%;
             background-color: var(--kakao-yellow);
             color: #000000;
             border: none;
-            padding: 18px 24px;
-            border-radius: 16px;
+            padding: 18px 20px;
+            border-radius: 18px;
             font-size: 18px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 6px 18px rgba(254, 229, 0, 0.45);
+            box-shadow: 0 8px 20px rgba(254, 229, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            transition: transform 0.1s ease;
         }
 
         .kakao-btn:active {
@@ -173,10 +215,9 @@
         }
 
         .kakao-btn-icon {
-            font-size: 20px;
+            font-size: 22px;
         }
 
-        /* Section Visibility Switches */
         #vapi-container {
             display: none;
             width: 100%;
@@ -187,23 +228,44 @@
             background-color: #25d366;
             color: #ffffff;
             border: none;
-            padding: 18px 24px;
-            border-radius: 16px;
+            padding: 18px 20px;
+            border-radius: 18px;
             font-size: 18px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.4);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
             margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- PAGE 1: KAKAO GATE SECTION -->
+    <!-- Background Graphics -->
+    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+
+    <div class="dot-pattern-left"></div>
+    <div class="dot-pattern-right"></div>
+
+    <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
-        <!-- Logo Header -->
+        
+        <!-- Pillar Logo -->
         <div class="logo-wrapper">
-            <div class="logo-icon">🏛️</div>
+            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="50" fill="url(#logo_grad)"/>
+                <path d="M25 38H75V43H25V38ZM30 46H35V68H30V46ZM43 46H48V68H43V46ZM56 46H61V68H56V46ZM68 46H73V68H68V46ZM25 71H75V75H25V71ZM50 25L75 35H25L50 25Z" fill="white"/>
+                <defs>
+                    <linearGradient id="logo_grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#0062b1"/>
+                        <stop offset="1" stop-color="#092543"/>
+                    </linearGradient>
+                </defs>
+            </svg>
             <div class="logo-text">
                 <div class="logo-text-main">Englisholic</div>
                 <div class="logo-text-sub">Innovative English</div>
@@ -215,27 +277,36 @@
             <img class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Teacher Jacqueline">
         </div>
 
-        <!-- Titles -->
+        <!-- Title Block -->
         <h1 class="title">Teacher Jacqueline</h1>
         <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
-        <!-- Mic Permission Box -->
+        <!-- Mic Permission Card -->
         <div class="info-box">
             <span class="info-box-icon">🎙️</span>
             <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
         </div>
 
-        <!-- Yellow Start Button -->
+        <!-- Yellow Kakao Start Button -->
         <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
             <span class="kakao-btn-icon">💬</span>
             <span id="btn-text-content">무료 체험 통화 시작하기</span>
         </button>
     </div>
 
-    <!-- PAGE 2 / 3: TRIAL SECTION (PRESERVED) -->
+    <!-- PAGE 2/3: TRIAL CALL (PRESERVED LOGIC) -->
     <div id="vapi-container" class="container">
         <div class="logo-wrapper">
-            <div class="logo-icon">🏛️</div>
+            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="50" fill="url(#logo_grad_2)"/>
+                <path d="M25 38H75V43H25V38ZM30 46H35V68H30V46ZM43 46H48V68H43V46ZM56 46H61V68H56V46ZM68 46H73V68H68V46ZM25 71H75V75H25V71ZM50 25L75 35H25L50 25Z" fill="white"/>
+                <defs>
+                    <linearGradient id="logo_grad_2" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#0062b1"/>
+                        <stop offset="1" stop-color="#092543"/>
+                    </linearGradient>
+                </defs>
+            </svg>
             <div class="logo-text">
                 <div class="logo-text-main">Englisholic</div>
                 <div class="logo-text-sub">Innovative English</div>
