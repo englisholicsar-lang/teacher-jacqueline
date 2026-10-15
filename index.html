@@ -39,6 +39,15 @@
             padding-bottom: 120px;
         }
 
+        /* Position Vapi button above KakaoTalk's bottom bar */
+        [class*="vapi"],
+        div[id*="vapi"] {
+            position: fixed !important;
+            bottom: calc(40px + env(safe-area-inset-bottom, 0px)) !important;
+            right: 20px !important;
+            z-index: 99999 !important;
+        }
+
         .bg-wave-top {
             position: absolute;
             top: 0;
@@ -170,7 +179,7 @@
 
         .floating-btn-container {
             position: fixed;
-            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            bottom: calc(40px + env(safe-area-inset-bottom, 0px));
             right: 20px;
             z-index: 9999;
         }
