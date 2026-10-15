@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Englisholic</title>
+    
+    <!-- Vapi Core Web SDK (Verified & Tested) -->
+    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -25,7 +29,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            padding-bottom: 90px;
+            padding-bottom: 120px;
         }
 
         /* Top Decorative Wave */
@@ -34,7 +38,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 150px;
+            height: 200px;
             z-index: 0;
             pointer-events: none;
         }
@@ -45,7 +49,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 100px;
+            height: 140px;
             z-index: 0;
             pointer-events: none;
         }
@@ -53,8 +57,8 @@
         /* Dot Grid Accents */
         .dot-grid {
             position: absolute;
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
             background-size: 12px 12px;
             z-index: 1;
@@ -62,20 +66,20 @@
         }
 
         .dot-grid-left {
-            top: 210px;
-            left: 10px;
+            top: 260px;
+            left: 12px;
         }
 
         .dot-grid-right {
-            top: 190px;
-            right: 10px;
+            top: 240px;
+            right: 12px;
         }
 
-        /* Main Container - Shifted UP significantly for clean breathing room */
+        /* Main Container - Restored to your preferred lower comfortable spacing */
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 4px 16px 16px;
+            padding: 20px 20px 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -86,12 +90,12 @@
 
         /* Logo Header */
         .logo-container {
-            margin-top: 2px;
-            margin-bottom: 10px;
+            margin-top: 10px;
+            margin-bottom: 24px;
         }
 
         .logo-img {
-            max-width: 170px;
+            max-width: 210px;
             height: auto;
             display: block;
         }
@@ -101,29 +105,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 20px;
         }
 
         .avatar-img {
-            width: 82px;
-            height: 82px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #ffffff;
-            box-shadow: 0 6px 18px rgba(148, 163, 184, 0.25);
-            margin-bottom: 6px;
+            border: 4px solid #ffffff;
+            box-shadow: 0 8px 24px rgba(148, 163, 184, 0.25);
+            margin-bottom: 14px;
         }
 
         .teacher-name {
-            font-size: 21px;
+            font-size: 26px;
             font-weight: 800;
             color: #0f172a;
-            margin-bottom: 2px;
+            margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
 
         .teacher-subtitle {
-            font-size: 12.5px;
+            font-size: 14px;
             color: #64748b;
             font-weight: 500;
         }
@@ -133,23 +137,23 @@
             width: 100%;
             background: #eef5ff;
             border: 1px solid #dbeafe;
-            border-radius: 12px;
-            padding: 8px 10px;
-            margin-bottom: 8px;
+            border-radius: 16px;
+            padding: 14px 12px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: 0 3px 10px rgba(219, 234, 254, 0.5);
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(219, 234, 254, 0.5);
         }
 
         .mic-icon {
-            font-size: 16px;
+            font-size: 22px;
             line-height: 1;
         }
 
         .mic-text {
-            font-size: 12px;
+            font-size: 13.5px;
             font-weight: 700;
             color: #1e40af;
             line-height: 1.4;
@@ -158,13 +162,11 @@
 
         /* Instruction Text */
         .instruction-text {
-            font-size: 12px;
+            font-size: 14px;
             color: #475569;
-            line-height: 1.5;
+            line-height: 1.6;
             font-weight: 500;
             text-align: center;
-            max-width: 300px;
-            margin: 0 auto;
         }
 
         .instruction-text strong {
@@ -172,17 +174,18 @@
             font-weight: 700;
         }
 
-        /* Floating Shield Verification Button Container */
+        /* Floating Action Button Container (Bottom Right Corner) */
         .floating-btn-container {
             position: fixed;
-            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-            right: 16px;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            right: 20px;
             z-index: 9999;
         }
 
+        /* Light Blue Shield Verification Button */
         .auth-btn {
-            width: 64px;
-            height: 64px;
+            width: 68px;
+            height: 68px;
             border-radius: 50%;
             background-color: #60a5fa;
             border: none;
@@ -190,7 +193,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 20px rgba(96, 165, 250, 0.45);
+            box-shadow: 0 8px 24px rgba(96, 165, 250, 0.45);
             transition: all 0.3s ease;
             color: #ffffff;
         }
@@ -200,8 +203,8 @@
         }
 
         .auth-btn svg {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             fill: none;
             stroke: #ffffff;
             stroke-width: 2;
@@ -213,18 +216,34 @@
             cursor: not-allowed;
         }
 
-        /* Hide Vapi's native widget button initially */
-        #vapi-support-button-container {
-            display: none !important;
+        /* Custom Vibrant Green Call Button (Initially Hidden) */
+        .call-btn {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            border: none;
+            cursor: pointer;
+            display: none; /* Revealed immediately upon successful auth */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.45);
+            transition: all 0.3s ease;
+            color: #ffffff;
         }
 
-        /* Class toggled on verification to reveal Vapi's native button in the exact same spot */
-        #vapi-support-button-container.show-vapi {
-            display: block !important;
-            position: fixed !important;
-            bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-            right: 16px !important;
-            z-index: 9999 !important;
+        .call-btn:active {
+            transform: scale(0.92);
+        }
+
+        .call-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
     </style>
 </head>
@@ -283,18 +302,28 @@
         </p>
     </div>
 
-    <!-- Verification Floating Button -->
-    <div class="floating-btn-container" id="auth-container">
+    <!-- Floating Action Button Container (Bottom-Right) -->
+    <div class="floating-btn-container">
+        <!-- 1. Shield Verification Button -->
         <button id="auth-btn" class="auth-btn" onclick="verifyAndShowPhone()">
             <svg viewBox="0 0 24 24">
                 <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                 <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </button>
+
+        <!-- 2. Custom Vibrant Green Call Button -->
+        <button id="call-btn" class="call-btn" onclick="startVapiCall()">
+            <svg viewBox="0 0 24 24">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+        </button>
     </div>
 
     <script>
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWzjwt_EEE4z-4HK0xNc_t5mZ8-tQAiYt0zNUYvh04Klgdb4iRXR092LGn7rcWqCA7HQ/exec";
+        const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
+        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
         async function getDeviceHash() {
             const rawIdentifier = [
@@ -331,14 +360,9 @@
                 // 2. Log trial
                 fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`).catch(e => console.log("Log error:", e));
 
-                // 3. Hide shield verification button
-                document.getElementById("auth-container").style.display = "none";
-
-                // 4. Reveal Vapi's native SDK call button in the exact same bottom-right spot
-                const vapiContainer = document.getElementById("vapi-support-button-container");
-                if (vapiContainer) {
-                    vapiContainer.classList.add("show-vapi");
-                }
+                // 3. Hide shield button and display custom green call button
+                authBtn.style.display = "none";
+                document.getElementById("call-btn").style.display = "flex";
 
                 alert("인증되었습니다! 생성된 통화 버튼을 눌러주세요.");
 
@@ -348,14 +372,17 @@
                 authBtn.disabled = false;
             }
         }
-    </script>
 
-    <!-- Official Vapi Web SDK script tag -->
-    <script 
-        src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"
-        data-public-key="6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3"
-        data-assistant-id="7b61af6b-87fe-47cb-a37b-f047f5b6fe8c"
-        data-position="bottom-right">
+        function startVapiCall() {
+            if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
+                window.vapiSDK.run({
+                    apiKey: VAPI_PUBLIC_KEY,
+                    assistant: VAPI_ASSISTANT_ID
+                });
+            } else {
+                alert("통화 연결 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+            }
+        }
     </script>
 </body>
 </html>
