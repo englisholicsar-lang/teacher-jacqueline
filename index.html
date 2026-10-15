@@ -229,4 +229,114 @@
         <button id="auth-btn" class="auth-btn" onclick="handleAuthClick()">
             <svg viewBox="0 0 24 24">
                 <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M9 12l2 2 4-4" fill
+                <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjhHqPyqzV5JKJRoO-xlhu3jb_VCqnKAZ8-ukixS6p0t6Hf6iu52A/exec";
+        const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
+        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+
+        let isLogging = false;
+
+        // 1. Reset handler
+        if (new URLSearchParams(window.location.search).get("reset") === "true") {
+            try { localStorage.removeItem("englisholic_trial_used"); } catch(e) {}
+        }
+
+        // 2. Helper device hash generator declared BEFORE usage
+        function getDeviceHashSync() {
+            try {
+                const str = [
+                    navigator.userAgent,
+                    screen.width + "x" + screen.height,
+                    screen.colorDepth,
+                    new Date().getTimezoneOffset(),
+                    navigator.language
+                ].join("|");
+
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0;
+                }
+                return "dev_" + Math.abs(hash).toString(16);
+            } catch (e) {
+                return "kakao_fallback_" + Date.now();
+            }
+        }
+
+        // 3. Helper to hide shield and click Vapi button
+        function startVapiCall() {
+            const authContainer = document.getElementById("auth-container");
+            if (authContainer) authContainer.style.display = "none";
+
+            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+            if (vapiBtn) {
+                vapiBtn.click();
+            }
+        }
+
+        // 4. Global JSONP callback
+        window.onLogSuccess = function(response) {
+            isLogging = false;
+            startVapiCall();
+        };
+
+        // 5. Main click handler
+        function handleAuthClick() {
+            try {
+                if (localStorage.getItem("englisholic_trial_used") === "true") {
+                    alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
+                    return;
+                }
+            } catch(e) {}
+
+            if (isLogging) return;
+            isLogging = true;
+
+            try { localStorage.setItem("englisholic_trial_used", "true"); } catch(e) {}
+
+            // Send JSONP logging request to Google Apps Script
+            try {
+                const deviceHash = getDeviceHashSync();
+                const script = document.createElement("script");
+                script.src = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&callback=onLogSuccess&t=${Date.now()}`;
+                
+                script.onerror = function() {
+                    isLogging = false;
+                    startVapiCall();
+                };
+
+                document.body.appendChild(script);
+            } catch(err) {
+                // Guaranteed fallback execution if anything fails
+                startVapiCall();
+            }
+
+            // Fallback timeout so page never freezes
+            setTimeout(() => {
+                if (isLogging) {
+                    isLogging = false;
+                    startVapiCall();
+                }
+            }, 800);
+        }
+    </script>
+
+    <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                window.vapiSDK.run({
+                    apiKey: VAPI_PUBLIC_KEY,
+                    assistant: VAPI_ASSISTANT_ID
+                });
+            }
+        });
+    </script>
+</body>
+</html>
