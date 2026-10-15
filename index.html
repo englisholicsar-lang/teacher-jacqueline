@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Jacqueline - 1:1 영어회화</title>
 
-    <!-- KakaoTalk Open Graph Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
     <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
@@ -36,15 +35,17 @@
             padding-bottom: 120px;
         }
 
-        /* Standardize Vapi button position */
         #vapi-support-btn,
-        [class*="vapi-btn-container"] {
+        [class*="vapi-btn-container"],
+        [class*="vapi-btn"] {
             position: fixed !important;
             bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
             right: 20px !important;
             left: auto !important;
             width: 68px !important;
             height: 68px !important;
+            border-radius: 50% !important;
+            overflow: hidden !important;
             z-index: 88888 !important;
         }
 
@@ -66,26 +67,6 @@
             height: 140px;
             z-index: 0;
             pointer-events: none;
-        }
-
-        .dot-grid {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
-            background-size: 12px 12px;
-            z-index: 1;
-            opacity: 0.65;
-        }
-
-        .dot-grid-left {
-            top: 260px;
-            left: 12px;
-        }
-
-        .dot-grid-right {
-            top: 240px;
-            right: 12px;
         }
 
         .container {
@@ -156,11 +137,6 @@
             box-shadow: 0 4px 12px rgba(219, 234, 254, 0.5);
         }
 
-        .mic-icon {
-            font-size: 22px;
-            line-height: 1;
-        }
-
         .mic-text {
             font-size: 13.5px;
             font-weight: 700;
@@ -177,11 +153,12 @@
             text-align: center;
         }
 
-        /* Floating Shield Overlay Button */
         .floating-btn-container {
             position: fixed;
             bottom: calc(30px + env(safe-area-inset-bottom, 0px));
             right: 20px;
+            width: 68px;
+            height: 68px;
             z-index: 999999;
         }
 
@@ -224,9 +201,6 @@
     </svg>
 
     <div class="container">
-        <div class="dot-grid dot-grid-left"></div>
-        <div class="dot-grid dot-grid-right"></div>
-
         <div class="logo-container">
             <img src="logo.png" alt="Englisholic Innovative English" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/210x50?text=Englisholic';">
         </div>
@@ -265,6 +239,11 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
+        // Admin reset hook directly in URL (?reset=true)
+        if (new URLSearchParams(window.location.search).get("reset") === "true") {
+            localStorage.removeItem("englisholic_trial_used");
+        }
+
         function getDeviceHashSync() {
             try {
                 const str = [
@@ -288,38 +267,30 @@
         }
 
         function handleAuthClick() {
-            // 1. Check trial limit
+            // 1. Check local storage lock
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
                 return;
             }
 
-            // 2. Mark local storage lock immediately
+            // 2. Set local trial flag
             localStorage.setItem("englisholic_trial_used", "true");
 
-            // 3. Send reliable background log to Google Sheets with explicit JSON payload
+            // 3. Unblockable GET parameter logging to Google Sheets
             const deviceHash = getDeviceHashSync();
-            const payload = JSON.stringify({ deviceHash: deviceHash });
+            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
             
-            if (navigator.sendBeacon) {
-                let blob = new Blob([payload], { type: 'application/json' });
-                navigator.sendBeacon(GAS_WEB_APP_URL, blob);
-            } else {
-                fetch(GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: payload
-                }).catch(() => {});
-            }
+            // Image beacon guarantee: Works across all WebViews and browsers
+            const img = new Image();
+            img.src = logUrl;
 
-            // 4. Remove Shield Overlay completely to reveal underlying Vapi button
+            // 4. Hide shield overlay
             const authContainer = document.getElementById("auth-container");
             if (authContainer) {
                 authContainer.style.display = "none";
             }
 
-            // 5. Programmatically trigger Vapi widget if already loaded
+            // 5. Trigger Vapi widget
             const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
             if (vapiBtn) {
                 vapiBtn.click();
@@ -327,7 +298,6 @@
         }
     </script>
 
-    <!-- Load Vapi SDK -->
     <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
     <script>
         window.addEventListener('load', function() {
