@@ -238,8 +238,7 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        let isHandled = false;
-
+        // Admin Reset Check
         if (new URLSearchParams(window.location.search).get("reset") === "true") {
             try { localStorage.removeItem("englisholic_trial_used"); } catch(e) {}
         }
@@ -266,22 +265,20 @@
             }
         }
 
-        function startVapiCall() {
-            const authContainer = document.getElementById("auth-container");
-            if (authContainer) authContainer.style.display = "none";
-
-            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
-            if (vapiBtn) vapiBtn.click();
+        // Send non-blocking background log
+        function sendLogToBeacon() {
+            const deviceHash = getDeviceHashSync();
+            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
+            
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(logUrl);
+            } else {
+                fetch(logUrl, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+            }
         }
 
-        window.onLogSuccess = function(response) {
-            if (!isHandled) {
-                isHandled = true;
-                startVapiCall();
-            }
-        };
-
         function handleAuthClick() {
+            // Check trial restriction
             try {
                 if (localStorage.getItem("englisholic_trial_used") === "true") {
                     alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
@@ -289,26 +286,21 @@
                 }
             } catch(e) {}
 
+            // Save trial state locally
             try { localStorage.setItem("englisholic_trial_used", "true"); } catch(e) {}
 
-            const deviceHash = getDeviceHashSync();
-            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&callback=onLogSuccess&t=${Date.now()}`;
+            // Send non-blocking log beacon to Google Sheets
+            sendLogToBeacon();
 
-            // Inject JSONP script tag
-            const script = document.createElement("script");
-            script.src = logUrl;
-            document.body.appendChild(script);
+            // Hide shield button container
+            const authContainer = document.getElementById("auth-container");
+            if (authContainer) authContainer.style.display = "none";
 
-            // Send silent fetch beacon
-            try { fetch(logUrl, { method: 'GET', mode: 'no-cors' }); } catch(e) {}
-
-            // Trigger call after 400ms without leaving page
-            setTimeout(() => {
-                if (!isHandled) {
-                    isHandled = true;
-                    startVapiCall();
-                }
-            }, 400);
+            // Trigger Vapi Widget Call
+            const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
+            if (vapiBtn) {
+                vapiBtn.click();
+            }
         }
     </script>
 
