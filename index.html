@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Englisholic</title>
+    <title>Teacher Jacqueline - 1:1 영어회화</title>
+
+    <!-- KakaoTalk & Social Open Graph Metadata -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Teacher Jacqueline - 1:1 영어회화">
+    <meta property="og:description" content="Jacqueline 선생님과 1:1 영어 회화를 체험해보세요!">
+    <meta property="og:image" content="https://englisholicsar-lang.github.io/jacqueline.png">
+    <meta property="og:url" content="https://englisholicsar-lang.github.io">
     
     <!-- Vapi Official Web SDK Loader -->
     <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
@@ -30,6 +37,17 @@
             align-items: center;
             position: relative;
             padding-bottom: 120px;
+        }
+
+        /* Hide Vapi's automatically injected default widget button */
+        .vapi-btn, 
+        #vapi-support-btn, 
+        [class*="vapi-btn"],
+        button[aria-label*="Vapi"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         .bg-wave-top {
@@ -355,7 +373,6 @@
         }
 
         function startVapiCall() {
-            // Check for vapiSDK runner or trigger fallback initialization
             if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
                 if (!vapiWidget) {
                     vapiWidget = window.vapiSDK.run({
@@ -366,7 +383,7 @@
                     vapiWidget.start();
                 }
             } else {
-                alert("통화 연결 모듈을 불러오는 중입니다. 2~3초 후 다시 눌러주세요.");
+                alert("통화 연결 모듈을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
             }
         }
     </script>
