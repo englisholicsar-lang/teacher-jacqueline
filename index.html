@@ -285,9 +285,14 @@
             // Hide shield button
             document.getElementById("auth-btn").style.display = "none";
 
-            // Fire-and-forget log call
+            // Log device hash reliably via sendBeacon or fetch fallback
             getDeviceHash().then(deviceHash => {
-                fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`, { mode: 'no-cors' }).catch(() => {});
+                const targetUrl = `${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`;
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon(targetUrl);
+                } else {
+                    fetch(targetUrl, { mode: 'no-cors' }).catch(() => {});
+                }
             });
 
             // Initialize Vapi widget
