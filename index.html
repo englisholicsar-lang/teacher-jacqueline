@@ -239,7 +239,6 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        // Admin reset hook directly in URL (?reset=true)
         if (new URLSearchParams(window.location.search).get("reset") === "true") {
             localStorage.removeItem("englisholic_trial_used");
         }
@@ -267,36 +266,38 @@
         }
 
         async function handleAuthClick() {
-            // 1. Check local storage lock
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
                 return;
             }
 
-            // 2. Set local trial flag
+            const btn = document.getElementById("auth-btn");
+            if (btn) btn.disabled = true;
+
+            const deviceHash = getDeviceHashSync();
+            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
+
+            // Force logging execution before lock & call trigger
+            try {
+                await fetch(logUrl, { method: 'GET', mode: 'no-cors' });
+            } catch (e) {
+                // Fallback via Image object
+                await new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                    img.src = logUrl;
+                    setTimeout(resolve, 500);
+                });
+            }
+
             localStorage.setItem("englisholic_trial_used", "true");
 
-            // 3. Hide shield overlay immediately
             const authContainer = document.getElementById("auth-container");
             if (authContainer) {
                 authContainer.style.display = "none";
             }
 
-            // 4. Send log request synchronously via fetch mode no-cors
-            const deviceHash = getDeviceHashSync();
-            const logUrl = `${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}&t=${Date.now()}`;
-            
-            try {
-                // Send fetch request and await response completion before opening Vapi
-                await fetch(logUrl, { method: 'GET', mode: 'no-cors' });
-            } catch (e) {
-                // Fallback attempt with sendBeacon if fetch fails
-                if (navigator.sendBeacon) {
-                    navigator.sendBeacon(logUrl);
-                }
-            }
-
-            // 5. Trigger Vapi widget call
             const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
             if (vapiBtn) {
                 vapiBtn.click();
