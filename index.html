@@ -39,7 +39,7 @@
             padding-bottom: 120px;
         }
 
-        /* Clean positioning for Vapi widget without stretching */
+        /* Clean positioning for Vapi widget */
         #vapi-support-btn,
         [class*="vapi-btn-container"] {
             position: fixed !important;
@@ -202,6 +202,11 @@
             color: #ffffff;
         }
 
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .auth-btn:active {
             transform: scale(0.92);
         }
@@ -261,11 +266,8 @@
         </button>
     </div>
 
-    <!-- Hidden iframe to handle silent logging without page redirects -->
-    <iframe id="log-iframe" name="log-iframe" style="display:none; width:0; height:0; border:0;"></iframe>
-
     <script>
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjHhQpyqzV5JKJRoo-xlhu3jb_VCqnKAZ8-ukixS6p0t6Hf6iu/exec";
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjhHqPyqzV5JKJRoO-xlhu3jb_VCqnKAZ8-ukixS6p0t6Hf6iu52A/exec";
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
@@ -291,30 +293,29 @@
             }
         }
 
-        function verifyAndInitializeCall() {
-            // Hide shield button
-            document.getElementById("auth-btn").style.display = "none";
+        async function verifyAndInitializeCall() {
+            const authBtn = document.getElementById("auth-btn");
+            authBtn.disabled = true;
 
-            // Get device hash synchronously
             const deviceHash = getDeviceHashSync();
 
-            // Submit log silently via a hidden form & iframe to prevent any white-screen redirects
-            const form = document.createElement("form");
-            form.method = "GET";
-            form.action = GAS_WEB_APP_URL;
-            form.target = "log-iframe";
+            try {
+                const response = await fetch(`${GAS_WEB_APP_URL}?deviceHash=${encodeURIComponent(deviceHash)}`);
+                const data = await response.json();
 
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "deviceHash";
-            input.value = deviceHash;
-            form.appendChild(input);
+                if (data.status === "EXISTS") {
+                    alert("이미 무료 체험을 사용하셨습니다. (1회 제한)");
+                    authBtn.style.display = "flex";
+                    authBtn.disabled = false;
+                    return;
+                }
+            } catch (err) {
+                console.warn("Verification request issue, allowing call fallback:", err);
+            }
 
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
+            // Hide shield button and initialize Vapi widget
+            authBtn.style.display = "none";
 
-            // Initialize Vapi widget immediately
             if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
                 window.vapiSDK.run({
                     apiKey: VAPI_PUBLIC_KEY,
