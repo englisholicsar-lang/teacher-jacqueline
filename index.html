@@ -13,7 +13,7 @@
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     
     <!-- Vapi Official HTML Script Tag Loader -->
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <script id="vapi-sdk-script" src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
         * {
@@ -44,6 +44,9 @@
         #vapi-support-btn, 
         [class*="vapi-btn"] {
             display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         .bg-wave-top {
@@ -301,22 +304,27 @@
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";       
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        let vapiWidget = null;
+        let vapiInstance = null;
 
-        // Pre-initialize Vapi SDK in the background immediately on page load
-        function preloadVapi() {
+        // Force initialization as soon as the DOM script tag mounts
+        function initVapiEngine() {
             if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-                if (!vapiWidget) {
-                    vapiWidget = window.vapiSDK.run({
+                if (!vapiInstance) {
+                    vapiInstance = window.vapiSDK.run({
                         apiKey: VAPI_PUBLIC_KEY,
                         assistant: VAPI_ASSISTANT_ID
                     });
                 }
             } else {
-                setTimeout(preloadVapi, 200);
+                setTimeout(initVapiEngine, 100);
             }
         }
-        window.addEventListener('load', preloadVapi);
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initVapiEngine);
+        } else {
+            initVapiEngine();
+        }
 
         async function getDeviceHash() {
             const rawIdentifier = [
@@ -337,22 +345,25 @@
             document.getElementById("auth-btn").style.display = "none";
             document.getElementById("call-btn").style.display = "flex";
 
-            // Non-blocking background log
+            // Fire-and-forget log call
             getDeviceHash().then(deviceHash => {
                 fetch(`${GAS_WEB_APP_URL}?deviceHash=${deviceHash}&action=log`, { mode: 'no-cors' }).catch(() => {});
             });
         }
 
         function startVapiCall() {
-            if (vapiWidget && typeof vapiWidget.start === "function") {
-                vapiWidget.start();
-            } else if (window.vapiSDK && typeof window.vapiSDK.run === "function") {
-                vapiWidget = window.vapiSDK.run({
+            // Guarantee vapiInstance is ready and trigger call directly
+            if (!vapiInstance && window.vapiSDK && typeof window.vapiSDK.run === "function") {
+                vapiInstance = window.vapiSDK.run({
                     apiKey: VAPI_PUBLIC_KEY,
                     assistant: VAPI_ASSISTANT_ID
                 });
+            }
+
+            if (vapiInstance && typeof vapiInstance.start === "function") {
+                vapiInstance.start();
             } else {
-                alert("통화 연결 모듈을 불러오는 중입니다. 1초 뒤에 다시 눌러주세요.");
+                alert("통화 모듈을 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
             }
         }
     </script>
