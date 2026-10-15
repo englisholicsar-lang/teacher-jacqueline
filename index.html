@@ -38,7 +38,7 @@
             color: var(--primary-navy);
         }
 
-        /* SVG Background Curves */
+        /* SVG Background Wave Graphics */
         .bg-wave-top {
             position: absolute;
             top: 0;
@@ -97,37 +97,18 @@
             text-align: center;
         }
 
-        /* Logo Header */
+        /* Logo Styling */
         .logo-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
             margin-bottom: 24px;
         }
 
-        .logo-svg {
-            width: 56px;
-            height: 56px;
-        }
-
-        .logo-text {
-            text-align: left;
-        }
-
-        .logo-text-main {
-            font-size: 28px;
-            font-weight: 800;
-            color: #0c2a4a;
-            line-height: 1.05;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-text-sub {
-            font-size: 13px;
-            font-weight: 700;
-            color: #0c2a4a;
-            letter-spacing: 0.1px;
+        .logo-img {
+            height: 52px;
+            width: auto;
+            object-fit: contain;
         }
 
         /* Teacher Avatar Profile */
@@ -147,7 +128,7 @@
             box-shadow: 0 10px 25px rgba(12, 42, 74, 0.15), 0 0 0 12px rgba(255, 255, 255, 0.4);
         }
 
-        /* Title & Subtitle */
+        /* Titles */
         .title {
             font-size: 30px;
             font-weight: 800;
@@ -254,27 +235,14 @@
     <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
         
-        <!-- Pillar Logo -->
+        <!-- Logo Header -->
         <div class="logo-wrapper">
-            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="50" fill="url(#logo_grad)"/>
-                <path d="M25 38H75V43H25V38ZM30 46H35V68H30V46ZM43 46H48V68H43V46ZM56 46H61V68H56V46ZM68 46H73V68H68V46ZM25 71H75V75H25V71ZM50 25L75 35H25L50 25Z" fill="white"/>
-                <defs>
-                    <linearGradient id="logo_grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#0062b1"/>
-                        <stop offset="1" stop-color="#092543"/>
-                    </linearGradient>
-                </defs>
-            </svg>
-            <div class="logo-text">
-                <div class="logo-text-main">Englisholic</div>
-                <div class="logo-text-sub">Innovative English</div>
-            </div>
+            <img src="logo.png" alt="Englisholic Logo" class="logo-img">
         </div>
 
         <!-- Teacher Avatar -->
         <div class="avatar-container">
-            <img class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Teacher Jacqueline">
+            <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
         </div>
 
         <!-- Title Block -->
@@ -294,27 +262,14 @@
         </button>
     </div>
 
-    <!-- PAGE 2/3: TRIAL CALL (PRESERVED LOGIC) -->
+    <!-- PAGE 2/3: TRIAL CALL -->
     <div id="vapi-container" class="container">
         <div class="logo-wrapper">
-            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="50" fill="url(#logo_grad_2)"/>
-                <path d="M25 38H75V43H25V38ZM30 46H35V68H30V46ZM43 46H48V68H43V46ZM56 46H61V68H56V46ZM68 46H73V68H68V46ZM25 71H75V75H25V71ZM50 25L75 35H25L50 25Z" fill="white"/>
-                <defs>
-                    <linearGradient id="logo_grad_2" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#0062b1"/>
-                        <stop offset="1" stop-color="#092543"/>
-                    </linearGradient>
-                </defs>
-            </svg>
-            <div class="logo-text">
-                <div class="logo-text-main">Englisholic</div>
-                <div class="logo-text-sub">Innovative English</div>
-            </div>
+            <img src="logo.png" alt="Englisholic Logo" class="logo-img">
         </div>
 
         <div class="avatar-container">
-            <img class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Teacher Jacqueline">
+            <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
         </div>
 
         <h1 class="title">Teacher Jacqueline</h1>
