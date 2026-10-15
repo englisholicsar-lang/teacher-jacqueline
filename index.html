@@ -59,17 +59,18 @@
         // Initialize Kakao SDK
         Kakao.init('4800b51cb8a7d1862dc4b2725633ea69');
 
-        // Check for returning Kakao Auth Code in URL
+        // Check if returning from Kakao login redirect
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const authCode = urlParams.get('code');
 
             if (authCode) {
-                document.getElementById("status-text").innerText = "인증 정보를 확인 중입니다...";
+                // User was returned from Kakao authentication
+                document.getElementById("status-text").innerText = "인증 완료! 체험을 시작합니다...";
                 document.getElementById("login-btn").style.display = "none";
 
-                // Register session using the returned authorization code
-                checkAndRegisterTrial("kakao_code_" + authCode.substring(0, 15));
+                // Register session using the authorization code as unique user token
+                checkAndRegisterTrial("kakao_code_" + authCode);
             }
         });
 
@@ -79,7 +80,7 @@
                 return;
             }
 
-            // Execute full authorization redirect flow for WebView compatibility
+            // Standard Kakao Authorize redirect for KakaoTalk WebView
             Kakao.Auth.authorize({
                 redirectUri: REDIRECT_URI
             });
@@ -91,11 +92,12 @@
                 .then(data => {
                     if (data.status === "ALREADY_USED") {
                         alert("이미 무료 체험을 사용하셨습니다. (1인 1회 제한)");
-                        document.getElementById("status-text").innerText = "무료 체험이 이미 종료되었습니다.";
+                        document.getElementById("status-text").innerText = "무료 체험이 이미 완료되었습니다.";
                     } else if (data.status === "SUCCESS") {
-                        const authContainer = document.getElementById("auth-container");
-                        if (authContainer) authContainer.style.display = "none";
+                        // Hide login box
+                        document.getElementById("auth-container").style.display = "none";
 
+                        // Trigger Vapi Widget Call
                         const vapiBtn = document.getElementById("vapi-support-btn") || document.querySelector('[class*="vapi-btn"]');
                         if (vapiBtn) {
                             vapiBtn.click();
