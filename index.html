@@ -77,7 +77,7 @@
             display: block;
         }
 
-        /* Profile & Dot Grids Container */
+        /* Profile & Outward Dot Grids Container */
         .profile-container {
             position: relative;
             width: 100%;
@@ -87,7 +87,6 @@
             margin-bottom: 12px;
         }
 
-        /* Smaller Dot Grids Pushed Farther Away */
         .dot-grid-left, .dot-grid-right {
             position: absolute;
             width: 50px;
@@ -170,7 +169,7 @@
             word-break: keep-all;
         }
 
-        /* Action Buttons with Soft Glowing Shadows */
+        /* Action Buttons with Glowing Soft Shadows */
         .btn-action {
             width: 100%;
             padding: 16px;
@@ -236,12 +235,12 @@
     <div class="bg-wave-bottom"></div>
 
     <div class="main-wrapper">
-        <!-- Englisholic Official Logo -->
+        <!-- Englisholic Logo Image -->
         <div class="logo-box">
             <img src="./logo.png" alt="Englisholic Innovative English" onerror="this.onerror=null; this.src='logo.jpg';">
         </div>
 
-        <!-- Profile Photo & Outward Dot Grids -->
+        <!-- Jacqueline Profile Photo & Dot Grids -->
         <div class="profile-container">
             <div class="dot-grid-left"></div>
             <div class="profile-img-wrap">
@@ -250,11 +249,11 @@
             <div class="dot-grid-right"></div>
         </div>
 
-        <!-- Dynamic Titles -->
+        <!-- Titles -->
         <h1>Teacher Jacqueline</h1>
         <p class="subtitle" id="page-subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
-        <!-- PAGE 1: Kakao Login & Mic Notice -->
+        <!-- PAGE 1: Kakao Login -->
         <div id="auth-container" style="width: 100%;">
             <div class="mic-box">
                 <span class="mic-icon">🎙️</span>
@@ -265,11 +264,11 @@
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.582 2 2 4.761 2 8.167C2 10.37 3.433 12.301 5.61 13.442L4.84 16.272C4.764 16.549 5.08 16.771 5.318 16.613L8.678 14.38C9.11 14.446 9.551 14.482 10 14.482C14.418 14.482 18 11.721 18 8.315C18 4.761 14.418 2 10 2Z" fill="#191919"/>
                 </svg>
-                <span id="btn-text-content">카카오로 1초만에 시작하기</span>
+                <span id="btn-text-content">무료 체험 통화 시작하기</span>
             </button>
         </div>
 
-        <!-- PAGE 2: Vapi Call Screen -->
+        <!-- PAGE 2: Active Vapi Call Screen -->
         <div id="vapi-container">
             <button id="call-btn" class="btn-action btn-vapi-start" onclick="toggleCall()">
                 <span id="call-btn-text">📞 통화 시작하기</span>
@@ -287,16 +286,13 @@
         let vapiInstance = null;
         let isCallActive = false;
 
-        // Dynamically get cleaned current URL without query parameters or trailing slashes
-        function getCleanRedirectUri() {
-            let cleanUrl = window.location.origin + window.location.pathname;
-            // Remove 'index.html' or trailing slashes if present
-            cleanUrl = cleanUrl.replace(/\/index\.html$/, "").replace(/\/$/, "");
-            return cleanUrl;
+        // Dynamic clean redirect URI matching the browser URL
+        function getRedirectUri() {
+            return window.location.origin + window.location.pathname;
         }
 
         function loginWithKakao() {
-            const redirectUri = getCleanRedirectUri();
+            const redirectUri = getRedirectUri();
             const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}`;
             window.location.href = kakaoAuthUrl;
         }
@@ -314,6 +310,7 @@
                     localStorage.setItem("englisholic_user_id", userIdentifier);
                 }
 
+                // Send user identifier to Google Apps Script to log entry in Column A
                 const requestUrl = GAS_URL + "?email=" + encodeURIComponent(userIdentifier) + 
                                    "&userId=" + encodeURIComponent(userIdentifier) + 
                                    "&identifier=" + encodeURIComponent(userIdentifier) + 
@@ -330,6 +327,7 @@
                                 alert("이미 무료 체험을 사용하셨습니다.");
                             };
                         } else {
+                            // Show Page 2 with call controls
                             document.getElementById("page-subtitle").innerText = "아래 버튼을 눌러 통화를 시작하세요!";
                             document.getElementById("auth-container").style.display = "none";
                             document.getElementById("vapi-container").style.display = "block";
