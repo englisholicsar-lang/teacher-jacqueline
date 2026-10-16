@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Jacqueline - Free Trial</title>
     
+    <!-- Open Graph Meta Tags for KakaoTalk Link Preview -->
+    <meta property="og:title" content="Teacher Jacqueline - Free Trial">
+    <meta property="og:description" content="재클린 선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
+    <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/og-preview.png">
+    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
+    <meta property="og:type" content="website">
+
     <!-- Kakao SDK & Vapi Web SDK -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
@@ -340,7 +347,7 @@
             <h1 class="title">Teacher Jacqueline</h1>
             <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
             
-            <!-- Timer Badge Wrapper (iOS / Android Compatible) -->
+            <!-- Timer Badge Wrapper -->
             <div class="timer-wrapper">
                 <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
             </div>
@@ -426,137 +433,3 @@
                                 if (scriptEl) scriptEl.remove();
 
                                 if (data.status === "ALREADY_USED") {
-                                    alert("이미 무료 체험을 사용하셨습니다.");
-                                    document.getElementById("btn-text-content").innerText = "무료 체험 완료됨 (" + userName + ")";
-                                    const btn = document.getElementById("login-btn");
-                                    btn.style.opacity = "0.6";
-                                    btn.onclick = function() { alert("이미 무료 체험을 사용하셨습니다."); };
-                                } else {
-                                    document.getElementById("auth-container").style.display = "none";
-                                    document.getElementById("vapi-container").style.display = "flex";
-                                }
-                            };
-
-                            const script = document.createElement('script');
-                            script.id = callbackName;
-                            script.src = GAS_URL + "?userId=" + encodeURIComponent(userId) + 
-                                         "&userName=" + encodeURIComponent(userName) + 
-                                         "&deviceHash=" + encodeURIComponent(deviceHash) + 
-                                         "&callback=" + callbackName + 
-                                         "&t=" + Date.now();
-
-                            script.onerror = function() {
-                                document.getElementById("auth-container").style.display = "none";
-                                document.getElementById("vapi-container").style.display = "flex";
-                            };
-
-                            document.body.appendChild(script);
-                        },
-                        fail: function(error) {
-                            alert("사용자 정보를 불러올 수 없습니다: " + JSON.stringify(error));
-                            document.getElementById("btn-text-content").innerText = "무료 체험 통화 시작하기";
-                        }
-                    });
-                },
-                fail: function(err) {
-                    alert("카카오 로그인 실패: " + JSON.stringify(err));
-                    document.getElementById("btn-text-content").innerText = "무료 체험 통화 시작하기";
-                }
-            });
-        }
-
-        function formatTime(totalSeconds) {
-            const mins = Math.floor(totalSeconds / 60);
-            const secs = totalSeconds % 60;
-            const formattedMins = mins < 10 ? "0" + mins : mins;
-            const formattedSecs = secs < 10 ? "0" + secs : secs;
-            return formattedMins + ":" + formattedSecs;
-        }
-
-        function startTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            secondsElapsed = 0;
-            
-            timerInterval = setInterval(() => {
-                secondsElapsed++;
-                const timerEl = document.getElementById("timer");
-                if (timerEl) {
-                    timerEl.innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
-                }
-
-                if (secondsElapsed >= MAX_SECONDS) {
-                    stopTimer();
-                    if (vapiInstance) vapiInstance.stop();
-                    isCallActive = false;
-                    document.getElementById("call-status").innerText = "10분 무료 체험이 종료되었습니다. 수고하셨습니다!";
-                    document.getElementById("call-btn-text").innerText = "체험 종료됨";
-                    const btn = document.getElementById("start-call-btn");
-                    btn.style.backgroundColor = "#a0aec0";
-                    btn.disabled = true;
-                }
-            }, 1000);
-        }
-
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-        }
-
-        async function toggleVapiCall() {
-            if (!isCallActive) {
-                if (window.vapiSDK) {
-                    vapiInstance = window.vapiSDK.run({
-                        apiKey: VAPI_KEY,
-                        assistant: VAPI_ASSISTANT_ID
-                    });
-
-                    // Call Start listener
-                    vapiInstance.on('call-start', () => {
-                        console.log("Call connected! Starting timer...");
-                        startTimer();
-                    });
-
-                    // Speech Start listener (Starts timer when Jacqueline speaks if call-start didn't fire)
-                    vapiInstance.on('speech-start', () => {
-                        if (!timerInterval) {
-                            startTimer();
-                        }
-                    });
-
-                    vapiInstance.on('call-end', () => {
-                        stopTimer();
-                    });
-
-                    vapiInstance.start(VAPI_ASSISTANT_ID);
-                    
-                    isCallActive = true;
-
-                    document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
-                    document.getElementById("call-btn-text").innerText = "🚫 전화 끊기";
-                    const btn = document.getElementById("start-call-btn");
-                    btn.style.backgroundColor = "#e05252";
-                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                } else {
-                    alert("Vapi SDK 로딩 실패");
-                }
-            } else {
-                if (vapiInstance) {
-                    vapiInstance.stop();
-                }
-                stopTimer();
-                isCallActive = false;
-
-                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
-                document.getElementById("call-btn-text").innerText = "통화 종료됨";
-                const btn = document.getElementById("start-call-btn");
-                btn.style.backgroundColor = "#a0aec0";
-                btn.style.boxShadow = "none";
-                btn.disabled = true;
-                btn.style.cursor = "default";
-            }
-        }
-    </script>
-</body>
-</html>
