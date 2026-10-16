@@ -235,9 +235,14 @@
             justify-content: center;
             gap: 8px;
             margin-top: 36px;
+            transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.1s ease;
         }
 
-        /* SPECIFIC HIDE Rule: Target ONLY external Vapi SDK floating elements */
+        .call-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Hide Vapi SDK default floating widget elements */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -309,7 +314,7 @@
         </div>
 
         <div class="bottom-group">
-            <button id="start-call-btn" class="call-btn" onclick="startVapiCall()">
+            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
                 <span id="call-btn-text">📞 통화 시작하기</span>
             </button>
         </div>
@@ -324,6 +329,7 @@
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
         let vapiInstance = null;
+        let isCallActive = false;
 
         function startKakaoAuth() {
             if (localStorage.getItem("englisholic_trial_used") === "true") {
@@ -372,21 +378,43 @@
             }
         };
 
-        function startVapiCall() {
-            if (window.vapiSDK) {
-                vapiInstance = window.vapiSDK.run({
-                    apiKey: VAPI_KEY,
-                    assistant: VAPI_ASSISTANT_ID
-                });
-                vapiInstance.start(VAPI_ASSISTANT_ID);
-                
-                localStorage.setItem("englisholic_trial_used", "true");
+        function toggleVapiCall() {
+            if (!isCallActive) {
+                // START CALL
+                if (window.vapiSDK) {
+                    vapiInstance = window.vapiSDK.run({
+                        apiKey: VAPI_KEY,
+                        assistant: VAPI_ASSISTANT_ID
+                    });
+                    vapiInstance.start(VAPI_ASSISTANT_ID);
+                    
+                    localStorage.setItem("englisholic_trial_used", "true");
+                    isCallActive = true;
 
-                document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
-                document.getElementById("call-btn-text").innerText = "🎙️ 통화 진행 중...";
-                document.getElementById("start-call-btn").style.backgroundColor = "#27ae60";
+                    // Update UI to Soft Red "Hang Up" button
+                    document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "🚫 전화 끊기";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#e05252"; // Soft warm red
+                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                } else {
+                    alert("Vapi SDK 로딩 실패");
+                }
             } else {
-                alert("Vapi SDK 로딩 실패");
+                // END / HANG UP CALL
+                if (vapiInstance) {
+                    vapiInstance.stop();
+                }
+                isCallActive = false;
+
+                // Update UI to "Ended" state
+                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+                document.getElementById("call-btn-text").innerText = "통화 종료됨";
+                const btn = document.getElementById("start-call-btn");
+                btn.style.backgroundColor = "#a0aec0"; // Soft muted grey
+                btn.style.boxShadow = "none";
+                btn.disabled = true;
+                btn.style.cursor = "default";
             }
         }
     </script>
