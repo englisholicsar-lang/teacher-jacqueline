@@ -18,27 +18,39 @@
 
         html, body {
             height: 100%;
-            overflow: hidden; /* Prevents unwanted mobile scrolling */
+            overflow: hidden;
         }
 
         body {
-            background: linear-gradient(180deg, #e6f2ff 0%, #ffffff 50%, #e6f2ff 100%);
+            background-color: #f2f8ff;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 12px 16px;
+            padding: 10px 16px;
             color: #0f172a;
             position: relative;
         }
 
-        /* Curved Wave Top Accent */
+        /* Top Arched Wave Background Graphic */
         .bg-wave-top {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 120px;
-            background: radial-gradient(circle at 50% -20%, #d8ebff 0%, rgba(216, 235, 255, 0) 70%);
+            height: 160px;
+            background: radial-gradient(ellipse 120% 90% at 50% -20%, #d8ebff 0%, #d8ebff 55%, rgba(216, 235, 255, 0) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Bottom Arched Wave Background Graphic */
+        .bg-wave-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 140px;
+            background: radial-gradient(ellipse 120% 80% at 50% 120%, #d8ebff 0%, #d8ebff 50%, rgba(216, 235, 255, 0) 100%);
             z-index: 0;
             pointer-events: none;
         }
@@ -54,56 +66,56 @@
             z-index: 1;
         }
 
-        /* Compact Logo Header */
+        /* Logo Header */
         .logo-box {
             margin-bottom: 12px;
         }
 
         .logo-box img {
-            max-width: 160px;
+            max-width: 175px;
             height: auto;
             display: block;
         }
 
-        /* Compact Profile & Dot Pattern */
+        /* Profile & Dot Grids Container */
         .profile-container {
             position: relative;
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
-        /* Dot Pattern Accents */
+        /* Smaller Dot Grids Pushed Farther Away */
         .dot-grid-left, .dot-grid-right {
             position: absolute;
             width: 50px;
-            height: 60px;
-            background-image: radial-gradient(#a3cdff 2px, transparent 2px);
-            background-size: 8px 8px;
-            opacity: 0.75;
+            height: 70px;
+            background-image: radial-gradient(#bcd8f8 1.8px, transparent 1.8px);
+            background-size: 7.5px 7.5px;
+            opacity: 0.85;
             pointer-events: none;
         }
 
         .dot-grid-left {
-            left: 20px;
-            bottom: -5px;
+            left: 8px; /* Shifted outward away from photo */
+            bottom: -8px;
         }
 
         .dot-grid-right {
-            right: 20px;
-            top: -5px;
+            right: 8px; /* Shifted outward away from photo */
+            top: -12px;
         }
 
         .profile-img-wrap {
             position: relative;
-            width: 105px;
-            height: 105px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
-            padding: 3px;
+            padding: 4px;
             background: #ffffff;
-            box-shadow: 0 8px 20px rgba(15, 76, 129, 0.12);
+            box-shadow: 0 10px 25px rgba(15, 76, 129, 0.16);
         }
 
         .profile-img-wrap img {
@@ -115,7 +127,7 @@
 
         /* Typography */
         h1 {
-            font-size: 22px;
+            font-size: 23px;
             font-weight: 800;
             color: #0f2c59;
             margin-bottom: 4px;
@@ -126,45 +138,45 @@
             font-size: 14px;
             font-weight: 600;
             color: #526d82;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
             letter-spacing: -0.3px;
         }
 
-        /* Compact Microphone Notice Box */
+        /* Microphone Permission Notice Banner */
         .mic-box {
             width: 100%;
             background-color: #f0f7ff;
             border: 1px solid #cbe3ff;
-            border-radius: 16px;
-            padding: 12px 14px;
+            border-radius: 20px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+            gap: 12px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 14px rgba(15, 76, 129, 0.04);
         }
 
         .mic-icon {
-            font-size: 22px;
+            font-size: 24px;
             flex-shrink: 0;
         }
 
         .mic-text {
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 700;
             color: #0f2c59;
-            line-height: 1.35;
+            line-height: 1.38;
             text-align: left;
             word-break: keep-all;
         }
 
-        /* Action Buttons */
+        /* Action Buttons with Glowing Soft Shadows */
         .btn-action {
             width: 100%;
             padding: 16px;
-            border-radius: 18px;
+            border-radius: 20px;
             border: none;
-            font-size: 16px;
+            font-size: 16.5px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
@@ -173,7 +185,7 @@
             gap: 8px;
             white-space: nowrap;
             letter-spacing: -0.3px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 20px rgba(255, 230, 0, 0.4);
             transition: all 0.2s ease;
         }
 
@@ -190,16 +202,19 @@
             background-color: #ffe600;
             opacity: 0.9;
             cursor: not-allowed;
+            box-shadow: 0 6px 16px rgba(255, 230, 0, 0.25);
         }
 
         .btn-vapi-start {
             background-color: #22c55e;
             color: #ffffff;
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
         }
 
         .btn-vapi-end {
             background-color: #ef4444;
             color: #ffffff;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
         }
 
         #vapi-container {
@@ -218,6 +233,7 @@
 <body>
 
     <div class="bg-wave-top"></div>
+    <div class="bg-wave-bottom"></div>
 
     <div class="main-wrapper">
         <!-- Englisholic Official Logo -->
@@ -225,7 +241,7 @@
             <img src="./logo.png" alt="Englisholic Innovative English" onerror="this.onerror=null; this.src='logo.jpg';">
         </div>
 
-        <!-- Profile Photo & Dot Grids -->
+        <!-- Profile Photo & Outward Dot Grids -->
         <div class="profile-container">
             <div class="dot-grid-left"></div>
             <div class="profile-img-wrap">
@@ -265,7 +281,6 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycby4C0SsERlnAJsjcK3SOUgdqERywyqJB6YyWqTHHRFfbVC3XzXzE_d9mEKJgtb3t_q_jA/exec"; 
         const KAKAO_CLIENT_ID = "6f7519b766b027481f792e3272958dfb";
-        // Fixed static domain matching Kakao App primary domain exactly
         const REDIRECT_URI = "https://englisholicsar-lang.github.io";
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
