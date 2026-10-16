@@ -34,7 +34,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 0px 20px 20px 20px; /* Reduced top padding to 0 */
+            padding: 0px 20px 20px 20px;
             color: var(--primary-navy);
         }
 
@@ -97,13 +97,13 @@
             text-align: center;
         }
 
-        /* Upper Section Group (Logo, Avatar, Name, Subtitle) */
+        /* Upper Section Group */
         .upper-group {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            margin-top: 6px; /* Small cushion below screen top edge */
+            margin-top: 6px;
         }
 
         .logo-wrapper {
@@ -149,13 +149,13 @@
             color: #4a637d;
         }
 
-        /* Lower Section Group (Pushed down to leave a gap above) */
+        /* Lower Section Group */
         .bottom-group {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 42px; /* Increased top margin creates clear separation */
+            margin-top: 42px;
         }
 
         .info-box {
@@ -213,7 +213,7 @@
             font-size: 19px;
         }
 
-        /* Page 2 Container */
+        /* Page 2 / Active Call Styles */
         #vapi-container {
             display: none;
             width: 100%;
@@ -221,16 +221,39 @@
 
         .call-btn {
             width: 100%;
-            background-color: #25d366;
+            background-color: #2ecc71;
             color: #ffffff;
             border: none;
-            padding: 15px 18px;
+            padding: 16px 20px;
             border-radius: 14px;
-            font-size: 16.5px;
+            font-size: 17px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
-            margin-top: 10px;
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 36px;
+        }
+
+        /* Helper Instruction Text */
+        #call-helper-text {
+            display: none;
+            margin-top: 14px;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #27ae60;
+            text-align: center;
+            width: 100%;
+            line-height: 1.4;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
         }
     </style>
 </head>
@@ -249,8 +272,6 @@
 
     <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
-        
-        <!-- Upper Group (Higher Up Near Top Wave) -->
         <div class="upper-group">
             <div class="logo-wrapper">
                 <img src="logo.png" alt="Englisholic Logo" class="logo-img">
@@ -264,7 +285,6 @@
             <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
         </div>
 
-        <!-- Lower Group (Separated by 42px Gap) -->
         <div class="bottom-group">
             <div class="info-box">
                 <span class="info-box-icon">🎙️</span>
@@ -278,22 +298,28 @@
         </div>
     </div>
 
-    <!-- PAGE 2/3: TRIAL CALL -->
+    <!-- PAGE 2: ACTIVE CALL SCREEN -->
     <div id="vapi-container" class="container">
-        <div class="logo-wrapper">
-            <img src="logo.png" alt="Englisholic Logo" class="logo-img">
+        <div class="upper-group">
+            <div class="logo-wrapper">
+                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
+            </div>
+
+            <div class="avatar-container">
+                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
+            </div>
+
+            <h1 class="title">Teacher Jacqueline</h1>
+            <p id="call-status" class="subtitle">통화 연결 중...</p>
         </div>
 
-        <div class="avatar-container">
-            <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
+        <div class="bottom-group">
+            <button id="start-call-btn" class="call-btn" onclick="startVapiCall()">
+                <span>📞 통화 시작하기</span>
+            </button>
+            <!-- Helper Instruction Text -->
+            <div id="call-helper-text">💡 통화 연결을 위해 아래 버튼을<br>한 번 더 터치해 주세요.</div>
         </div>
-
-        <h1 class="title">Teacher Jacqueline</h1>
-        <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
-
-        <button id="start-call-btn" class="call-btn" onclick="startVapiCall()">
-            📞 통화 시작하기
-        </button>
     </div>
 
     <script>
@@ -307,6 +333,12 @@
         let vapiInstance = null;
 
         function startKakaoAuth() {
+            // Check client-side block before redirecting
+            if (localStorage.getItem("englisholic_trial_used") === "true") {
+                alert("이미 무료 체험을 사용하셨습니다.");
+                return;
+            }
+
             const authUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + KAKAO_CLIENT_ID + 
                             "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) + 
                             "&response_type=code";
@@ -314,6 +346,15 @@
         }
 
         window.onload = function() {
+            // Check local storage for repeated attempts
+            if (localStorage.getItem("englisholic_trial_used") === "true") {
+                document.getElementById("btn-text-content").innerText = "무료 체험 완료됨";
+                document.getElementById("login-btn").style.opacity = "0.6";
+                document.getElementById("login-btn").onclick = function() {
+                    alert("이미 무료 체험을 사용하셨습니다.");
+                };
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const authCode = urlParams.get('code');
 
@@ -326,6 +367,7 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "ALREADY_USED") {
+                            localStorage.setItem("englisholic_trial_used", "true");
                             alert("이미 무료 체험을 사용하셨습니다.");
                             document.getElementById("btn-text-content").innerText = "무료 체험 종료됨";
                         } else {
@@ -346,7 +388,13 @@
                     assistant: VAPI_ASSISTANT_ID
                 });
                 vapiInstance.start(VAPI_ASSISTANT_ID);
-                document.getElementById("call-status").innerText = "통화 연결 중...";
+                
+                // Mark as used locally so repeated attempts on the same browser are blocked immediately
+                localStorage.setItem("englisholic_trial_used", "true");
+
+                document.getElementById("start-call-btn").style.opacity = "0.8";
+                document.getElementById("call-status").innerText = "통화 연결 준비 완료";
+                document.getElementById("call-helper-text").style.display = "block";
             } else {
                 alert("Vapi SDK 로딩 실패");
             }
