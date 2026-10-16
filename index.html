@@ -237,11 +237,14 @@
             margin-top: 36px;
         }
 
-        /* Hide Vapi Default Floating Button Widget */
-        div[id*="vapi"], 
+        /* SPECIFIC HIDE Rule: Target ONLY external Vapi SDK floating elements */
         iframe[title*="vapi"],
+        iframe[src*="vapi"],
+        .vapi-btn,
         .vapi-btn-container,
-        #vapi-widget-container {
+        [class*="vapi-btn"],
+        [id*="vapi-widget"],
+        button[class*="vapi"] {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
