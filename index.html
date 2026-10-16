@@ -17,64 +17,104 @@
         }
 
         body {
-            background-color: #eef7ff;
-            background-image: 
-                radial-gradient(#cce3f7 1.5px, transparent 1.5px),
-                radial-gradient(#cce3f7 1.5px, #eef7ff 1.5px);
-            background-size: 30px 30px;
-            background-position: 0 0, 15px 15px;
-            color: #0f172a;
+            background: linear-gradient(180deg, #e6f2ff 0%, #ffffff 50%, #e6f2ff 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 16px;
+            padding: 20px 16px;
+            color: #0f172a;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .card {
+        /* Curved Wave Background Layer */
+        .bg-wave-top {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 380px;
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
-            padding: 28px 20px;
+            height: 180px;
+            background: radial-gradient(circle at 50% -20%, #d8ebff 0%, rgba(216, 235, 255, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 390px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
             position: relative;
-            overflow: hidden;
+            z-index: 1;
         }
 
-        .logo-container {
+        /* Logo Header */
+        .logo-box {
+            margin-bottom: 24px;
+        }
+
+        .logo-box img {
+            max-width: 210px;
+            height: auto;
+            display: block;
+        }
+
+        /* Profile & Background Dot Pattern */
+        .profile-container {
+            position: relative;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
-        .logo-img {
-            height: 48px;
-            object-fit: contain;
+        /* Dot Grids on Left and Right */
+        .dot-grid-left, .dot-grid-right {
+            position: absolute;
+            width: 70px;
+            height: 80px;
+            background-image: radial-gradient(#a3cdff 2px, transparent 2px);
+            background-size: 10px 10px;
+            opacity: 0.7;
+            pointer-events: none;
         }
 
-        .profile-wrapper {
+        .dot-grid-left {
+            left: 10px;
+            bottom: -10px;
+        }
+
+        .dot-grid-right {
+            right: 10px;
+            top: -10px;
+        }
+
+        .profile-img-wrap {
             position: relative;
-            width: 140px;
-            height: 140px;
-            margin: 0 auto 18px auto;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            padding: 4px;
+            background: #ffffff;
+            box-shadow: 0 10px 25px rgba(15, 76, 129, 0.15);
         }
 
-        .profile-img {
+        .profile-img-wrap img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #ffffff;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
+        /* Typography */
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
-            color: #1e293b;
+            color: #0f2c59;
             margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
@@ -82,44 +122,44 @@
         p.subtitle {
             font-size: 15px;
             font-weight: 600;
-            color: #64748b;
-            line-height: 1.4;
-            margin-bottom: 22px;
+            color: #526d82;
+            margin-bottom: 24px;
             letter-spacing: -0.3px;
         }
 
-        /* Mic Helper Notice Box */
-        .mic-notice {
+        /* Microphone Permission Notice Banner */
+        .mic-box {
+            width: 100%;
             background-color: #f0f7ff;
-            border: 1px solid #d0e4ff;
-            border-radius: 18px;
-            padding: 14px 16px;
+            border: 1px solid #cbe3ff;
+            border-radius: 20px;
+            padding: 16px 18px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            text-align: left;
+            gap: 14px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         }
 
         .mic-icon {
-            font-size: 24px;
+            font-size: 28px;
             flex-shrink: 0;
         }
 
         .mic-text {
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 700;
-            color: #1e3a8a;
-            line-height: 1.35;
+            color: #0f2c59;
+            line-height: 1.4;
+            text-align: left;
             word-break: keep-all;
         }
 
-        /* Common Button Styles */
-        .btn {
+        /* Action Buttons */
+        .btn-action {
             width: 100%;
-            padding: 18px 20px;
-            border-radius: 20px;
+            padding: 18px;
+            border-radius: 22px;
             border: none;
             font-size: 17px;
             font-weight: 800;
@@ -128,38 +168,30 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: all 0.2s ease;
             white-space: nowrap;
             letter-spacing: -0.3px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
         }
 
-        /* Kakao Yellow Button */
         .btn-kakao {
-            background-color: #FFE600;
+            background-color: #ffe600;
             color: #191919;
         }
 
         .btn-kakao:active {
             transform: scale(0.98);
-            background-color: #fada00;
         }
 
         .btn-kakao.disabled {
-            background-color: #FFE600;
-            opacity: 0.85;
+            background-color: #ffe600;
+            opacity: 0.9;
             cursor: not-allowed;
         }
 
-        /* Vapi Call Buttons */
         .btn-vapi-start {
             background-color: #22c55e;
             color: #ffffff;
-        }
-
-        .btn-vapi-start:active {
-            transform: scale(0.98);
-            background-color: #16a34a;
         }
 
         .btn-vapi-end {
@@ -167,17 +199,12 @@
             color: #ffffff;
         }
 
-        .btn-vapi-end:active {
-            transform: scale(0.98);
-            background-color: #dc2626;
-        }
-
         #vapi-container {
             display: none;
             width: 100%;
         }
 
-        .call-status {
+        .status-msg {
             margin-top: 14px;
             font-size: 14px;
             font-weight: 600;
@@ -187,36 +214,35 @@
 </head>
 <body>
 
-    <div class="card">
-        <!-- Englisholic Brand Header -->
-        <div class="logo-container">
-            <svg width="180" height="42" viewBox="0 0 200 48" fill="none" class="logo-img">
-                <circle cx="24" cy="24" r="20" fill="#0F4C81"/>
-                <path d="M14 34V31H34V34H14ZM16 30V18H19V30H16ZM22.5 30V18H25.5V30H22.5ZM29 30V18H32V30H29ZM14 17V14H34V17H14Z" fill="#FFFFFF"/>
-                <text x="50" y="24" font-family="-apple-system, sans-serif" font-weight="800" font-size="20" fill="#0F4C81">Englisholic</text>
-                <text x="50" y="38" font-family="-apple-system, sans-serif" font-weight="600" font-size="11" fill="#475569" letter-spacing="0.5">Innovative English</text>
-            </svg>
+    <div class="bg-wave-top"></div>
+
+    <div class="main-wrapper">
+        <!-- Englisholic Official Logo Image -->
+        <div class="logo-box">
+            <img src="./logo.png" alt="Englisholic Innovative English" onerror="this.onerror=null; this.src='logo.jpg';">
         </div>
 
-        <!-- Jacqueline Profile Photo -->
-        <div class="profile-wrapper">
-            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300" alt="Teacher Jacqueline" class="profile-img">
+        <!-- Profile Photo with Background Dot Grids -->
+        <div class="profile-container">
+            <div class="dot-grid-left"></div>
+            <div class="profile-img-wrap">
+                <img src="./jacqueline.png" alt="Teacher Jacqueline" onerror="this.onerror=null; this.src='jacqueline.jpg';">
+            </div>
+            <div class="dot-grid-right"></div>
         </div>
 
-        <!-- Dynamic Title & Subtitle -->
-        <h1 id="page-title">Teacher Jacqueline</h1>
+        <!-- Dynamic Header Texts -->
+        <h1>Teacher Jacqueline</h1>
         <p class="subtitle" id="page-subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
-        <!-- PAGE 1: Kakao Verification Gate -->
-        <div id="auth-container">
-            <!-- Microphone Notice Box -->
-            <div class="mic-notice">
+        <!-- PAGE 1: Kakao Login & Mic Notice -->
+        <div id="auth-container" style="width: 100%;">
+            <div class="mic-box">
                 <span class="mic-icon">🎙️</span>
                 <span class="mic-text">원활한 통화를 위해 마이크 권한을 허용해 주세요.</span>
             </div>
 
-            <!-- Kakao Button -->
-            <button id="login-btn" class="btn btn-kakao" onclick="loginWithKakao()">
+            <button id="login-btn" class="btn-action btn-kakao" onclick="loginWithKakao()">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.582 2 2 4.761 2 8.167C2 10.37 3.433 12.301 5.61 13.442L4.84 16.272C4.764 16.549 5.08 16.771 5.318 16.613L8.678 14.38C9.11 14.446 9.551 14.482 10 14.482C14.418 14.482 18 11.721 18 8.315C18 4.761 14.418 2 10 2Z" fill="#191919"/>
                 </svg>
@@ -224,17 +250,16 @@
             </button>
         </div>
 
-        <!-- PAGE 2: Active Vapi Call Screen -->
+        <!-- PAGE 2: Vapi Call Control -->
         <div id="vapi-container">
-            <button id="call-btn" class="btn btn-vapi-start" onclick="toggleCall()">
+            <button id="call-btn" class="btn-action btn-vapi-start" onclick="toggleCall()">
                 <span id="call-btn-text">📞 통화 시작하기</span>
             </button>
-            <div id="call-status" class="call-status">연결 준비 완료</div>
+            <div id="call-status" class="status-msg">연결 준비 완료</div>
         </div>
     </div>
 
     <script>
-        // CONFIGURATION (PERSISTED KEYS)
         const GAS_URL = "https://script.google.com/macros/s/AKfycby4C0SsERlnAJsjcK3SOUgdqERywyqJB6YyWqTHHRFfbVC3XzXzE_d9mEKJgtb3t_q_jA/exec"; 
         const KAKAO_CLIENT_ID = "6f7519b766b027481f792e3272958dfb";
         const REDIRECT_URI = window.location.origin + window.location.pathname;
@@ -244,13 +269,11 @@
         let vapiInstance = null;
         let isCallActive = false;
 
-        // Step 1: Initialize Kakao Login Redirect
         function loginWithKakao() {
             const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
             window.location.href = kakaoAuthUrl;
         }
 
-        // Step 2: Handle Redirect and Check Session in Google Sheets
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const authCode = urlParams.get('code');
@@ -273,7 +296,7 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "ALREADY_USED") {
-                            // USED STATE: Update yellow button to "무료 체험 완료됨"
+                            // 이미 사용된 경우: 노란 버튼 문구를 "💬 무료 체험 완료됨"으로 변경
                             document.getElementById("btn-text-content").innerText = "💬 무료 체험 완료됨";
                             const loginBtn = document.getElementById("login-btn");
                             loginBtn.classList.add("disabled");
@@ -281,7 +304,7 @@
                                 alert("이미 무료 체험을 사용하셨습니다.");
                             };
                         } else {
-                            // SUCCESS: Transition to Page 2 layout
+                            // 첫 사용: Page 2 통화 화면으로 전환 & 서브타이틀 변경
                             document.getElementById("page-subtitle").innerText = "아래 버튼을 눌러 통화를 시작하세요!";
                             document.getElementById("auth-container").style.display = "none";
                             document.getElementById("vapi-container").style.display = "block";
@@ -294,7 +317,6 @@
             }
         };
 
-        // Step 3: Vapi Web SDK Handlers
         function initVapi() {
             if (typeof Vapi !== "undefined") {
                 vapiInstance = new Vapi(VAPI_PUBLIC_KEY);
@@ -302,7 +324,7 @@
                 vapiInstance.on("call-start", () => {
                     isCallActive = true;
                     const callBtn = document.getElementById("call-btn");
-                    callBtn.className = "btn btn-vapi-end";
+                    callBtn.className = "btn-action btn-vapi-end";
                     document.getElementById("call-btn-text").innerText = "🔴 통화 종료하기";
                     document.getElementById("call-status").innerText = "통화 진행 중...";
                 });
@@ -310,7 +332,7 @@
                 vapiInstance.on("call-end", () => {
                     isCallActive = false;
                     const callBtn = document.getElementById("call-btn");
-                    callBtn.className = "btn btn-vapi-start";
+                    callBtn.className = "btn-action btn-vapi-start";
                     document.getElementById("call-btn-text").innerText = "📞 통화 시작하기";
                     document.getElementById("call-status").innerText = "통화가 종료되었습니다.";
                 });
@@ -322,7 +344,6 @@
             }
         }
 
-        // Step 4: Toggle Call State
         async function toggleCall() {
             if (!vapiInstance) {
                 initVapi();
