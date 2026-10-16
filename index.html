@@ -332,6 +332,10 @@
         let isCallActive = false;
 
         function startKakaoAuth() {
+            if (localStorage.getItem("englisholic_trial_used") === "true") {
+                alert("이미 무료 체험을 사용하셨습니다.");
+                return;
+            }
             const authUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + KAKAO_CLIENT_ID + 
                             "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) + 
                             "&response_type=code";
@@ -339,31 +343,41 @@
         }
 
         window.onload = function() {
+            if (localStorage.getItem("englisholic_trial_used") === "true") {
+                document.getElementById("btn-text-content").innerText = "무료 체험 완료됨";
+                const btn = document.getElementById("login-btn");
+                btn.style.opacity = "0.6";
+                btn.onclick = function() {
+                    alert("이미 무료 체험을 사용하셨습니다.");
+                };
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const authCode = urlParams.get('code');
 
             if (authCode) {
                 document.getElementById("btn-text-content").innerText = "인증 확인 중...";
                 
-                // Retrieve or generate a clean persistent user email/identifier for tracking in Sheets
                 let userEmail = localStorage.getItem("englisholic_kakao_identity");
                 if (!userEmail) {
                     userEmail = "user_" + Math.random().toString(36).substring(2, 8) + "@kakao.user";
                     localStorage.setItem("englisholic_kakao_identity", userEmail);
                 }
                 
-                // Send identifier/email to Google Apps Script
                 fetch(GAS_URL + "?email=" + encodeURIComponent(userEmail) + "&t=" + Date.now())
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "ALREADY_USED") {
+                            localStorage.setItem("englisholic_trial_used", "true");
                             alert("이미 무료 체험을 사용하셨습니다.");
                             document.getElementById("btn-text-content").innerText = "무료 체험 완료됨";
-                            document.getElementById("login-btn").style.opacity = "0.6";
-                            document.getElementById("login-btn").onclick = function() {
+                            const btn = document.getElementById("login-btn");
+                            btn.style.opacity = "0.6";
+                            btn.onclick = function() {
                                 alert("이미 무료 체험을 사용하셨습니다.");
                             };
                         } else {
+                            localStorage.setItem("englisholic_trial_used", "true");
                             document.getElementById("auth-container").style.display = "none";
                             document.getElementById("vapi-container").style.display = "flex";
                         }
@@ -376,15 +390,6 @@
 
         async function toggleVapiCall() {
             if (!isCallActive) {
-                // Request Microphone permissions explicitly
-                try {
-                    await navigator.mediaDevices.getUserMedia({ audio: true });
-                } catch (err) {
-                    alert("마이크 권한 허용이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해 주세요.");
-                    return;
-                }
-
-                // START CALL
                 if (window.vapiSDK) {
                     vapiInstance = window.vapiSDK.run({
                         apiKey: VAPI_KEY,
@@ -394,7 +399,6 @@
                     
                     isCallActive = true;
 
-                    // Update UI to Soft Red "Hang Up" button
                     document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
                     document.getElementById("call-btn-text").innerText = "🚫 전화 끊기";
                     const btn = document.getElementById("start-call-btn");
@@ -404,13 +408,11 @@
                     alert("Vapi SDK 로딩 실패");
                 }
             } else {
-                // END / HANG UP CALL
                 if (vapiInstance) {
                     vapiInstance.stop();
                 }
                 isCallActive = false;
 
-                // Update UI to "Ended" state
                 document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
                 document.getElementById("call-btn-text").innerText = "통화 종료됨";
                 const btn = document.getElementById("start-call-btn");
