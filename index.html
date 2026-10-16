@@ -237,23 +237,15 @@
             margin-top: 36px;
         }
 
-        /* Helper Instruction Text */
-        #call-helper-text {
-            display: none;
-            margin-top: 14px;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #27ae60;
-            text-align: center;
-            width: 100%;
-            line-height: 1.4;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { opacity: 0.7; }
+        /* Hide Vapi Default Floating Button Widget */
+        div[id*="vapi"], 
+        iframe[title*="vapi"],
+        .vapi-btn-container,
+        #vapi-widget-container {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
     </style>
 </head>
@@ -310,15 +302,13 @@
             </div>
 
             <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">통화 연결 중...</p>
+            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
         </div>
 
         <div class="bottom-group">
             <button id="start-call-btn" class="call-btn" onclick="startVapiCall()">
-                <span>📞 통화 시작하기</span>
+                <span id="call-btn-text">📞 통화 시작하기</span>
             </button>
-            <!-- Helper Instruction Text -->
-            <div id="call-helper-text">💡 통화 연결을 위해 아래 버튼을<br>한 번 더 터치해 주세요.</div>
         </div>
     </div>
 
@@ -333,7 +323,6 @@
         let vapiInstance = null;
 
         function startKakaoAuth() {
-            // Check client-side block before redirecting
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 alert("이미 무료 체험을 사용하셨습니다.");
                 return;
@@ -346,7 +335,6 @@
         }
 
         window.onload = function() {
-            // Check local storage for repeated attempts
             if (localStorage.getItem("englisholic_trial_used") === "true") {
                 document.getElementById("btn-text-content").innerText = "무료 체험 완료됨";
                 document.getElementById("login-btn").style.opacity = "0.6";
@@ -389,12 +377,11 @@
                 });
                 vapiInstance.start(VAPI_ASSISTANT_ID);
                 
-                // Mark as used locally so repeated attempts on the same browser are blocked immediately
                 localStorage.setItem("englisholic_trial_used", "true");
 
-                document.getElementById("start-call-btn").style.opacity = "0.8";
-                document.getElementById("call-status").innerText = "통화 연결 준비 완료";
-                document.getElementById("call-helper-text").style.display = "block";
+                document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
+                document.getElementById("call-btn-text").innerText = "🎙️ 통화 진행 중...";
+                document.getElementById("start-call-btn").style.backgroundColor = "#27ae60";
             } else {
                 alert("Vapi SDK 로딩 실패");
             }
