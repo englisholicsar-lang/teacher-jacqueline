@@ -170,7 +170,7 @@
             word-break: keep-all;
         }
 
-        /* Action Buttons with Glowing Soft Shadows */
+        /* Action Buttons with Soft Glowing Shadows */
         .btn-action {
             width: 100%;
             padding: 16px;
@@ -281,18 +281,23 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycby4C0SsERlnAJsjcK3SOUgdqERywyqJB6YyWqTHHRFfbVC3XzXzE_d9mEKJgtb3t_q_jA/exec"; 
         const KAKAO_CLIENT_ID = "6f7519b766b027481f792e3272958dfb";
-        
-        // Exact GitHub Pages repository path
-        const REDIRECT_URI = "https://englisholicsar-lang.github.io/teacher-jacqueline/";
-        
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
         let vapiInstance = null;
         let isCallActive = false;
 
+        // Dynamically get cleaned current URL without query parameters or trailing slashes
+        function getCleanRedirectUri() {
+            let cleanUrl = window.location.origin + window.location.pathname;
+            // Remove 'index.html' or trailing slashes if present
+            cleanUrl = cleanUrl.replace(/\/index\.html$/, "").replace(/\/$/, "");
+            return cleanUrl;
+        }
+
         function loginWithKakao() {
-            const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+            const redirectUri = getCleanRedirectUri();
+            const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}`;
             window.location.href = kakaoAuthUrl;
         }
 
