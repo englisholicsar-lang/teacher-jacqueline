@@ -335,6 +335,25 @@
             Kakao.init(KAKAO_CLIENT_ID);
         }
 
+        // Generate client-side device hash fingerprint
+        function getDeviceHash() {
+            const rawString = [
+                navigator.userAgent,
+                navigator.language,
+                screen.width + "x" + screen.height,
+                screen.colorDepth,
+                new Date().getTimezoneOffset()
+            ].join("|");
+
+            let hash = 0;
+            for (let i = 0; i < rawString.length; i++) {
+                const char = rawString.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash |= 0;
+            }
+            return "DEV-" + Math.abs(hash).toString(16).toUpperCase();
+        }
+
         function startKakaoAuth() {
             document.getElementById("btn-text-content").innerText = "카카오 로그인 중...";
 
@@ -345,10 +364,11 @@
                         success: function(res) {
                             const userId = res.id;
                             const userName = (res.properties && res.properties.nickname) ? res.properties.nickname : "Kakao User";
+                            const deviceHash = getDeviceHash();
 
                             document.getElementById("btn-text-content").innerText = "인증 확인 중...";
 
-                            // JSONP Callback to log into Google Sheets safely
+                            // JSONP Callback to log into Google Sheets safely with device hash
                             const callbackName = "gasCallback_" + Date.now();
                             
                             window[callbackName] = function(data) {
@@ -373,6 +393,7 @@
                             script.id = callbackName;
                             script.src = GAS_URL + "?userId=" + encodeURIComponent(userId) + 
                                          "&userName=" + encodeURIComponent(userName) + 
+                                         "&deviceHash=" + encodeURIComponent(deviceHash) + 
                                          "&callback=" + callbackName + 
                                          "&t=" + Date.now();
 
