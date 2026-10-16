@@ -398,17 +398,23 @@
         }
 
         function startKakaoAuth() {
-            alert("카카오 로그인을 진행합니다.");
-
             if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                 Kakao.init(KAKAO_CLIENT_ID);
             }
 
-            document.getElementById("btn-text-content").innerText = "카카오 로그인 중...";
+            const btnText = document.getElementById("btn-text-content");
+            btnText.innerText = "카카오 로그인 중...";
+
+            const showCallScreen = () => {
+                document.getElementById("auth-container").style.display = "none";
+                document.getElementById("vapi-container").style.display = "flex";
+            };
 
             Kakao.Auth.login({
                 throughTalk: false,
                 success: function(authObj) {
+                    btnText.innerText = "인증 확인 중...";
+
                     Kakao.API.request({
                         url: '/v2/user/me',
                         success: function(res) {
@@ -422,14 +428,149 @@
                             }
 
                             const deviceHash = getDeviceHash();
-
-                            document.getElementById("btn-text-content").innerText = "인증 확인 중...";
-
                             const callbackName = "gasCallback_" + Date.now();
                             
+                            const fallbackTimer = setTimeout(() => {
+                                console.warn("GAS endpoint response delayed; proceeding to trial screen.");
+                                showCallScreen();
+                            }, 4000);
+
                             window[callbackName] = function(data) {
+                                clearTimeout(fallbackTimer);
                                 delete window[callbackName];
                                 const scriptEl = document.getElementById(callbackName);
                                 if (scriptEl) scriptEl.remove();
 
-                                if (data.status === "ALREADY_USED") {
+                                if (data && data.status === "ALREADY_USED") {
+                                    alert("이미 무료 체험을 사용하셨습니다.");
+                                    btnText.innerText = "무료 체험 완료됨 (" + userName + ")";
+                                    const btn = document.getElementById("login-btn");
+                                    btn.style.opacity = "0.6";
+                                    btn.onclick = function() { alert("이미 무료 체험을 사용하셨습니다."); };
+                                } else {
+                                    showCallScreen();
+                                }
+                            };
+
+                            const script = document.createElement('script');
+                            script.id = callbackName;
+                            script.src = GAS_URL + "?userId=" + encodeURIComponent(userId) + 
+                                         "&userName=" + encodeURIComponent(userName) + 
+                                         "&deviceHash=" + encodeURIComponent(deviceHash) + 
+                                         "&callback=" + callbackName + 
+                                         "&t=" + Date.now();
+
+                            script.onerror = function() {
+                                clearTimeout(fallbackTimer);
+                                showCallScreen();
+                            };
+
+                            document.body.appendChild(script);
+                        },
+                        fail: function(error) {
+                            btnText.innerText = "무료 체험 통화 시작하기";
+                            showCallScreen();
+                        }
+                    });
+                },
+                fail: function(err) {
+                    console.error("Kakao login failed", err);
+                    btnText.innerText = "무료 체험 통화 시작하기";
+                    alert("카카오 로그인 취소 또는 오류가 발생했습니다. 다시 시도해 주세요.");
+                }
+            });
+        }
+
+        function formatTime(totalSeconds) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            const formattedMins = mins < 10 ? "0" + mins : mins;
+            const formattedSecs = secs < 10 ? "0" + secs : secs;
+            return formattedMins + ":" + formattedSecs;
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const timerEl = document.getElementById("timer");
+                if (timerEl) {
+                    timerEl.innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                }
+
+                if (secondsElapsed >= MAX_SECONDS) {
+                    stopTimer();
+                    if (vapiInstance) vapiInstance.stop();
+                    isCallActive = false;
+                    document.getElementById("call-status").innerText = "10분 무료 체험이 종료되었습니다. 수고하셨습니다!";
+                    document.getElementById("call-btn-text").innerText = "체험 종료됨";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#a0aec0";
+                    btn.disabled = true;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        async function toggleVapiCall() {
+            if (!isCallActive) {
+                if (window.vapiSDK) {
+                    vapiInstance = window.vapiSDK.run({
+                        apiKey: VAPI_KEY,
+                        assistant: VAPI_ASSISTANT_ID
+                    });
+
+                    vapiInstance.on('call-start', () => {
+                        console.log("Call connected! Starting timer...");
+                        startTimer();
+                    });
+
+                    vapiInstance.on('speech-start', () => {
+                        if (!timerInterval) {
+                            startTimer();
+                        }
+                    });
+
+                    vapiInstance.on('call-end', () => {
+                        stopTimer();
+                    });
+
+                    vapiInstance.start(VAPI_ASSISTANT_ID);
+                    
+                    isCallActive = true;
+
+                    document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "🚫 전화 끊기";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#e05252";
+                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                } else {
+                    alert("Vapi SDK 로딩 실패");
+                }
+            } else {
+                if (vapiInstance) {
+                    vapiInstance.stop();
+                }
+                stopTimer();
+                isCallActive = false;
+
+                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+                document.getElementById("call-btn-text").innerText = "통화 종료됨";
+                const btn = document.getElementById("start-call-btn");
+                btn.style.backgroundColor = "#a0aec0";
+                btn.style.boxShadow = "none";
+                btn.disabled = true;
+                btn.style.cursor = "default";
+            }
+        }
+    </script>
+</body>
+</html>
