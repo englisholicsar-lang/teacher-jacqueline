@@ -315,4 +315,119 @@
         </div>
 
         <div class="bottom-group">
-            <button id="start-call
+            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
+                <span id="call-btn-text">📞 통화 시작하기</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjhHqPyqzV5JKJRoO-xlhu3jb_VCqnKAz8-ukixS6p0t6Hf6iu52A/exec";
+        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
+        const REDIRECT_URI = "https://englisholicsar-lang.github.io/teacher-jacqueline/";
+
+        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+
+        let vapiInstance = null;
+        let isCallActive = false;
+
+        // Initialize Kakao SDK
+        if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
+            Kakao.init(KAKAO_CLIENT_ID);
+        }
+
+        function startKakaoAuth() {
+            document.getElementById("btn-text-content").innerText = "카카오 로그인 중...";
+            
+            // Use standard redirection auth flow so it never freezes or gets stuck on mobile/external browsers
+            const authUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + KAKAO_CLIENT_ID + 
+                            "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) + 
+                            "&response_type=code";
+            window.location.href = authUrl;
+        }
+
+        // Handle page load when returning from Kakao login redirect
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authCode = urlParams.get('code');
+
+            if (authCode) {
+                document.getElementById("btn-text-content").innerText = "인증 확인 중...";
+
+                // Clean the URL bar so refresh doesn't re-trigger code
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                // Use JSONP to send code and get user profile safely without CORS errors
+                const callbackName = "gasCallback_" + Date.now();
+                
+                window[callbackName] = function(data) {
+                    delete window[callbackName];
+                    const scriptEl = document.getElementById(callbackName);
+                    if (scriptEl) scriptEl.remove();
+
+                    if (data.status === "ALREADY_USED") {
+                        alert("이미 무료 체험을 사용하셨습니다.");
+                        document.getElementById("btn-text-content").innerText = "무료 체험 완료됨 (" + (data.name || "사용자") + ")";
+                        const btn = document.getElementById("login-btn");
+                        btn.style.opacity = "0.6";
+                        btn.onclick = function() { alert("이미 무료 체험을 사용하셨습니다."); };
+                    } else {
+                        // Success: Switch to Call Screen smoothly
+                        document.getElementById("auth-container").style.display = "none";
+                        document.getElementById("vapi-container").style.display = "flex";
+                    }
+                };
+
+                const script = document.createElement('script');
+                script.id = callbackName;
+                script.src = GAS_URL + "?code=" + encodeURIComponent(authCode) + 
+                             "&callback=" + callbackName + 
+                             "&t=" + Date.now();
+
+                script.onerror = function() {
+                    alert("서버 연결 실패. 다시 시도해 주세요.");
+                    document.getElementById("btn-text-content").innerText = "무료 체험 통화 시작하기";
+                };
+
+                document.body.appendChild(script);
+            }
+        };
+
+        async function toggleVapiCall() {
+            if (!isCallActive) {
+                if (window.vapiSDK) {
+                    vapiInstance = window.vapiSDK.run({
+                        apiKey: VAPI_KEY,
+                        assistant: VAPI_ASSISTANT_ID
+                    });
+                    vapiInstance.start(VAPI_ASSISTANT_ID);
+                    
+                    isCallActive = true;
+
+                    document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "🚫 전화 끊기";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#e05252";
+                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                } else {
+                    alert("Vapi SDK 로딩 실패");
+                }
+            } else {
+                if (vapiInstance) {
+                    vapiInstance.stop();
+                }
+                isCallActive = false;
+
+                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+                document.getElementById("call-btn-text").innerText = "통화 종료됨";
+                const btn = document.getElementById("start-call-btn");
+                btn.style.backgroundColor = "#a0aec0";
+                btn.style.boxShadow = "none";
+                btn.disabled = true;
+                btn.style.cursor = "default";
+            }
+        }
+    </script>
+</body>
+</html>
