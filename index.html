@@ -2,358 +2,178 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Jacqueline - Free Trial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teacher Jacqueline - Englisholic</title>
     
     <!-- Vapi Web SDK -->
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
-        :root {
-            --bg-base: #f0f6ff;
-            --primary-navy: #0e2a47;
-            --sub-text: #4a637d;
-            --box-bg: #eaf3fe;
-            --box-border: #d4e5f9;
-            --kakao-yellow: #fee500;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            background-color: var(--bg-base);
-            position: relative;
-            overflow-x: hidden;
+            background-color: #f8fafc;
+            color: #1e293b;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: flex-start;
-            padding: 0px 20px 20px 20px;
-            color: var(--primary-navy);
-        }
-
-        /* SVG Background Wave Graphics */
-        .bg-wave-top {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .bg-wave-bottom {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        /* Background Accent Dots */
-        .dot-pattern-left {
-            position: absolute;
-            top: 220px;
-            left: 10px;
-            width: 45px;
-            height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 10px 10px;
-            z-index: 0;
-        }
-
-        .dot-pattern-right {
-            position: absolute;
-            top: 80px;
-            right: 10px;
-            width: 45px;
-            height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 10px 10px;
-            z-index: 0;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
-            position: relative;
-            z-index: 1;
             width: 100%;
-            max-width: 380px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            padding: 32px 24px;
             text-align: center;
         }
 
-        /* Upper Section Group */
-        .upper-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            margin-top: 6px;
-        }
-
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-
-        .logo-img {
-            height: 75px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .avatar-container {
-            position: relative;
-            width: 115px;
-            height: 115px;
-            margin-bottom: 8px;
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
+        .profile-img {
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #ffffff;
-            box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
+            margin-bottom: 20px;
+            border: 4px solid #f1f5f9;
         }
 
-        .title {
+        h1 {
             font-size: 22px;
-            font-weight: 800;
-            color: #0c2a4a;
-            margin-bottom: 2px;
-            letter-spacing: -0.3px;
-        }
-
-        .subtitle {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #4a637d;
-        }
-
-        /* Lower Section Group */
-        .bottom-group {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 42px;
-        }
-
-        .info-box {
-            width: 100%;
-            background-color: var(--box-bg);
-            border: 1px solid var(--box-border);
-            border-radius: 14px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
-        }
-
-        .info-box-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .info-box-text {
-            font-size: 13.5px;
             font-weight: 700;
-            color: #1a3c61;
-            line-height: 1.28;
-            text-align: left;
+            margin-bottom: 8px;
+            color: #0f172a;
         }
 
-        .kakao-btn {
+        p.subtitle {
+            font-size: 15px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        .btn {
             width: 100%;
-            background-color: var(--kakao-yellow);
-            color: #000000;
-            border: none;
-            padding: 15px 18px;
+            padding: 16px;
             border-radius: 14px;
-            font-size: 16.5px;
-            font-weight: 800;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: transform 0.1s ease;
+            gap: 10px;
+            transition: all 0.2s ease;
         }
 
-        .kakao-btn:active {
-            transform: scale(0.98);
+        .btn-kakao {
+            background-color: #FEE500;
+            color: #000000;
         }
 
-        .kakao-btn-icon {
-            font-size: 19px;
+        .btn-vapi {
+            background-color: #22c55e;
+            color: #ffffff;
+            display: none;
         }
 
-        /* Page 2 / Active Call Styles */
+        .btn-vapi.active {
+            background-color: #ef4444;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .vapi-status {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #64748b;
+            display: none;
+        }
+
         #vapi-container {
             display: none;
-            width: 100%;
-        }
-
-        .call-btn {
-            width: 100%;
-            background-color: #2ecc71;
-            color: #ffffff;
-            border: none;
-            padding: 16px 20px;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
-            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 36px;
-            transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.1s ease;
-        }
-
-        .call-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Hide Vapi SDK default floating widget elements */
-        iframe[title*="vapi"],
-        iframe[src*="vapi"],
-        .vapi-btn,
-        .vapi-btn-container,
-        [class*="vapi-btn"],
-        [id*="vapi-widget"],
-        button[class*="vapi"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
         }
     </style>
 </head>
 <body>
 
-    <!-- Background Wave Graphics -->
-    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/>
-    </svg>
-    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/>
-    </svg>
+    <div class="container">
+        <!-- Teacher Profile Section -->
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250" alt="Teacher Jacqueline" class="profile-img">
+        <h1>Teacher Jacqueline</h1>
+        <p class="subtitle">1:1 원어민 AI 영어회화 무료 체험<br>지금 바로 통화를 시작해 보세요!</p>
 
-    <div class="dot-pattern-left"></div>
-    <div class="dot-pattern-right"></div>
-
-    <!-- PAGE 1: AUTH GATE -->
-    <div id="auth-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-
-            <div class="avatar-container">
-                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-            </div>
-
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
-        </div>
-
-        <div class="bottom-group">
-            <div class="info-box">
-                <span class="info-box-icon">🎙️</span>
-                <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
-            </div>
-
-            <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
-                <span class="kakao-btn-icon">💬</span>
-                <span id="btn-text-content">무료 체험 통화 시작하기</span>
+        <!-- PAGE 1: Kakao Login Gate -->
+        <div id="auth-container">
+            <button id="login-btn" class="btn btn-kakao" onclick="loginWithKakao()">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9 2C5.134 2 2 4.418 2 7.4C2 9.328 3.254 11.018 5.158 12.016L4.484 14.492C4.418 14.734 4.694 14.928 4.902 14.79L7.842 12.836C8.22 12.894 8.606 12.926 9 12.926C12.866 12.926 16 10.508 16 7.526C16 4.418 12.866 2 9 2Z" fill="#000000"/>
+                </svg>
+                <span id="btn-text-content">카카오로 1초만에 시작하기</span>
             </button>
         </div>
-    </div>
 
-    <!-- PAGE 2: ACTIVE CALL SCREEN -->
-    <div id="vapi-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-
-            <div class="avatar-container">
-                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-            </div>
-
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
-        </div>
-
-        <div class="bottom-group">
-            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
+        <!-- PAGE 2: Active Call Screen -->
+        <div id="vapi-container">
+            <button id="call-btn" class="btn btn-vapi" onclick="toggleCall()">
                 <span id="call-btn-text">📞 통화 시작하기</span>
             </button>
+            <div id="call-status" class="vapi-status">연결 준비 완료</div>
         </div>
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycby5kz-Y8bNFNVhcSZjhHqPyqzV5JKJRoO-xlhu3jb_VCqnKAz8-ukixS6p0t6Hf6iu52A/exec";
-        const REDIRECT_URI = "https://englisholicsar-lang.github.io/teacher-jacqueline/";
-        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
-
-        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
-        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+        // CONFIGURATION
+        const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE"; 
+        const KAKAO_CLIENT_ID = "YOUR_KAKAO_REST_API_KEY_HERE";
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
+        const VAPI_PUBLIC_KEY = "YOUR_VAPI_PUBLIC_KEY_HERE";
+        const VAPI_ASSISTANT_ID = "YOUR_VAPI_ASSISTANT_ID_HERE";
 
         let vapiInstance = null;
         let isCallActive = false;
 
-        function startKakaoAuth() {
-            const authUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + KAKAO_CLIENT_ID + 
-                            "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) + 
-                            "&response_type=code";
-            window.location.href = authUrl;
+        // Step 1: Initialize Kakao Login Redirect
+        function loginWithKakao() {
+            const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+            window.location.href = kakaoAuthUrl;
         }
 
+        // Step 2: Handle Kakao Redirect & Google Sheets Verification on Load
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const authCode = urlParams.get('code');
 
             if (authCode) {
                 document.getElementById("btn-text-content").innerText = "인증 확인 중...";
-                
-                // Retrieve or generate a clean persistent user email/identifier for tracking in Sheets
-                let userEmail = localStorage.getItem("englisholic_kakao_identity");
-                if (!userEmail) {
-                    userEmail = "user_" + Math.random().toString(36).substring(2, 8) + "@kakao.user";
-                    localStorage.setItem("englisholic_kakao_identity", userEmail);
+
+                // Get existing ID or generate a persistent kakao_user_ ID
+                let userIdentifier = localStorage.getItem("englisholic_user_id");
+                if (!userIdentifier) {
+                    userIdentifier = "kakao_user_" + Math.random().toString(36).substring(2, 8);
+                    localStorage.setItem("englisholic_user_id", userIdentifier);
                 }
-                
-                // Send identifier/email to Google Apps Script
-                fetch(GAS_URL + "?email=" + encodeURIComponent(userEmail) + "&t=" + Date.now())
+
+                // Explicitly send identifier across multiple parameters to ensure Google Apps Script catches it
+                const requestUrl = GAS_URL + "?email=" + encodeURIComponent(userIdentifier) + 
+                                   "&userId=" + encodeURIComponent(userIdentifier) + 
+                                   "&identifier=" + encodeURIComponent(userIdentifier) + 
+                                   "&t=" + Date.now();
+
+                fetch(requestUrl)
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "ALREADY_USED") {
@@ -364,8 +184,11 @@
                                 alert("이미 무료 체험을 사용하셨습니다.");
                             };
                         } else {
+                            // First time user: Hide Page 1 and show Page 2 (Call Screen)
                             document.getElementById("auth-container").style.display = "none";
                             document.getElementById("vapi-container").style.display = "flex";
+                            document.getElementById("call-btn").style.display = "flex";
+                            initVapi();
                         }
                     })
                     .catch(err => {
@@ -374,50 +197,49 @@
             }
         };
 
-        async function toggleVapiCall() {
-            if (!isCallActive) {
-                // Request Microphone permissions explicitly
-                try {
-                    await navigator.mediaDevices.getUserMedia({ audio: true });
-                } catch (err) {
-                    alert("마이크 권한 허용이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해 주세요.");
-                    return;
-                }
+        // Step 3: Initialize Vapi SDK & Call Handlers
+        function initVapi() {
+            if (typeof Vapi !== "undefined") {
+                vapiInstance = new Vapi(VAPI_PUBLIC_KEY);
 
-                // START CALL
-                if (window.vapiSDK) {
-                    vapiInstance = window.vapiSDK.run({
-                        apiKey: VAPI_KEY,
-                        assistant: VAPI_ASSISTANT_ID
-                    });
-                    vapiInstance.start(VAPI_ASSISTANT_ID);
-                    
+                vapiInstance.on("call-start", () => {
                     isCallActive = true;
+                    document.getElementById("call-btn").classList.add("active");
+                    document.getElementById("call-btn-text").innerText = "🔴 통화 종료하기";
+                    document.getElementById("call-status").style.display = "block";
+                    document.getElementById("call-status").innerText = "통화 중...";
+                });
 
-                    // Update UI to Soft Red "Hang Up" button
-                    document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
-                    document.getElementById("call-btn-text").innerText = "🚫 전화 끊기";
-                    const btn = document.getElementById("start-call-btn");
-                    btn.style.backgroundColor = "#e05252";
-                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                } else {
-                    alert("Vapi SDK 로딩 실패");
+                vapiInstance.on("call-end", () => {
+                    isCallActive = false;
+                    document.getElementById("call-btn").classList.remove("active");
+                    document.getElementById("call-btn-text").innerText = "📞 통화 시작하기";
+                    document.getElementById("call-status").innerText = "통화가 종료되었습니다.";
+                });
+
+                vapiInstance.on("error", (e) => {
+                    console.error("Vapi Error:", e);
+                    document.getElementById("call-status").innerText = "오류가 발생했습니다. 다시 시도해 주세요.";
+                });
+            }
+        }
+
+        // Step 4: Toggle Call State (Microphone Access & Start/Stop)
+        async function toggleCall() {
+            if (!vapiInstance) {
+                initVapi();
+            }
+
+            if (!isCallActive) {
+                try {
+                    // Explicitly request microphone permission first
+                    await navigator.mediaDevices.getUserMedia({ audio: true });
+                    vapiInstance.start(VAPI_ASSISTANT_ID);
+                } catch (err) {
+                    alert("마이크 권한이 필요합니다. 브라우저 설정에서 마이크 사용을 허용해 주세요.");
                 }
             } else {
-                // END / HANG UP CALL
-                if (vapiInstance) {
-                    vapiInstance.stop();
-                }
-                isCallActive = false;
-
-                // Update UI to "Ended" state
-                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
-                document.getElementById("call-btn-text").innerText = "통화 종료됨";
-                const btn = document.getElementById("start-call-btn");
-                btn.style.backgroundColor = "#a0aec0";
-                btn.style.boxShadow = "none";
-                btn.disabled = true;
-                btn.style.cursor = "default";
+                vapiInstance.stop();
             }
         }
     </script>
