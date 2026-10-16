@@ -16,25 +16,28 @@
             font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevents unwanted mobile scrolling */
+        }
+
         body {
             background: linear-gradient(180deg, #e6f2ff 0%, #ffffff 50%, #e6f2ff 100%);
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px 16px;
+            padding: 12px 16px;
             color: #0f172a;
             position: relative;
-            overflow-x: hidden;
         }
 
-        /* Curved Wave Background Layer */
+        /* Curved Wave Top Accent */
         .bg-wave-top {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 180px;
+            height: 120px;
             background: radial-gradient(circle at 50% -20%, #d8ebff 0%, rgba(216, 235, 255, 0) 70%);
             z-index: 0;
             pointer-events: none;
@@ -42,7 +45,7 @@
 
         .main-wrapper {
             width: 100%;
-            max-width: 390px;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -51,56 +54,56 @@
             z-index: 1;
         }
 
-        /* Logo Header */
+        /* Compact Logo Header */
         .logo-box {
-            margin-bottom: 24px;
+            margin-bottom: 12px;
         }
 
         .logo-box img {
-            max-width: 210px;
+            max-width: 160px;
             height: auto;
             display: block;
         }
 
-        /* Profile & Background Dot Pattern */
+        /* Compact Profile & Dot Pattern */
         .profile-container {
             position: relative;
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
 
-        /* Dot Grids on Left and Right */
+        /* Dot Pattern Accents */
         .dot-grid-left, .dot-grid-right {
             position: absolute;
-            width: 70px;
-            height: 80px;
+            width: 50px;
+            height: 60px;
             background-image: radial-gradient(#a3cdff 2px, transparent 2px);
-            background-size: 10px 10px;
-            opacity: 0.7;
+            background-size: 8px 8px;
+            opacity: 0.75;
             pointer-events: none;
         }
 
         .dot-grid-left {
-            left: 10px;
-            bottom: -10px;
+            left: 20px;
+            bottom: -5px;
         }
 
         .dot-grid-right {
-            right: 10px;
-            top: -10px;
+            right: 20px;
+            top: -5px;
         }
 
         .profile-img-wrap {
             position: relative;
-            width: 130px;
-            height: 130px;
+            width: 105px;
+            height: 105px;
             border-radius: 50%;
-            padding: 4px;
+            padding: 3px;
             background: #ffffff;
-            box-shadow: 0 10px 25px rgba(15, 76, 129, 0.15);
+            box-shadow: 0 8px 20px rgba(15, 76, 129, 0.12);
         }
 
         .profile-img-wrap img {
@@ -112,45 +115,45 @@
 
         /* Typography */
         h1 {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 800;
             color: #0f2c59;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             letter-spacing: -0.5px;
         }
 
         p.subtitle {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #526d82;
-            margin-bottom: 24px;
+            margin-bottom: 14px;
             letter-spacing: -0.3px;
         }
 
-        /* Microphone Permission Notice Banner */
+        /* Compact Microphone Notice Box */
         .mic-box {
             width: 100%;
             background-color: #f0f7ff;
             border: 1px solid #cbe3ff;
-            border-radius: 20px;
-            padding: 16px 18px;
+            border-radius: 16px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            gap: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
         }
 
         .mic-icon {
-            font-size: 28px;
+            font-size: 22px;
             flex-shrink: 0;
         }
 
         .mic-text {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #0f2c59;
-            line-height: 1.4;
+            line-height: 1.35;
             text-align: left;
             word-break: keep-all;
         }
@@ -158,19 +161,19 @@
         /* Action Buttons */
         .btn-action {
             width: 100%;
-            padding: 18px;
-            border-radius: 22px;
+            padding: 16px;
+            border-radius: 18px;
             border: none;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             white-space: nowrap;
             letter-spacing: -0.3px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease;
         }
 
@@ -205,8 +208,8 @@
         }
 
         .status-msg {
-            margin-top: 14px;
-            font-size: 14px;
+            margin-top: 10px;
+            font-size: 13px;
             font-weight: 600;
             color: #64748b;
         }
@@ -217,12 +220,12 @@
     <div class="bg-wave-top"></div>
 
     <div class="main-wrapper">
-        <!-- Englisholic Official Logo Image -->
+        <!-- Englisholic Official Logo -->
         <div class="logo-box">
             <img src="./logo.png" alt="Englisholic Innovative English" onerror="this.onerror=null; this.src='logo.jpg';">
         </div>
 
-        <!-- Profile Photo with Background Dot Grids -->
+        <!-- Profile Photo & Dot Grids -->
         <div class="profile-container">
             <div class="dot-grid-left"></div>
             <div class="profile-img-wrap">
@@ -231,7 +234,7 @@
             <div class="dot-grid-right"></div>
         </div>
 
-        <!-- Dynamic Header Texts -->
+        <!-- Dynamic Titles -->
         <h1>Teacher Jacqueline</h1>
         <p class="subtitle" id="page-subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
@@ -243,14 +246,14 @@
             </div>
 
             <button id="login-btn" class="btn-action btn-kakao" onclick="loginWithKakao()">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.582 2 2 4.761 2 8.167C2 10.37 3.433 12.301 5.61 13.442L4.84 16.272C4.764 16.549 5.08 16.771 5.318 16.613L8.678 14.38C9.11 14.446 9.551 14.482 10 14.482C14.418 14.482 18 11.721 18 8.315C18 4.761 14.418 2 10 2Z" fill="#191919"/>
                 </svg>
                 <span id="btn-text-content">카카오로 1초만에 시작하기</span>
             </button>
         </div>
 
-        <!-- PAGE 2: Vapi Call Control -->
+        <!-- PAGE 2: Vapi Call Screen -->
         <div id="vapi-container">
             <button id="call-btn" class="btn-action btn-vapi-start" onclick="toggleCall()">
                 <span id="call-btn-text">📞 통화 시작하기</span>
@@ -262,7 +265,8 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycby4C0SsERlnAJsjcK3SOUgdqERywyqJB6YyWqTHHRFfbVC3XzXzE_d9mEKJgtb3t_q_jA/exec"; 
         const KAKAO_CLIENT_ID = "6f7519b766b027481f792e3272958dfb";
-        const REDIRECT_URI = window.location.origin + window.location.pathname;
+        // Fixed static domain matching Kakao App primary domain exactly
+        const REDIRECT_URI = "https://englisholicsar-lang.github.io";
         const VAPI_PUBLIC_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
@@ -296,7 +300,6 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "ALREADY_USED") {
-                            // 이미 사용된 경우: 노란 버튼 문구를 "💬 무료 체험 완료됨"으로 변경
                             document.getElementById("btn-text-content").innerText = "💬 무료 체험 완료됨";
                             const loginBtn = document.getElementById("login-btn");
                             loginBtn.classList.add("disabled");
@@ -304,7 +307,6 @@
                                 alert("이미 무료 체험을 사용하셨습니다.");
                             };
                         } else {
-                            // 첫 사용: Page 2 통화 화면으로 전환 & 서브타이틀 변경
                             document.getElementById("page-subtitle").innerText = "아래 버튼을 눌러 통화를 시작하세요!";
                             document.getElementById("auth-container").style.display = "none";
                             document.getElementById("vapi-container").style.display = "block";
