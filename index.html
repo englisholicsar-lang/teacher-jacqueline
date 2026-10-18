@@ -427,6 +427,9 @@
                                 userName = res.kakao_account.profile.nickname;
                             }
 
+                            // 🌺 STORE GLOBALLY FOR VAPI
+                            window.authenticatedUserName = userName;
+
                             const deviceHash = getDeviceHash();
                             const callbackName = "gasCallback_" + Date.now();
                             
@@ -455,10 +458,10 @@
                             const script = document.createElement('script');
                             script.id = callbackName;
                             script.src = GAS_URL + "?userId=" + encodeURIComponent(userId) + 
-                                         "&userName=" + encodeURIComponent(userName) + 
-                                         "&deviceHash=" + encodeURIComponent(deviceHash) + 
-                                         "&callback=" + callbackName + 
-                                         "&t=" + Date.now();
+                                                   "&userName=" + encodeURIComponent(userName) + 
+                                                   "&deviceHash=" + encodeURIComponent(deviceHash) + 
+                                                   "&callback=" + callbackName + 
+                                                   "&t=" + Date.now();
 
                             script.onerror = function() {
                                 clearTimeout(fallbackTimer);
@@ -523,9 +526,15 @@
         async function toggleVapiCall() {
             if (!isCallActive) {
                 if (window.vapiSDK) {
+                    // 🌺 PASS AUTHENTICATED STUDENT NAME TO VAPI
                     vapiInstance = window.vapiSDK.run({
                         apiKey: VAPI_KEY,
-                        assistant: VAPI_ASSISTANT_ID
+                        assistant: VAPI_ASSISTANT_ID,
+                        assistantOverrides: {
+                            variableValues: {
+                                studentName: window.authenticatedUserName || "Student"
+                            }
+                        }
                     });
 
                     vapiInstance.on('call-start', () => {
@@ -543,8 +552,6 @@
                         stopTimer();
                     });
 
-                    vapiInstance.start(VAPI_ASSISTANT_ID);
-                    
                     isCallActive = true;
 
                     document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
