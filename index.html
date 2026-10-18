@@ -48,7 +48,7 @@
 
         .container {
             position: relative;
-            z-index: 1;
+            z-index: 10;
             width: 100%;
             max-width: 380px;
             display: flex;
@@ -173,14 +173,22 @@
             transition: all 0.2s ease;
         }
 
-        /* Shift Vapi native widget slightly so it doesn't overlap visually, but stays active in DOM */
+        /* Forcefully obliterate any default Vapi widgets so they never overlap or block touch events */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
+        .vapi-btn,
         .vapi-btn-container,
-        div[id*="vapi"] {
-            bottom: -200px !important;
-            opacity: 0.01 !important;
-            pointer-events: auto !important;
+        div[id*="vapi"],
+        span[class*="vapi"],
+        button[class*="vapi"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            position: absolute !important;
+            z-index: -99999 !important;
         }
     </style>
 </head>
@@ -269,16 +277,6 @@
             }
         }
 
-        function triggerVapiNativeCall() {
-            // Find and click Vapi internal button automatically to enable WebRTC audio
-            setTimeout(() => {
-                const vapiBtn = document.querySelector('button[class*="vapi"], div[class*="vapi"] button, iframe[title*="vapi"]');
-                if (vapiBtn) {
-                    vapiBtn.click();
-                }
-            }, 300);
-        }
-
         function setUIReady() {
             flowStage = "READY";
             const statusEl = document.getElementById("call-status");
@@ -333,7 +331,7 @@
             const btnTextEl = document.getElementById("btn-text");
             const btnEl = document.getElementById("action-btn");
 
-            // STAGE 1: Yellow Button Tap -> Verifying
+            // STAGE 1: Yellow Button Tap -> Verifying Phase
             if (flowStage === "START") {
                 flowStage = "VERIFYING";
                 if (btnTextEl) btnTextEl.innerText = "인증 확인 중...";
@@ -345,11 +343,11 @@
                 return;
             }
 
-            // STAGE 2: Green Button Tap -> Request Mic, Launch Vapi & Trigger Native Call
+            // STAGE 2: Green Button Tap -> Request Mic & Start Call Session
             if (flowStage === "READY") {
                 unlockWebViewAudio();
 
-                // Request microphone permission
+                // Direct hardware mic check
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -365,11 +363,11 @@
                 if (vapiSdkObj && typeof vapiSdkObj.run === 'function') {
                     vapiInstance = vapiSdkObj;
 
-                    // Transition UI to Active Call & start timer
+                    // Transition UI to Active Call & start timer immediately
                     setUIInCall();
                     startTimer();
 
-                    // Launch Vapi Call
+                    // Launch Vapi session cleanly
                     vapiInstance.run({
                         apiKey: VAPI_KEY,
                         assistant: VAPI_ASSISTANT_ID,
@@ -377,16 +375,13 @@
                             variableValues: { studentName: "Student" }
                         }
                     });
-
-                    // Trigger Vapi internal call button
-                    triggerVapiNativeCall();
                 } else {
                     alert("Vapi SDK가 아직 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
                 }
                 return;
             }
 
-            // STAGE 3: Red Button Tap -> End Call
+            // STAGE 3: Red Button Tap -> Terminate Call
             if (flowStage === "IN_CALL") {
                 try {
                     if (vapiInstance && typeof vapiInstance.stop === 'function') {
