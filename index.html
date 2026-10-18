@@ -12,7 +12,7 @@
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
-    <!-- SDKs with Fallback / Async safety -->
+    <!-- SDKs -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
@@ -195,6 +195,24 @@
             gap: 8px;
             margin-top: 24px;
         }
+
+        /* Absolute annihilation of any Vapi floating widget artifacts */
+        iframe[title*="vapi"],
+        iframe[src*="vapi"],
+        .vapi-btn,
+        .vapi-btn-container,
+        div[id*="vapi"],
+        span[class*="vapi"],
+        button[class*="vapi"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            position: absolute !important;
+            z-index: -9999 !important;
+        }
     </style>
 </head>
 <body>
@@ -262,7 +280,6 @@
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
 
-        // 안전한 카카오 초기화 (에러 발생해도 화면 백화 현상 방지)
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
@@ -309,7 +326,6 @@
                                 const isKoreanName = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(userName);
                                 window.authenticatedUserName = isKoreanName ? "KOREAN_NAME_DETECTED" : userName;
 
-                                // Google Apps Script 로그 전송 (비동기 처리로 화면 멈춤 방지)
                                 try {
                                     const callbackName = "gasCallback_" + Date.now();
                                     const fallbackTimer = setTimeout(() => { showCallScreenSafe(); }, 2500);
@@ -350,11 +366,11 @@
                     },
                     fail: function(err) {
                         if (btnText) btnText.innerText = "무료 체험 통화 시작하기";
-                        showCallScreenSafe(); // 로그인 실패 시에도 백화 현상 없이 통화 화면으로 안전 진입
+                        showCallScreenSafe();
                     }
                 });
             } catch (ex) {
-                showCallScreenSafe(); // 예외 발생 시 비상 안전 장치
+                showCallScreenSafe();
             }
         }
 
@@ -394,15 +410,25 @@
             }
         }
 
-        function toggleVapiCall() {
+        async function toggleVapiCall() {
             if (!isCallActive) {
                 try {
+                    // 🌺 EXPLICITLY REQUEST MICROPHONE ACCESS TO UNBLOCK WEBRTC AUDIO
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            stream.getTracks().forEach(track => track.stop());
+                        } catch (micErr) {
+                            alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
+                            return;
+                        }
+                    }
+
                     const vapiSdkObj = window.vapi || window.vapiSDK;
 
                     if (vapiSdkObj) {
                         vapiInstance = vapiSdkObj;
 
-                        // 타이머 및 상태 즉시 활성화 (인앱 브라우저 지연 방지)
                         startTimer();
                         isCallActive = true;
 
