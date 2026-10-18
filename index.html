@@ -277,7 +277,7 @@
             transform: scale(0.98);
         }
 
-        /* Shift Vapi SDK default widget elements so they don't block clicks */
+        /* Prevent Vapi widget from blocking touch events */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -293,6 +293,9 @@
     </style>
 </head>
 <body>
+
+    <!-- Hidden audio element for WebRTC audio context unlock -->
+    <audio id="webview-audio-unlock" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" preload="auto" playsinline></audio>
 
     <!-- Background Wave Graphics -->
     <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -379,6 +382,13 @@
             }
         });
 
+        function unlockWebViewAudio() {
+            const audioEl = document.getElementById("webview-audio-unlock");
+            if (audioEl) {
+                audioEl.play().then(() => audioEl.pause()).catch(() => {});
+            }
+        }
+
         function getDeviceHash() {
             const rawString = [
                 navigator.userAgent,
@@ -397,6 +407,17 @@
             return "DEV-" + Math.abs(hash).toString(16).toUpperCase();
         }
 
+        function showCallScreen() {
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("vapi-container").style.display = "flex";
+            document.getElementById("call-status").innerText = "아래 버튼을 눌러 통화를 시작하세요!";
+            document.getElementById("call-btn-text").innerText = "📞 통화 시작하기";
+            const btn = document.getElementById("start-call-btn");
+            btn.style.backgroundColor = "#2ecc71";
+            btn.style.boxShadow = "0 6px 16px rgba(46, 204, 113, 0.4)";
+            btn.disabled = false;
+        }
+
         function startKakaoAuth() {
             if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                 Kakao.init(KAKAO_CLIENT_ID);
@@ -404,11 +425,6 @@
 
             const btnText = document.getElementById("btn-text-content");
             btnText.innerText = "카카오 로그인 중...";
-
-            const showCallScreen = () => {
-                document.getElementById("auth-container").style.display = "none";
-                document.getElementById("vapi-container").style.display = "flex";
-            };
 
             Kakao.Auth.login({
                 throughTalk: false,
@@ -524,6 +540,19 @@
 
         async function toggleVapiCall() {
             if (!isCallActive) {
+                unlockWebViewAudio();
+
+                // Mic hardware check
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        stream.getTracks().forEach(track => track.stop());
+                    } catch (micErr) {
+                        alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
+                        return;
+                    }
+                }
+
                 const sdkObj = window.vapiSDK || window.vapi;
 
                 if (sdkObj && typeof sdkObj.run === 'function') {
