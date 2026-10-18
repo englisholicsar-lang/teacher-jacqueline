@@ -1,355 +1,4 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Teacher Jacqueline - Free Trial</title>
-    
-    <!-- Open Graph Meta Tags for KakaoTalk Link Preview -->
-    <meta property="og:title" content="Teacher Jacqueline - Free Trial">
-    <meta property="og:description" content="재클린 선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
-    <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/og_preview.png">
-    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
-    <meta property="og:type" content="website">
-
-    <!-- Kakao SDK & Vapi Web SDK -->
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" crossorigin="anonymous"></script>
-
-    <style>
-        :root {
-            --bg-base: #f0f6ff;
-            --primary-navy: #0e2a47;
-            --sub-text: #4a637d;
-            --box-bg: #eaf3fe;
-            --box-border: #d4e5f9;
-            --kakao-yellow: #fee500;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            background-color: var(--bg-base);
-            position: relative;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 0px 20px 20px 20px;
-            color: var(--primary-navy);
-        }
-
-        /* SVG Background Wave Graphics */
-        .bg-wave-top {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .bg-wave-bottom {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .dot-pattern-left {
-            position: absolute;
-            top: 220px;
-            left: 10px;
-            width: 45px;
-            height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 10px 10px;
-            z-index: 0;
-        }
-
-        .dot-pattern-right {
-            position: absolute;
-            top: 80px;
-            right: 10px;
-            width: 45px;
-            height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 10px 10px;
-            z-index: 0;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 380px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .upper-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            margin-top: 6px;
-        }
-
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-
-        .logo-img {
-            height: 75px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .avatar-container {
-            position: relative;
-            width: 115px;
-            height: 115px;
-            margin-bottom: 8px;
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #ffffff;
-            box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
-        }
-
-        .title {
-            font-size: 22px;
-            font-weight: 800;
-            color: #0c2a4a;
-            margin-bottom: 2px;
-            letter-spacing: -0.3px;
-        }
-
-        .subtitle {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #4a637d;
-        }
-
-        .timer-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .timer-display {
-            font-size: 18px;
-            font-weight: 800;
-            color: #0e2a47;
-            background-color: #ffffff;
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 2px solid #d4e5f9;
-            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            line-height: 1.2;
-        }
-
-        .bottom-group {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 24px;
-        }
-
-        .info-box {
-            width: 100%;
-            background-color: var(--box-bg);
-            border: 1px solid var(--box-border);
-            border-radius: 14px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
-        }
-
-        .info-box-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .info-box-text {
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #1a3c61;
-            line-height: 1.28;
-            text-align: left;
-        }
-
-        .kakao-btn {
-            width: 100%;
-            background-color: var(--kakao-yellow);
-            color: #000000;
-            border: none;
-            padding: 15px 18px;
-            border-radius: 14px;
-            font-size: 16.5px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .kakao-btn:active {
-            transform: scale(0.98);
-        }
-
-        .kakao-btn-icon {
-            font-size: 19px;
-        }
-
-        #vapi-container {
-            display: none;
-            width: 100%;
-        }
-
-        .call-btn {
-            width: 100%;
-            background-color: #2ecc71;
-            color: #ffffff;
-            border: none;
-            padding: 16px 20px;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 24px;
-        }
-
-        .call-btn:active {
-            transform: scale(0.98);
-        }
-
-        iframe[title*="vapi"],
-        iframe[src*="vapi"],
-        .vapi-btn,
-        .vapi-btn-container,
-        [class*="vapi-btn"],
-        [id*="vapi-widget"],
-        button[class*="vapi"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-    </style>
-</head>
-<body>
-
-    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/>
-    </svg>
-    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/>
-    </svg>
-
-    <div class="dot-pattern-left"></div>
-    <div class="dot-pattern-right"></div>
-
-    <!-- PAGE 1: AUTH GATE -->
-    <div id="auth-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-
-            <div class="avatar-container">
-                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-            </div>
-
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
-        </div>
-
-        <div class="bottom-group">
-            <div class="info-box">
-                <span class="info-box-icon">🎙️</span>
-                <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
-            </div>
-
-            <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
-                <span class="kakao-btn-icon">💬</span>
-                <span id="btn-text-content">무료 체험 통화 시작하기</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- PAGE 2: ACTIVE CALL SCREEN -->
-    <div id="vapi-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-
-            <div class="avatar-container">
-                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-            </div>
-
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
-            
-            <div class="timer-wrapper">
-                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
-            </div>
-        </div>
-
-        <div class="bottom-group">
-            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
-                <span id="call-btn-text">📞 통화 시작하기</span>
-            </button>
-        </div>
-    </div>
-
-    <script>
+<script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyrYTZ4vQQaVkryF70yqumB-aUF7Hk4wdmDbdNT0_MTCLiUycH28A_sPVieQL4h4fgsYw/exec";
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
 
@@ -367,9 +16,7 @@
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
                     Kakao.init(KAKAO_CLIENT_ID);
                 }
-            } catch (e) {
-                console.error("Kakao init non-fatal error:", e);
-            }
+            } catch (e) {}
         });
 
         function startKakaoAuth() {
@@ -502,18 +149,22 @@
                     if (vapiSdkObj) {
                         vapiInstance = vapiSdkObj;
 
-                        if (typeof vapiInstance.on === 'function') {
-                            vapiInstance.on('call-start', () => {
-                                startTimer();
-                            });
-                            vapiInstance.on('speech-start', () => {
-                                if (!timerInterval) startTimer();
-                            });
-                            vapiInstance.on('call-end', () => {
-                                stopTimer();
-                            });
+                        // 🌺 FORCE TRIGGER TIMER & UI IMMEDIATELY ON BUTTON TAP
+                        startTimer();
+                        isCallActive = true;
+
+                        const statusEl = document.getElementById("call-status");
+                        const btnTextEl = document.getElementById("call-btn-text");
+                        const btnEl = document.getElementById("start-call-btn");
+
+                        if (statusEl) statusEl.innerText = "🔊 통화가 연결되었습니다.";
+                        if (btnTextEl) btnTextEl.innerText = "🚫 전화 끊기";
+                        if (btnEl) {
+                            btnEl.style.backgroundColor = "#e05252";
+                            btnEl.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
                         }
 
+                        // RUN VAPI CALL
                         if (typeof vapiInstance.run === 'function') {
                             vapiInstance.run({
                                 apiKey: VAPI_KEY,
@@ -525,20 +176,8 @@
                                 }
                             });
                         }
-
-                        isCallActive = true;
-                        const statusEl = document.getElementById("call-status");
-                        const btnTextEl = document.getElementById("call-btn-text");
-                        const btnEl = document.getElementById("start-call-btn");
-
-                        if (statusEl) statusEl.innerText = "🔊 통화가 연결되었습니다.";
-                        if (btnTextEl) btnTextEl.innerText = "🚫 전화 끊기";
-                        if (btnEl) {
-                            btnEl.style.backgroundColor = "#e05252";
-                            btnEl.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                        }
                     } else {
-                        alert("Vapi SDK가 로딩되지 않았습니다. 페이지를 새로고침 해주세요.");
+                        alert("Vapi SDK가 로딩되지 않았습니다. 새로고침 해주세요.");
                     }
                 } catch (err) {
                     console.error("Vapi call execution error:", err);
@@ -567,5 +206,3 @@
             }
         }
     </script>
-</body>
-</html>
