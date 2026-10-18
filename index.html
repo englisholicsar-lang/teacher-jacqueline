@@ -196,7 +196,7 @@
             margin-top: 24px;
         }
 
-        /* Absolute annihilation of any Vapi floating widget artifacts */
+        /* Vapi 잔여 UI 요소 완전히 숨김 */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -236,7 +236,7 @@
                 <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
             </div>
 
-            <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
+            <button id="login-btn" class="kakao-btn" onclick="handleStartTrial()">
                 <span>💬</span>
                 <span id="btn-text-content">무료 체험 통화 시작하기</span>
             </button>
@@ -285,93 +285,26 @@
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
                     Kakao.init(KAKAO_CLIENT_ID);
                 }
-            } catch (e) {
-                console.warn("Kakao init warning:", e);
-            }
+            } catch (e) {}
         });
 
-        function showCallScreenSafe() {
-            const authEl = document.getElementById("auth-container");
-            const vapiEl = document.getElementById("vapi-container");
-            if (authEl) authEl.style.display = "none";
-            if (vapiEl) vapiEl.style.display = "flex";
+        function showCallScreen() {
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("vapi-container").style.display = "flex";
         }
 
-        function startKakaoAuth() {
-            const btnText = document.getElementById("btn-text-content");
-            if (btnText) btnText.innerText = "카카오 로그인 중...";
-
+        // 인앱 브라우저 흰 화면(kapi.kakao.com/cors/afterlogin.html) 멈춤 방지용 직행 처리
+        function handleStartTrial() {
+            window.authenticatedUserName = "KOREAN_NAME_DETECTED";
+            
+            // 시도 로그 비동기 기록
             try {
-                if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
-                    Kakao.init(KAKAO_CLIENT_ID);
-                }
+                const script = document.createElement('script');
+                script.src = GAS_URL + "?userName=Student&t=" + Date.now();
+                document.body.appendChild(script);
+            } catch(e) {}
 
-                Kakao.Auth.login({
-                    throughTalk: false,
-                    success: function(authObj) {
-                        if (btnText) btnText.innerText = "인증 확인 중...";
-
-                        Kakao.API.request({
-                            url: '/v2/user/me',
-                            success: function(res) {
-                                const userId = res.id;
-                                let userName = "Kakao User";
-                                
-                                if (res.properties && res.properties.nickname) {
-                                    userName = res.properties.nickname;
-                                } else if (res.kakao_account && res.kakao_account.profile && res.kakao_account.profile.nickname) {
-                                    userName = res.kakao_account.profile.nickname;
-                                }
-
-                                const isKoreanName = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(userName);
-                                window.authenticatedUserName = isKoreanName ? "KOREAN_NAME_DETECTED" : userName;
-
-                                try {
-                                    const callbackName = "gasCallback_" + Date.now();
-                                    const fallbackTimer = setTimeout(() => { showCallScreenSafe(); }, 2500);
-
-                                    window[callbackName] = function(data) {
-                                        clearTimeout(fallbackTimer);
-                                        delete window[callbackName];
-                                        const scriptEl = document.getElementById(callbackName);
-                                        if (scriptEl) scriptEl.remove();
-
-                                        if (data && data.status === "ALREADY_USED") {
-                                            alert("이미 무료 체험을 사용하셨습니다.");
-                                            if (btnText) btnText.innerText = "무료 체험 완료됨";
-                                        } else {
-                                            showCallScreenSafe();
-                                        }
-                                    };
-
-                                    const script = document.createElement('script');
-                                    script.id = callbackName;
-                                    script.src = GAS_URL + "?userId=" + encodeURIComponent(userId) + 
-                                                           "&userName=" + encodeURIComponent(userName) + 
-                                                           "&callback=" + callbackName + 
-                                                           "&t=" + Date.now();
-                                    script.onerror = function() {
-                                        clearTimeout(fallbackTimer);
-                                        showCallScreenSafe();
-                                    };
-                                    document.body.appendChild(script);
-                                } catch (gasErr) {
-                                    showCallScreenSafe();
-                                }
-                            },
-                            fail: function(error) {
-                                showCallScreenSafe();
-                            }
-                        });
-                    },
-                    fail: function(err) {
-                        if (btnText) btnText.innerText = "무료 체험 통화 시작하기";
-                        showCallScreenSafe();
-                    }
-                });
-            } catch (ex) {
-                showCallScreenSafe();
-            }
+            showCallScreen();
         }
 
         function formatTime(totalSeconds) {
@@ -413,7 +346,7 @@
         async function toggleVapiCall() {
             if (!isCallActive) {
                 try {
-                    // 🌺 EXPLICITLY REQUEST MICROPHONE ACCESS TO UNBLOCK WEBRTC AUDIO
+                    // 마이크 권한 팝업 즉시 호출
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
