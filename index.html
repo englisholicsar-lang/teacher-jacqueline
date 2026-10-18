@@ -173,7 +173,7 @@
             transition: background-color 0.2s ease;
         }
 
-        /* Absolute hiding of any default Vapi floating elements */
+        /* Hide Vapi floating elements */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -194,7 +194,6 @@
 </head>
 <body>
 
-    <!-- SINGLE STABLE VIEWPORT -->
     <div class="container">
         <div class="upper-group">
             <div class="logo-wrapper">
@@ -284,7 +283,7 @@
             const btnEl = document.getElementById("action-btn");
 
             if (!isCallActive) {
-                // 1. Direct hardware mic check to prompt native system dialog without DOM changes
+                // Request Hardware Microphone permission
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -311,14 +310,20 @@
                         btnEl.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
                     }
 
-                    if (typeof vapiInstance.run === 'function') {
+                    // Dual compatibility launcher for Vapi SDK methods
+                    if (typeof vapiInstance.start === 'function') {
+                        vapiInstance.start(VAPI_ASSISTANT_ID, {
+                            apiKey: VAPI_KEY,
+                            assistantOverrides: {
+                                variableValues: { studentName: "Student" }
+                            }
+                        });
+                    } else if (typeof vapiInstance.run === 'function') {
                         vapiInstance.run({
                             apiKey: VAPI_KEY,
                             assistant: VAPI_ASSISTANT_ID,
                             assistantOverrides: {
-                                variableValues: {
-                                    studentName: "Student"
-                                }
+                                variableValues: { studentName: "Student" }
                             }
                         });
                     }
