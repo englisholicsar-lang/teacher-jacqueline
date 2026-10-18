@@ -3,350 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Teacher Jacqueline - Free Trial</title>
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Teacher Jacqueline - Free Trial">
-    <meta property="og:description" content="재클린 선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
-    <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/og_preview.png">
-    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
-    <meta property="og:type" content="website">
+    <title>Teacher Jacqueline - Free Trial (Diagnostic)</title>
 
     <!-- Vapi Web SDK -->
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
-        :root {
-            --bg-base: #f0f6ff;
-            --primary-navy: #0e2a47;
-            --sub-text: #4a637d;
-            --box-bg: #eaf3fe;
-            --box-border: #d4e5f9;
-            --kakao-yellow: #fee500;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh;
-            background-color: var(--bg-base);
-            position: relative;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 0px 20px 20px 20px;
-            color: var(--primary-navy);
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 380px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .upper-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-
-        .logo-wrapper {
-            margin-bottom: 8px;
-        }
-
-        .logo-img {
-            height: 75px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .avatar-container {
-            width: 115px;
-            height: 115px;
-            margin-bottom: 8px;
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #ffffff;
-            box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12);
-        }
-
-        .title {
-            font-size: 22px;
-            font-weight: 800;
-            color: #0c2a4a;
-            margin-bottom: 2px;
-        }
-
-        .subtitle {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #4a637d;
-        }
-
-        .timer-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .timer-display {
-            font-size: 18px;
-            font-weight: 800;
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f0f6ff;
             color: #0e2a47;
-            background-color: #ffffff;
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 2px solid #d4e5f9;
-            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06);
+            text-align: center;
         }
-
-        .bottom-group {
+        .btn {
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 24px;
-        }
-
-        .info-box {
-            width: 100%;
-            background-color: var(--box-bg);
-            border: 1px solid var(--box-border);
-            border-radius: 14px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .info-box-icon {
-            font-size: 24px;
-        }
-
-        .info-box-text {
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #1a3c61;
-            text-align: left;
-            line-height: 1.28;
-        }
-
-        .main-action-btn {
-            width: 100%;
-            background-color: var(--kakao-yellow);
-            color: #000000;
+            padding: 16px;
+            background: #fee500;
             border: none;
-            padding: 16px 18px;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 800;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background-color 0.2s ease;
+            margin-bottom: 15px;
         }
-
-        /* Hide Vapi floating elements */
-        iframe[title*="vapi"],
-        iframe[src*="vapi"],
-        .vapi-btn,
-        .vapi-btn-container,
-        div[id*="vapi"],
-        span[class*="vapi"],
-        button[class*="vapi"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            width: 0 !important;
-            height: 0 !important;
-            position: absolute !important;
-            z-index: -9999 !important;
+        #debug-log {
+            width: 100%;
+            height: 250px;
+            background: #1e1e1e;
+            color: #00ff66;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: left;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-            <div class="avatar-container">
-                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-            </div>
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+    <h2>Teacher Jacqueline Test</h2>
+    <p id="status-text">Ready to test</p>
 
-            <div class="timer-wrapper">
-                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
-            </div>
-        </div>
+    <button id="test-btn" class="btn" onclick="runDiagnosticTest()">🧪 Run Call Diagnostic</button>
 
-        <div class="bottom-group">
-            <div id="info-box-wrapper" class="info-box">
-                <span class="info-box-icon">🎙️</span>
-                <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
-            </div>
-
-            <button id="action-btn" class="main-action-btn" onclick="toggleVapiCall()">
-                <span>💬</span>
-                <span id="btn-text">무료 체험 통화 시작하기</span>
-            </button>
-        </div>
-    </div>
+    <h3>Live Debug Console:</h3>
+    <div id="debug-log">-- Debug Log Started --\n</div>
 
     <script>
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
-        let vapiInstance = null;
-        let isCallActive = false;
-        let timerInterval = null;
-        let secondsElapsed = 0;
-        const MAX_SECONDS = 600;
-
-        function formatTime(totalSeconds) {
-            const mins = Math.floor(totalSeconds / 60);
-            const secs = totalSeconds % 60;
-            return (mins < 10 ? "0" + mins : mins) + ":" + (secs < 10 ? "0" + secs : secs);
-        }
-
-        function startTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            secondsElapsed = 0;
-            
-            timerInterval = setInterval(() => {
-                secondsElapsed++;
-                const timerEl = document.getElementById("timer");
-                if (timerEl) {
-                    timerEl.innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
-                }
-
-                if (secondsElapsed >= MAX_SECONDS) {
-                    stopTimer();
-                    if (vapiInstance && typeof vapiInstance.stop === 'function') {
-                        vapiInstance.stop();
-                    }
-                    isCallActive = false;
-                    const statusEl = document.getElementById("call-status");
-                    const btnTextEl = document.getElementById("btn-text");
-                    const btnEl = document.getElementById("action-btn");
-
-                    if (statusEl) statusEl.innerText = "10분 무료 체험이 종료되었습니다.";
-                    if (btnTextEl) btnTextEl.innerText = "체험 종료됨";
-                    if (btnEl) {
-                        btnEl.style.backgroundColor = "#a0aec0";
-                        btnEl.disabled = true;
-                    }
-                }
-            }, 1000);
-        }
-
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
+        function log(msg) {
+            const consoleEl = document.getElementById("debug-log");
+            if (consoleEl) {
+                consoleEl.innerText += "[" + new Date().toLocaleTimeString() + "] " + msg + "\n";
+                consoleEl.scrollTop = consoleEl.scrollHeight;
             }
+            console.log(msg);
         }
 
-        async function toggleVapiCall() {
-            const statusEl = document.getElementById("call-status");
-            const btnTextEl = document.getElementById("btn-text");
-            const btnEl = document.getElementById("action-btn");
+        async function runDiagnosticTest() {
+            log("1. Tap detected.");
 
-            if (!isCallActive) {
-                // Request Hardware Microphone permission
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        stream.getTracks().forEach(track => track.stop());
-                    } catch (micErr) {
-                        alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
-                        return;
-                    }
-                }
+            // Step 1: Check Mic
+            try {
+                log("2. Requesting mic stream...");
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                log("3. Mic granted! Tracks count: " + stream.getAudioTracks().length);
+                stream.getTracks().forEach(t => t.stop());
+            } catch (err) {
+                log("❌ Mic Error: " + err.message);
+                return;
+            }
 
-                const vapiSdkObj = window.vapi || window.vapiSDK;
+            // Step 2: Inspect Vapi SDK Object
+            const vapiSdk = window.vapi || window.vapiSDK;
+            if (!vapiSdk) {
+                log("❌ Vapi SDK not found on window object!");
+                return;
+            }
 
-                if (vapiSdkObj) {
-                    vapiInstance = vapiSdkObj;
+            log("4. Vapi SDK detected. Available keys: " + Object.keys(vapiSdk).join(", "));
 
-                    startTimer();
-                    isCallActive = true;
+            // Step 3: Attach Event Listeners
+            if (typeof vapiSdk.on === 'function') {
+                vapiSdk.on('call-start', () => log("🟢 EVENT: call-start"));
+                vapiSdk.on('call-end', () => log("🔴 EVENT: call-end"));
+                vapiSdk.on('speech-start', () => log("🗣️ EVENT: Jacqueline speech started!"));
+                vapiSdk.on('error', (e) => log("❌ EVENT Error: " + JSON.stringify(e)));
+            }
 
-                    if (statusEl) statusEl.innerText = "🔊 통화가 연결되었습니다.";
-                    if (btnTextEl) btnTextEl.innerText = "🚫 전화 끊기";
-                    if (btnEl) {
-                        btnEl.style.backgroundColor = "#e05252";
-                        btnEl.style.color = "#ffffff";
-                        btnEl.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                    }
+            // Step 4: Execute Launch Test
+            try {
+                log("5. Initializing call via .run()...");
+                document.getElementById("status-text").innerText = "Connecting...";
 
-                    // Dual compatibility launcher for Vapi SDK methods
-                    if (typeof vapiInstance.start === 'function') {
-                        vapiInstance.start(VAPI_ASSISTANT_ID, {
-                            apiKey: VAPI_KEY,
-                            assistantOverrides: {
-                                variableValues: { studentName: "Student" }
-                            }
-                        });
-                    } else if (typeof vapiInstance.run === 'function') {
-                        vapiInstance.run({
-                            apiKey: VAPI_KEY,
-                            assistant: VAPI_ASSISTANT_ID,
-                            assistantOverrides: {
-                                variableValues: { studentName: "Student" }
-                            }
-                        });
-                    }
+                if (typeof vapiSdk.run === 'function') {
+                    vapiSdk.run({
+                        apiKey: VAPI_KEY,
+                        assistant: VAPI_ASSISTANT_ID
+                    });
+                    log("6. .run() invoked successfully.");
+                } else if (typeof vapiSdk.start === 'function') {
+                    vapiSdk.start(VAPI_ASSISTANT_ID);
+                    log("6. .start() invoked successfully.");
                 } else {
-                    alert("Vapi SDK가 아직 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+                    log("❌ Neither .run() nor .start() exists on vapi object.");
                 }
-            } else {
-                try {
-                    if (vapiInstance && typeof vapiInstance.stop === 'function') {
-                        vapiInstance.stop();
-                    }
-                } catch(e) {}
-                
-                stopTimer();
-                isCallActive = false;
-
-                if (statusEl) statusEl.innerText = "통화가 종료되었습니다.";
-                if (btnTextEl) btnTextEl.innerText = "통화 종료됨";
-                if (btnEl) {
-                    btnEl.style.backgroundColor = "#a0aec0";
-                    btnEl.style.color = "#ffffff";
-                    btnEl.disabled = true;
-                }
+            } catch (err) {
+                log("❌ Launch Error: " + err.message);
             }
         }
     </script>
