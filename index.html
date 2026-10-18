@@ -196,7 +196,7 @@
             margin-top: 24px;
         }
 
-        /* Vapi 잔여 UI 요소 완전히 숨김 */
+        /* Hide Vapi floating widget completely */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -288,23 +288,17 @@
             } catch (e) {}
         });
 
-        function showCallScreen() {
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("vapi-container").style.display = "flex";
-        }
-
-        // 인앱 브라우저 흰 화면(kapi.kakao.com/cors/afterlogin.html) 멈춤 방지용 직행 처리
         function handleStartTrial() {
             window.authenticatedUserName = "KOREAN_NAME_DETECTED";
-            
-            // 시도 로그 비동기 기록
-            try {
-                const script = document.createElement('script');
-                script.src = GAS_URL + "?userName=Student&t=" + Date.now();
-                document.body.appendChild(script);
-            } catch(e) {}
 
-            showCallScreen();
+            // Non-blocking background log to GAS
+            try {
+                fetch(GAS_URL + "?userName=Student&t=" + Date.now(), { mode: 'no-cors' }).catch(() => {});
+            } catch (e) {}
+
+            // Immediate DOM toggle - eliminates white screens
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("vapi-container").style.display = "flex";
         }
 
         function formatTime(totalSeconds) {
@@ -346,7 +340,7 @@
         async function toggleVapiCall() {
             if (!isCallActive) {
                 try {
-                    // 마이크 권한 팝업 즉시 호출
+                    // Explicit hardware mic check on user click
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
