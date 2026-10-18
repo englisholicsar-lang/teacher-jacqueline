@@ -195,7 +195,7 @@
             margin-top: 24px;
         }
 
-        /* Hide Vapi floating widget artifacts completely */
+        /* Fully hide any Vapi floating elements */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -216,7 +216,7 @@
 </head>
 <body>
 
-    <!-- PAGE 1: AUTH / START GATE -->
+    <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
         <div class="upper-group">
             <div class="logo-wrapper">
@@ -235,7 +235,7 @@
                 <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
             </div>
 
-            <button id="login-btn" class="kakao-btn" onclick="startTrialWithMicPrompt()">
+            <button id="login-btn" class="kakao-btn" onclick="startTrialFlow()">
                 <span>💬</span>
                 <span id="btn-text-content">무료 체험 통화 시작하기</span>
             </button>
@@ -276,21 +276,21 @@
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
 
-        // 1. Trigger Mic Prompt Directly on First Tap to Avoid Webview Audio Block
-        async function startTrialWithMicPrompt() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    // Release audio tracks immediately so Vapi can cleanly claim hardware
-                    stream.getTracks().forEach(track => track.stop());
-                } catch (micErr) {
-                    console.warn("Microphone permission denied or prompt dismissed:", micErr);
-                }
-            }
-
-            // Transition UI instantly without external network dependencies
+        // Synchronous view change to prevent webview render freezes
+        function startTrialFlow() {
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("vapi-container").style.display = "flex";
+
+            // Non-blocking microphone permission prompt
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        stream.getTracks().forEach(track => track.stop());
+                    })
+                    .catch(err => {
+                        console.warn("Microphone request warning:", err);
+                    });
+            }
         }
 
         function formatTime(totalSeconds) {
@@ -329,20 +329,9 @@
             }
         }
 
-        async function toggleVapiCall() {
+        function toggleVapiCall() {
             if (!isCallActive) {
                 try {
-                    // Secondary mic safeguard before WebRTC initialization
-                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                            stream.getTracks().forEach(track => track.stop());
-                        } catch (micErr) {
-                            alert("마이크 권한이 필요합니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
-                            return;
-                        }
-                    }
-
                     const vapiSdkObj = window.vapi || window.vapiSDK;
 
                     if (vapiSdkObj) {
