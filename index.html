@@ -155,14 +155,14 @@
             line-height: 1.28;
         }
 
-        .kakao-btn {
+        .main-action-btn {
             width: 100%;
             background-color: var(--kakao-yellow);
             color: #000000;
             border: none;
-            padding: 15px 18px;
+            padding: 16px 18px;
             border-radius: 14px;
-            font-size: 16.5px;
+            font-size: 17px;
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
@@ -170,32 +170,10 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: background-color 0.2s ease;
         }
 
-        #vapi-container {
-            display: none;
-            width: 100%;
-        }
-
-        .call-btn {
-            width: 100%;
-            background-color: #2ecc71;
-            color: #ffffff;
-            border: none;
-            padding: 16px 20px;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 24px;
-        }
-
-        /* Completely hide default Vapi floating elements */
+        /* Absolute hiding of any default Vapi floating elements */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -216,8 +194,8 @@
 </head>
 <body>
 
-    <!-- PAGE 1: START GATE -->
-    <div id="auth-container" class="container">
+    <!-- SINGLE STABLE VIEWPORT -->
+    <div class="container">
         <div class="upper-group">
             <div class="logo-wrapper">
                 <img src="logo.png" alt="Englisholic Logo" class="logo-img">
@@ -226,42 +204,22 @@
                 <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
             </div>
             <h1 class="title">Teacher Jacqueline</h1>
-            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
-        </div>
+            <p id="call-status" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
 
-        <div class="bottom-group">
-            <div class="info-box">
-                <span class="info-box-icon">🎙️</span>
-                <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
-            </div>
-
-            <button id="login-btn" class="kakao-btn" onclick="goToCallScreen()">
-                <span>💬</span>
-                <span id="btn-text-content">무료 체험 통화 시작하기</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- PAGE 2: ACTIVE CALL SCREEN -->
-    <div id="vapi-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-            <div class="avatar-container">
-                <img class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-            </div>
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
-            
             <div class="timer-wrapper">
                 <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
             </div>
         </div>
 
         <div class="bottom-group">
-            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
-                <span id="call-btn-text">📞 통화 시작하기</span>
+            <div id="info-box-wrapper" class="info-box">
+                <span class="info-box-icon">🎙️</span>
+                <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
+            </div>
+
+            <button id="action-btn" class="main-action-btn" onclick="toggleVapiCall()">
+                <span>💬</span>
+                <span id="btn-text">무료 체험 통화 시작하기</span>
             </button>
         </div>
     </div>
@@ -275,12 +233,6 @@
         let timerInterval = null;
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
-
-        // 100% pure, synchronous DOM transition
-        function goToCallScreen() {
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("vapi-container").style.display = "flex";
-        }
 
         function formatTime(totalSeconds) {
             const mins = Math.floor(totalSeconds / 60);
@@ -306,7 +258,15 @@
                     }
                     isCallActive = false;
                     const statusEl = document.getElementById("call-status");
+                    const btnTextEl = document.getElementById("btn-text");
+                    const btnEl = document.getElementById("action-btn");
+
                     if (statusEl) statusEl.innerText = "10분 무료 체험이 종료되었습니다.";
+                    if (btnTextEl) btnTextEl.innerText = "체험 종료됨";
+                    if (btnEl) {
+                        btnEl.style.backgroundColor = "#a0aec0";
+                        btnEl.disabled = true;
+                    }
                 }
             }, 1000);
         }
@@ -319,55 +279,51 @@
         }
 
         async function toggleVapiCall() {
+            const statusEl = document.getElementById("call-status");
+            const btnTextEl = document.getElementById("btn-text");
+            const btnEl = document.getElementById("action-btn");
+
             if (!isCallActive) {
-                try {
-                    // Trigger Microphone Permission Popup on Page 2 when Call Button is clicked
-                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                            stream.getTracks().forEach(track => track.stop());
-                        } catch (micErr) {
-                            alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
-                            return;
-                        }
+                // 1. Direct hardware mic check to prompt native system dialog without DOM changes
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        stream.getTracks().forEach(track => track.stop());
+                    } catch (micErr) {
+                        alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
+                        return;
+                    }
+                }
+
+                const vapiSdkObj = window.vapi || window.vapiSDK;
+
+                if (vapiSdkObj) {
+                    vapiInstance = vapiSdkObj;
+
+                    startTimer();
+                    isCallActive = true;
+
+                    if (statusEl) statusEl.innerText = "🔊 통화가 연결되었습니다.";
+                    if (btnTextEl) btnTextEl.innerText = "🚫 전화 끊기";
+                    if (btnEl) {
+                        btnEl.style.backgroundColor = "#e05252";
+                        btnEl.style.color = "#ffffff";
+                        btnEl.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
                     }
 
-                    const vapiSdkObj = window.vapi || window.vapiSDK;
-
-                    if (vapiSdkObj) {
-                        vapiInstance = vapiSdkObj;
-
-                        startTimer();
-                        isCallActive = true;
-
-                        const statusEl = document.getElementById("call-status");
-                        const btnTextEl = document.getElementById("call-btn-text");
-                        const btnEl = document.getElementById("start-call-btn");
-
-                        if (statusEl) statusEl.innerText = "🔊 통화가 연결되었습니다.";
-                        if (btnTextEl) btnTextEl.innerText = "🚫 전화 끊기";
-                        if (btnEl) {
-                            btnEl.style.backgroundColor = "#e05252";
-                            btnEl.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                        }
-
-                        if (typeof vapiInstance.run === 'function') {
-                            vapiInstance.run({
-                                apiKey: VAPI_KEY,
-                                assistant: VAPI_ASSISTANT_ID,
-                                assistantOverrides: {
-                                    variableValues: {
-                                        studentName: "Student"
-                                    }
+                    if (typeof vapiInstance.run === 'function') {
+                        vapiInstance.run({
+                            apiKey: VAPI_KEY,
+                            assistant: VAPI_ASSISTANT_ID,
+                            assistantOverrides: {
+                                variableValues: {
+                                    studentName: "Student"
                                 }
-                            });
-                        }
-                    } else {
-                        alert("Vapi SDK가 아직 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+                            }
+                        });
                     }
-                } catch (err) {
-                    console.error("Vapi call execution error:", err);
-                    alert("통화 연결 중 오류가 발생했습니다.");
+                } else {
+                    alert("Vapi SDK가 아직 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
                 }
             } else {
                 try {
@@ -379,14 +335,11 @@
                 stopTimer();
                 isCallActive = false;
 
-                const statusEl = document.getElementById("call-status");
-                const btnTextEl = document.getElementById("call-btn-text");
-                const btnEl = document.getElementById("start-call-btn");
-
                 if (statusEl) statusEl.innerText = "통화가 종료되었습니다.";
                 if (btnTextEl) btnTextEl.innerText = "통화 종료됨";
                 if (btnEl) {
                     btnEl.style.backgroundColor = "#a0aec0";
+                    btnEl.style.color = "#ffffff";
                     btnEl.disabled = true;
                 }
             }
