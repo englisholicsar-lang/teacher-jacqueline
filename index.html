@@ -235,7 +235,7 @@
                 <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
             </div>
 
-            <button id="login-btn" class="kakao-btn" onclick="startTrialFlow()">
+            <button id="login-btn" class="kakao-btn" onclick="goToCallScreen()">
                 <span>💬</span>
                 <span id="btn-text-content">무료 체험 통화 시작하기</span>
             </button>
@@ -276,21 +276,10 @@
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
 
-        // Synchronous view change to prevent webview render freezes
-        function startTrialFlow() {
+        // 100% Pure Synchronous DOM Switch
+        function goToCallScreen() {
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("vapi-container").style.display = "flex";
-
-            // Non-blocking microphone permission prompt
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(stream => {
-                        stream.getTracks().forEach(track => track.stop());
-                    })
-                    .catch(err => {
-                        console.warn("Microphone request warning:", err);
-                    });
-            }
         }
 
         function formatTime(totalSeconds) {
@@ -329,9 +318,20 @@
             }
         }
 
-        function toggleVapiCall() {
+        async function toggleVapiCall() {
             if (!isCallActive) {
                 try {
+                    // Trigger Microphone Permission Popup on Page 2 when Call Button is clicked
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            stream.getTracks().forEach(track => track.stop());
+                        } catch (micErr) {
+                            alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
+                            return;
+                        }
+                    }
+
                     const vapiSdkObj = window.vapi || window.vapiSDK;
 
                     if (vapiSdkObj) {
