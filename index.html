@@ -195,7 +195,7 @@
             margin-top: 24px;
         }
 
-        /* Fully hide any Vapi floating elements */
+        /* Completely hide default Vapi floating elements */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -216,7 +216,7 @@
 </head>
 <body>
 
-    <!-- PAGE 1: AUTH GATE -->
+    <!-- PAGE 1: START GATE -->
     <div id="auth-container" class="container">
         <div class="upper-group">
             <div class="logo-wrapper">
@@ -276,7 +276,7 @@
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
 
-        // 100% Pure Synchronous DOM Switch
+        // 100% pure, synchronous DOM transition
         function goToCallScreen() {
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("vapi-container").style.display = "flex";
