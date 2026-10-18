@@ -213,7 +213,7 @@
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
         let vapiInstance = null;
-        let flowStage = "START"; // START -> VERIFYING -> READY -> IN_CALL -> ENDED
+        let flowStage = "START"; // START -> VERIFYING -> READY -> IN_CALL
         let timerInterval = null;
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
@@ -240,7 +240,6 @@
                     if (vapiInstance && typeof vapiInstance.stop === 'function') {
                         vapiInstance.stop();
                     }
-                    setUIEnded("10분 무료 체험이 종료되었습니다.");
                 }
             }, 1000);
         }
@@ -275,45 +274,12 @@
             }
         }
 
-        function setUIInCall() {
-            flowStage = "IN_CALL";
-            const statusEl = document.getElementById("call-status");
-            const btnTextEl = document.getElementById("btn-text");
-            const btnEl = document.getElementById("action-btn");
-
-            if (statusEl) statusEl.innerText = "🔊 통화가 연결되었습니다.";
-            if (btnTextEl) btnTextEl.innerText = "🚫 통화 종료하기";
-            if (btnEl) {
-                btnEl.style.backgroundColor = "#e05252";
-                btnEl.style.color = "#ffffff";
-                btnEl.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                btnEl.disabled = false;
-            }
-        }
-
-        function setUIEnded(msg) {
-            flowStage = "ENDED";
-            stopTimer();
-
-            const statusEl = document.getElementById("call-status");
-            const btnTextEl = document.getElementById("btn-text");
-            const btnEl = document.getElementById("action-btn");
-
-            if (statusEl) statusEl.innerText = msg || "통화가 종료되었습니다.";
-            if (btnTextEl) btnTextEl.innerText = "통화 종료됨";
-            if (btnEl) {
-                btnEl.style.backgroundColor = "#a0aec0";
-                btnEl.style.color = "#ffffff";
-                btnEl.style.boxShadow = "none";
-                btnEl.disabled = true;
-            }
-        }
-
         async function handleButtonClick() {
             const btnTextEl = document.getElementById("btn-text");
             const btnEl = document.getElementById("action-btn");
+            const statusEl = document.getElementById("call-status");
 
-            // STAGE 1: Free Trial Start -> Verifying
+            // STAGE 1: Yellow Button Tap -> "인증 확인 중..."
             if (flowStage === "START") {
                 flowStage = "VERIFYING";
                 if (btnTextEl) btnTextEl.innerText = "인증 확인 중...";
@@ -325,7 +291,7 @@
                 return;
             }
 
-            // STAGE 2: Call Launch
+            // STAGE 2: Green Button Tap -> Request Mic & Hand off to Vapi
             if (flowStage === "READY") {
                 unlockWebViewAudio();
 
@@ -344,12 +310,27 @@
 
                 if (vapiSdkObj && typeof vapiSdkObj.run === 'function') {
                     vapiInstance = vapiSdkObj;
+                    flowStage = "IN_CALL";
 
-                    // Immediately transition UI to Active Call & start timer
-                    setUIInCall();
-                    startTimer();
+                    if (statusEl) statusEl.innerText = "🔊 통화가 연결되었습니다.";
+                    
+                    // HIDE our button so Vapi's widget is unblocked and audio plays out loud
+                    if (btnEl) btnEl.style.display = "none";
 
-                    // Launch Vapi WebRTC
+                    // Attach strict event listeners to start/stop the timer
+                    if (typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            startTimer();
+                        });
+
+                        vapiInstance.on('call-end', () => {
+                            stopTimer();
+                            if (statusEl) statusEl.innerText = "통화가 종료되었습니다.";
+                            setTimeout(() => { window.location.reload(); }, 1200);
+                        });
+                    }
+
+                    // Launch Vapi Call
                     vapiInstance.run({
                         apiKey: VAPI_KEY,
                         assistant: VAPI_ASSISTANT_ID,
@@ -360,21 +341,6 @@
                 } else {
                     alert("Vapi SDK가 아직 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
                 }
-                return;
-            }
-
-            // STAGE 3: Call Termination
-            if (flowStage === "IN_CALL") {
-                try {
-                    if (vapiInstance && typeof vapiInstance.stop === 'function') {
-                        vapiInstance.stop();
-                    }
-                } catch(e) {}
-                setUIEnded("통화가 종료되었습니다.");
-                
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1200);
             }
         }
     </script>
