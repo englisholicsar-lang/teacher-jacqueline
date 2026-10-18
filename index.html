@@ -12,8 +12,7 @@
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
-    <!-- SDKs -->
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <!-- Vapi Web SDK -->
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
@@ -196,7 +195,7 @@
             margin-top: 24px;
         }
 
-        /* Hide Vapi floating widget completely */
+        /* Fully hide any default Vapi floating widget artifacts */
         iframe[title*="vapi"],
         iframe[src*="vapi"],
         .vapi-btn,
@@ -236,7 +235,7 @@
                 <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
             </div>
 
-            <button id="login-btn" class="kakao-btn" onclick="handleStartTrial()">
+            <button id="login-btn" class="kakao-btn" onclick="goToCallScreen()">
                 <span>💬</span>
                 <span id="btn-text-content">무료 체험 통화 시작하기</span>
             </button>
@@ -268,9 +267,6 @@
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyrYTZ4vQQaVkryF70yqumB-aUF7Hk4wdmDbdNT0_MTCLiUycH28A_sPVieQL4h4fgsYw/exec";
-        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
-
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
 
@@ -280,23 +276,8 @@
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
-                    Kakao.init(KAKAO_CLIENT_ID);
-                }
-            } catch (e) {}
-        });
-
-        function handleStartTrial() {
-            window.authenticatedUserName = "KOREAN_NAME_DETECTED";
-
-            // Non-blocking background log to GAS
-            try {
-                fetch(GAS_URL + "?userName=Student&t=" + Date.now(), { mode: 'no-cors' }).catch(() => {});
-            } catch (e) {}
-
-            // Immediate DOM toggle - eliminates white screens
+        // Pure DOM transition - zero network requests to avoid white screen
+        function goToCallScreen() {
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("vapi-container").style.display = "flex";
         }
@@ -340,7 +321,7 @@
         async function toggleVapiCall() {
             if (!isCallActive) {
                 try {
-                    // Explicit hardware mic check on user click
+                    // Explicit hardware mic request to trigger native browser permission popup
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -376,7 +357,7 @@
                                 assistant: VAPI_ASSISTANT_ID,
                                 assistantOverrides: {
                                     variableValues: {
-                                        studentName: window.authenticatedUserName || "Student"
+                                        studentName: "Student"
                                     }
                                 }
                             });
