@@ -495,7 +495,7 @@
                         await remoteAudio.setSinkId(targetDevice.deviceId);
                     }
                     speakerBtn.classList.toggle("active", isSpeakerOn);
-                    speakerBtnText.innerText = isSpeakerOn ? "🔊 귀에 대고 통화하기 (수신기)" : "🔊 스피커폰 켜기";
+                    speakerBtnText.innerText = isSpeakerOn ? "🔊 귀에 대고 통화하기" : "🔊 스피커폰 켜기";
                 } catch (e) { 
                     console.warn("Sink switching note:", e);
                     speakerBtn.classList.toggle("active", isSpeakerOn);
@@ -507,20 +507,8 @@
             }
         }
 
-        async function toggleVapiCall() {
+        function toggleVapiCall() {
             if (!isCallActive) {
-                try {
-                    // Enhanced WebRTC voice processing constraints
-                    await navigator.mediaDevices.getUserMedia({ 
-                        audio: { 
-                            echoCancellation: true, 
-                            noiseSuppression: true, 
-                            autoGainControl: true,
-                            channelCount: 1
-                        } 
-                    });
-                } catch (e) { console.warn("Constraint request note:", e); }
-
                 if (window.vapiSDK) {
                     vapiInstance = window.vapiSDK.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID });
 
@@ -548,6 +536,7 @@
                         document.getElementById("speaker-btn").style.display = "none";
                     });
 
+                    // Start Vapi Call directly with single permission prompt
                     vapiInstance.start(VAPI_ASSISTANT_ID, {
                         metadata: {
                             nickname: currentKakaoNickname,
@@ -570,7 +559,7 @@
                 isCallActive = false;
 
                 document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
-                document.getElementById("call-btn-text").innerText = "통화 종료됨";
+                document.getElementById("call-btn-text").innerText = "체험 종료됨";
                 document.getElementById("speaker-btn").style.display = "none";
                 const btn = document.getElementById("start-call-btn");
                 btn.style.backgroundColor = "#a0aec0";
