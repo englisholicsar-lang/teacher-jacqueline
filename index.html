@@ -552,56 +552,85 @@
 
         async function toggleVapiCall() {
             if (!isCallActive) {
-                // Immediately unlock audio context inside the direct touch handler
+                // 1. Immediately unlock audio context inside the direct touch handler
                 unlockWebViewAudio();
 
-                // Mic hardware check
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    try {
+                const btn = document.getElementById("start-call-btn");
+                const callStatus = document.getElementById("call-status");
+                const callBtnText = document.getElementById("call-btn-text");
+
+                // UI Loading feedback
+                callStatus.innerText = "🎙️ 마이크 권한 확인 중...";
+                btn.disabled = true;
+
+                // 2. Await Microphone Permission explicitly BEFORE invoking Vapi
+                try {
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        // Clean up temporary stream so Vapi can capture the microphone device
                         stream.getTracks().forEach(track => track.stop());
-                    } catch (micErr) {
-                        alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
-                        return;
                     }
+                } catch (micErr) {
+                    console.error("Mic permission denied or error:", micErr);
+                    alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 허용을 확인해 주세요.");
+                    callStatus.innerText = "아래 버튼을 눌러 통화를 시작하세요!";
+                    btn.disabled = false;
+                    return;
                 }
 
+                // 3. Microphone is 100% granted NOW -> Start Vapi Call
                 const sdkObj = window.vapiSDK || window.vapi;
 
                 if (sdkObj && typeof sdkObj.run === 'function') {
                     isCallActive = true;
+                    btn.disabled = false;
 
-                    document.getElementById("call-status").innerText = "🔊 통화 연결 중...";
-                    document.getElementById("call-btn-text").innerText = "🚫 전화 끊기";
-                    const btn = document.getElementById("start-call-btn");
+                    callStatus.innerText = "🔊 통화 연결 중...";
+                    callBtnText.innerText = "🚫 전화 끊기";
                     btn.style.backgroundColor = "#e05252";
                     btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
 
-                    vapiInstance = sdkObj.run({
-                        apiKey: VAPI_KEY,
-                        assistant: VAPI_ASSISTANT_ID
-                    });
+                    try {
+                        vapiInstance = sdkObj.run({
+                            apiKey: VAPI_KEY,
+                            assistant: VAPI_ASSISTANT_ID
+                        });
+                    } catch (vapiErr) {
+                        console.error("Vapi initialization error:", vapiErr);
+                        alert("통화 연결 초기화 중 오류가 발생했습니다.");
+                        stopTimer();
+                        isCallActive = false;
+                        callStatus.innerText = "통화 연결 실패";
+                        callBtnText.innerText = "📞 통화 다시 시도";
+                        btn.style.backgroundColor = "#2ecc71";
+                        return;
+                    }
 
                     if (vapiInstance && typeof vapiInstance.on === 'function') {
                         vapiInstance.on('call-start', () => {
                             console.log("Call connected! Starting timer...");
-                            document.getElementById("call-status").innerText = "🔊 통화가 연결되었습니다.";
+                            callStatus.innerText = "🔊 통화가 연결되었습니다.";
                             startTimer();
                         });
 
                         vapiInstance.on('call-end', () => {
                             stopTimer();
                             isCallActive = false;
-                            document.getElementById("call-status").innerText = "통화가 종료되었습니다.";
-                            document.getElementById("call-btn-text").innerText = "통화 종료됨";
+                            callStatus.innerText = "통화가 종료되었습니다.";
+                            callBtnText.innerText = "통화 종료됨";
                             btn.style.backgroundColor = "#a0aec0";
                             btn.style.boxShadow = "none";
                             btn.disabled = true;
+                        });
+
+                        vapiInstance.on('error', (e) => {
+                            console.error("Vapi runtime error:", e);
                         });
                     } else {
                         startTimer();
                     }
                 } else {
+                    btn.disabled = false;
                     alert("Vapi SDK 로딩 실패");
                 }
             } else {
