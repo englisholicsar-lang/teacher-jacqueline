@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Jacqueline - Free Trial</title>
     
+    <!-- Open Graph Meta Tags for KakaoTalk Link Preview -->
     <meta property="og:title" content="Teacher Jacqueline - Free Trial">
     <meta property="og:description" content="재클린 선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
     <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/og_preview.png">
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
+    <!-- Kakao SDK & Vapi Web SDK -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
@@ -45,8 +47,10 @@
             color: var(--primary-navy);
         }
 
-        .bg-wave-top, .bg-wave-bottom {
+        .bg-wave-top {
             position: absolute;
+            top: 0;
+            right: 0;
             width: 100%;
             max-width: 500px;
             height: auto;
@@ -54,78 +58,233 @@
             pointer-events: none;
             opacity: 0.8;
         }
-        .bg-wave-top { top: 0; right: 0; }
-        .bg-wave-bottom { bottom: 0; left: 0; }
+
+        .bg-wave-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
 
         .dot-pattern-left {
-            position: absolute; top: 220px; left: 10px; width: 45px; height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0;
+            position: absolute;
+            top: 220px;
+            left: 10px;
+            width: 45px;
+            height: 80px;
+            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
+            background-size: 10px 10px;
+            z-index: 0;
         }
+
         .dot-pattern-right {
-            position: absolute; top: 80px; right: 10px; width: 45px; height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0;
+            position: absolute;
+            top: 80px;
+            right: 10px;
+            width: 45px;
+            height: 80px;
+            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
+            background-size: 10px 10px;
+            z-index: 0;
         }
 
         .container {
-            position: relative; z-index: 1; width: 100%; max-width: 380px;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
-        .upper-group { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 6px; }
-        .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-        .logo-img { height: 75px; width: auto; object-fit: contain; }
-        .avatar-container { position: relative; width: 115px; height: 115px; margin-bottom: 8px; }
+        .upper-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-img {
+            height: 75px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 115px;
+            height: 115px;
+            margin-bottom: 8px;
+        }
+
         .avatar-img {
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-            border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
         }
 
-        .title { font-size: 22px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
-        .subtitle { font-size: 13.5px; font-weight: 600; color: #4a637d; }
+        .title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0c2a4a;
+            margin-bottom: 2px;
+            letter-spacing: -0.3px;
+        }
 
-        .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 12px; }
+        .subtitle {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #4a637d;
+        }
+
+        .timer-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 12px;
+        }
+
         .timer-display {
-            font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff;
-            padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9;
-            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center;
-            justify-content: center; gap: 6px; line-height: 1.2;
+            font-size: 18px;
+            font-weight: 800;
+            color: #0e2a47;
+            background-color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 2px solid #d4e5f9;
+            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            line-height: 1.2;
+            -webkit-appearance: none;
         }
 
-        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
-        .info-box {
-            width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border);
-            border-radius: 14px; padding: 10px 14px; display: flex; align-items: center;
-            justify-content: center; gap: 12px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
+        .bottom-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 24px;
         }
-        .info-box-icon { font-size: 24px; flex-shrink: 0; display: flex; align-items: center; }
-        .info-box-text { font-size: 13.5px; font-weight: 700; color: #1a3c61; line-height: 1.28; text-align: left; }
+
+        .info-box {
+            width: 100%;
+            background-color: var(--box-bg);
+            border: 1px solid var(--box-border);
+            border-radius: 14px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
+        }
+
+        .info-box-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-box-text {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #1a3c61;
+            line-height: 1.28;
+            text-align: left;
+        }
 
         .kakao-btn {
-            width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none;
-            padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800;
-            cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex;
-            align-items: center; justify-content: center; gap: 8px;
+            width: 100%;
+            background-color: var(--kakao-yellow);
+            color: #000000;
+            border: none;
+            padding: 15px 18px;
+            border-radius: 14px;
+            font-size: 16.5px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        #vapi-container { display: none; width: 100%; }
+        #vapi-container {
+            display: none;
+            width: 100%;
+        }
 
         .call-btn {
-            width: 100%; background-color: #2ecc71; color: #ffffff; border: none;
-            padding: 16px 20px; border-radius: 14px; font-size: 17px; font-weight: 800;
-            cursor: pointer; box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4); display: flex;
-            align-items: center; justify-content: center; gap: 8px;
+            width: 100%;
+            background-color: #2ecc71;
+            color: #ffffff;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .speaker-btn {
-            display: none; width: 100%; background-color: #ffffff; color: var(--primary-navy);
-            border: 2px solid #d4e5f9; padding: 12px 16px; border-radius: 14px; font-size: 15px;
-            font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.05);
-            margin-top: 12px; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;
+            display: none; 
+            width: 100%;
+            background-color: #ffffff;
+            color: var(--primary-navy);
+            border: 2px solid #d4e5f9;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.05);
+            margin-top: 12px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
         }
-        .speaker-btn.active { background-color: #eaf3fe; border-color: #a0c4f1; }
+
+        .speaker-btn.active {
+            background-color: #eaf3fe;
+            border-color: #a0c4f1;
+        }
 
         iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn {
-            display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
     </style>
 </head>
@@ -141,8 +300,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Hidden audio element for WebRTC sound output -->
-    <audio id="remote-audio" autoplay playsinline></audio>
+    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
 
     <!-- PAGE 1: AUTH GATE -->
     <div id="auth-container" class="container">
@@ -192,7 +350,7 @@
             </button>
 
             <button id="speaker-btn" class="speaker-btn" onclick="toggleSpeakerphone()">
-                <span id="speaker-btn-text">🔊 스피커폰 모드 전환</span>
+                <span id="speaker-btn-text">🔊 스피커폰 켜기</span>
             </button>
         </div>
     </div>
@@ -339,7 +497,7 @@
                     speakerBtn.classList.toggle("active", isSpeakerOn);
                     speakerBtnText.innerText = isSpeakerOn ? "🔊 귀에 대고 통화하기 (수신기)" : "🔊 스피커폰 켜기";
                 } catch (e) { 
-                    console.warn("Sink switching error:", e);
+                    console.warn("Sink switching note:", e);
                     speakerBtn.classList.toggle("active", isSpeakerOn);
                     speakerBtnText.innerText = isSpeakerOn ? "🔊 귀에 대고 통화하기" : "🔊 스피커폰 켜기";
                 }
@@ -352,7 +510,15 @@
         async function toggleVapiCall() {
             if (!isCallActive) {
                 try {
-                    await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+                    // Enhanced WebRTC voice processing constraints
+                    await navigator.mediaDevices.getUserMedia({ 
+                        audio: { 
+                            echoCancellation: true, 
+                            noiseSuppression: true, 
+                            autoGainControl: true,
+                            channelCount: 1
+                        } 
+                    });
                 } catch (e) { console.warn("Constraint request note:", e); }
 
                 if (window.vapiSDK) {
@@ -361,10 +527,8 @@
                     vapiInstance.on('call-start', () => {
                         startTimer();
                         document.getElementById("speaker-btn").style.display = "flex";
-                        
-                        // Force local playback to remote-audio tag
                         const remoteAudio = document.getElementById("remote-audio");
-                        if (remoteAudio) { remoteAudio.play().catch(e => console.log("Autoplay catch", e)); }
+                        if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play catch", e)); }
                     });
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
