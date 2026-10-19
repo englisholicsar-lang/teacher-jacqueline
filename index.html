@@ -361,7 +361,7 @@
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyrYTZ4vQQaVkryF70yqumB-aUF7Hk4wdmDbdNT0_MTCLiUycH28A_sPVieQL4h4fgsYw/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxTN4JtTD8eTbhv9A7QJ4d4vQGVdWEta6RpNaLKOyosvNUHakuwrc7mAHGj4OKF744q-g/exec";
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
 
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
@@ -455,10 +455,10 @@
                             const script = document.createElement('script');
                             script.id = callbackName;
                             script.src = GAS_URL + "?userId=" + encodeURIComponent(userId) + 
-                                         "&userName=" + encodeURIComponent(userName) + 
-                                         "&deviceHash=" + encodeURIComponent(deviceHash) + 
-                                         "&callback=" + callbackName + 
-                                         "&t=" + Date.now();
+                                                   "&userName=" + encodeURIComponent(userName) + 
+                                                   "&deviceHash=" + encodeURIComponent(deviceHash) + 
+                                                   "&callback=" + callbackName + 
+                                                   "&t=" + Date.now();
 
                             script.onerror = function() {
                                 clearTimeout(fallbackTimer);
