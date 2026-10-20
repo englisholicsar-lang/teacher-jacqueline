@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Teacher Jacqueline - 1:1 English Talk</title>
 
-  <!-- ⚡ KAKAOTALK AUTO-REDIRECT (IMMEDIATE HEAD EXECUTION) -->
+  <!-- ⚡ KAKAOTALK AUTO-REDIRECT (RUNS IMMEDIATELY IN HEAD) -->
   <script>
     (function forceExternalBrowser() {
       var ua = navigator.userAgent.toLowerCase();
@@ -16,10 +16,8 @@
         var cleanUrl = rawUrl.replace(/^https?:\/\//, '');
 
         if (ua.indexOf('android') > -1) {
-          // Launch Google Chrome directly via Android Intent
           window.location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end;';
         } else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) {
-          // Launch Safari directly via KakaoTalk external protocol
           window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(rawUrl);
         }
       }
@@ -56,7 +54,7 @@
       text-align: center;
     }
 
-    /* Original Logo Layout */
+    /* Logo Container styling matching original */
     .logo-container {
       margin-bottom: 24px;
       display: flex;
@@ -65,12 +63,13 @@
     }
 
     .logo-container img {
-      height: 48px;
       max-width: 220px;
+      width: 100%;
+      height: auto;
       object-fit: contain;
     }
 
-    /* Original Avatar Ring Layout */
+    /* Avatar Ring styling matching original */
     .avatar-container {
       width: 130px;
       height: 130px;
@@ -115,4 +114,234 @@
       font-size: 28px;
       font-weight: 700;
       color: #2563eb;
-      margin:
+      margin: 10px 0;
+      display: none;
+    }
+
+    .btn-start {
+      width: 100%;
+      background-color: #fee500;
+      color: #191919;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
+    }
+
+    .btn-start:disabled {
+      background-color: #cbd5e1;
+      color: #64748b;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <!-- LOCAL REPOSITORY LOGO -->
+    <div class="logo-container">
+      <img src="logo.png" alt="Englisholic Innovative English" onError="this.onerror=null; this.src='logo.jpg';" />
+    </div>
+
+    <!-- LOCAL REPOSITORY JACQUELINE AVATAR -->
+    <div class="avatar-container">
+      <img src="jacqueline.jpg" alt="Teacher Jacqueline" onError="this.onerror=null; this.src='jacqueline.png';" />
+    </div>
+
+    <h1 class="title">Teacher Jacqueline</h1>
+    <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+
+    <div id="statusBox" class="status-box">
+      원활한 통화를 위해 마이크 권한을 허용해 주세요.
+    </div>
+
+    <div id="timerDisplay" class="timer-display">10:00</div>
+
+    <button id="startBtn" class="btn-start" onclick="initiateCall()">
+      <span>💬</span> 무료 체험 통화 시작하기
+    </button>
+  </div>
+
+  <script>
+    const CONFIG = {
+      vapiApiKey: "YOUR_VAPI_PUBLIC_KEY",                   // Insert Vapi Public Key (pk_...)
+      assistantId: "ab0d16c5-842d-40c6-8fa4-055fee015089", // Finalized Assistant ID
+      googleScriptUrl: "YOUR_GOOGLE_APPS_SCRIPT_EXEC_URL", // Insert Code.gs /exec URL
+      maxCallDurationSec: 600                              // 10 Minutes
+    };
+
+    let vapiInstance = null;
+    let callTimer = null;
+    let secondsRemaining = CONFIG.maxCallDurationSec;
+    let deviceFingerprint = "";
+    let capturedPhoneNumber = "N/A";
+
+    function generateFingerprint() {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = "top";
+        ctx.font = "14px 'Arial'";
+        ctx.fillStyle = "#f60";
+        ctx.fillRect(125,1,62,20);
+        ctx.fillStyle = "#069";
+        ctx.fillText("JacquelineTrial", 2, 15);
+        
+        const b64 = canvas.toDataURL();
+        let hash = 0;
+        for (let i = 0; i < b64.length; i++) {
+          const char = b64.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash |= 0;
+        }
+        return "FP-" + Math.abs(hash) + "-" + (navigator.hardwareConcurrency || 4) + "-" + screen.width + "x" + screen.height;
+      } catch (e) {
+        return "FP-FALLBACK-" + Math.floor(Math.random() * 1000000);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      deviceFingerprint = generateFingerprint();
+
+      if (localStorage.getItem("jacqueline_trial_completed") === "true") {
+        lockTrial("이미 1회 무료 체험을 완료하셨습니다.");
+        return;
+      }
+
+      if (window.vapiSDK) {
+        vapiInstance = window.vapiSDK.run({
+          apiKey: CONFIG.vapiApiKey
+        });
+        setupVapiListeners();
+      }
+    });
+
+    function lockTrial(reason) {
+      const btn = document.getElementById('startBtn');
+      const status = document.getElementById('statusBox');
+      btn.disabled = true;
+      btn.innerText = "무료 체험 완료";
+      status.innerText = reason;
+      status.style.color = "#dc2626";
+    }
+
+    async function initiateCall() {
+      if (localStorage.getItem("jacqueline_trial_completed") === "true") {
+        alert("이미 무료 체험을 사용하셨습니다.");
+        return;
+      }
+
+      const btn = document.getElementById('startBtn');
+      const status = document.getElementById('statusBox');
+
+      try {
+        btn.disabled = true;
+        status.innerText = "마이크 권한 확인 중...";
+
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        status.innerText = "선생님과 연결 중입니다...";
+        vapiInstance.start(CONFIG.assistantId);
+
+      } catch (err) {
+        console.error("Mic Request Error:", err);
+        btn.disabled = false;
+        status.innerText = "마이크 권한이 거부되었거나 연결에 실패했습니다.";
+        alert("마이크 접근 권한이 필요합니다. 브라우저 설정에서 권한을 허용해 주세요.");
+      }
+    }
+
+    function setupVapiListeners() {
+      vapiInstance.on('call-start', () => {
+        document.getElementById('statusBox').innerText = "통화가 연결되었습니다. 대화를 시작해 주세요!";
+        document.getElementById('timerDisplay').style.display = 'block';
+        startTimer();
+      });
+
+      vapiInstance.on('message', (msg) => {
+        if (msg.type === 'function-call' && msg.functionCall && msg.functionCall.parameters) {
+          if (msg.functionCall.parameters.phone_number) {
+            capturedPhoneNumber = msg.functionCall.parameters.phone_number;
+          }
+        } else if (msg.type === 'transcript' && msg.transcript) {
+          const matched = msg.transcript.match(/01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}/);
+          if (matched) {
+            capturedPhoneNumber = matched[0];
+          }
+        }
+      });
+
+      vapiInstance.on('call-end', () => {
+        handleCallTermination();
+      });
+
+      vapiInstance.on('error', (e) => {
+        console.error('Vapi Error:', e);
+        document.getElementById('statusBox').innerText = "연결 오류가 발생했습니다. 다시 시도해 주세요.";
+        document.getElementById('startBtn').disabled = false;
+      });
+    }
+
+    function startTimer() {
+      secondsRemaining = CONFIG.maxCallDurationSec;
+      updateTimerUI();
+
+      callTimer = setInterval(() => {
+        secondsRemaining--;
+        updateTimerUI();
+
+        if (secondsRemaining <= 0) {
+          clearInterval(callTimer);
+          if (vapiInstance) {
+            vapiInstance.stop();
+          }
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      const mins = Math.floor(secondsRemaining / 60);
+      const secs = settings = secondsRemaining % 60;
+      document.getElementById('timerDisplay').innerText = 
+        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function handleCallTermination() {
+      clearInterval(callTimer);
+      
+      localStorage.setItem("jacqueline_trial_completed", "true");
+      lockTrial("통화가 종료되었습니다. 무료 체험이 완료되었습니다.");
+
+      const durationSpentSec = CONFIG.maxCallDurationSec - secondsRemaining;
+
+      const payload = {
+        timestamp: new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
+        fingerprint: deviceFingerprint,
+        durationSeconds: durationSpentSec,
+        phone: capturedPhoneNumber,
+        status: "Completed"
+      };
+
+      fetch(CONFIG.googleScriptUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(() => console.log("Logged to Google Sheets CRM!"))
+      .catch(err => console.error("Logging Error:", err));
+    }
+  </script>
+</body>
+</html>
