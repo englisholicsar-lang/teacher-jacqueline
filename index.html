@@ -4,7 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Teacher Jacqueline - 1:1 English Talk</title>
-  
+
+  <!-- ⚡ CRITICAL: KAKAOTALK AUTO-REDIRECT (EXECUTED IMMEDIATELY BEFORE PAGE RENDER) -->
+  <script>
+    (function forceExternalBrowser() {
+      var ua = navigator.userAgent.toLowerCase();
+      var isKakao = ua.indexOf('kakaotalk') > -1;
+
+      if (isKakao) {
+        var rawUrl = window.location.href;
+        var cleanUrl = rawUrl.replace(/^https?:\/\//, '');
+
+        if (ua.indexOf('android') > -1) {
+          // Force launch Google Chrome via Android Intent
+          window.location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end;';
+        } else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) {
+          // Force open default Safari on iOS KakaoTalk
+          window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(rawUrl);
+        }
+      }
+    })();
+  </script>
+
   <!-- Vapi Web SDK -->
   <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
@@ -118,7 +139,6 @@
       box-shadow: none;
     }
 
-    /* Kakao External Browser Notice Modal */
     .kakao-modal {
       display: none;
       position: fixed;
@@ -188,21 +208,21 @@
     </button>
   </div>
 
-  <!-- KakaoTalk Modal for iOS -->
+  <!-- Manual Redirect Modal Fallback -->
   <div id="kakaoModal" class="kakao-modal">
     <div class="kakao-modal-content">
       <h3>외부 브라우저 연결</h3>
-      <p>카카오톡 내장 브라우저에서는 마이크 연결이 제한될 수 있습니다.<br/><br/><strong>Safari</strong> 또는 <strong>Chrome</strong>에서 연결을 진행해 주세요.</p>
+      <p>카카오톡 내장 브라우저에서는 마이크 연결이 제한될 수 있습니다.<br/><br/><strong>Chrome</strong> 또는 <strong>Safari</strong>에서 진행해 주세요.</p>
       <button class="btn-external" onclick="openInExternalBrowser()">외부 브라우저로 열기</button>
     </div>
   </div>
 
   <script>
     const CONFIG = {
-      vapiApiKey: "YOUR_VAPI_PUBLIC_KEY", // Insert your Vapi Public Key here
-      assistantId: "ab0d16c5-...",        // Insert your Assistant ID here
-      googleScriptUrl: "YOUR_GOOGLE_APPS_SCRIPT_EXEC_URL", // Insert your Code.gs /exec URL here
-      maxCallDurationSec: 600 // 10 Minutes
+      vapiApiKey: "YOUR_VAPI_PUBLIC_KEY",                   // Insert Vapi Public Key
+      assistantId: "ab0d16c5-YOUR-ASSISTANT-ID",           // Insert Assistant ID
+      googleScriptUrl: "YOUR_GOOGLE_APPS_SCRIPT_EXEC_URL", // Insert Google Apps Script /exec URL
+      maxCallDurationSec: 600                              // 10 Minutes
     };
 
     let vapiInstance = null;
@@ -232,36 +252,15 @@
       return "FP-" + Math.abs(hash) + "-" + (navigator.hardwareConcurrency || 4) + "-" + screen.width + "x" + screen.height;
     }
 
-    // 2. KakaoTalk WebView Detection & Auto-Redirect
-    function handleKakaoBrowser() {
-      const ua = navigator.userAgent.toLowerCase();
-      const isKakao = ua.indexOf('kakaotalk') > -1;
-      
-      if (isKakao) {
-        if (ua.indexOf('android') > -1) {
-          const cleanUrl = location.href.replace(/https?:\/\//, '');
-          location.href = `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end;`;
-          return true;
-        } else {
-          document.getElementById('kakaoModal').style.display = 'flex';
-          return true;
-        }
-      }
-      return false;
-    }
-
     function openInExternalBrowser() {
       window.open(window.location.href, '_blank');
     }
 
-    // 3. Page Initialization
+    // 2. Initialize Page
     window.addEventListener('DOMContentLoaded', () => {
       deviceFingerprint = generateFingerprint();
-      
-      // Check KakaoTalk redirect
-      handleKakaoBrowser();
 
-      // Lock if trial already completed
+      // Check if trial is completed
       if (localStorage.getItem("jacqueline_trial_completed") === "true") {
         lockTrial("이미 1회 무료 체험을 완료하셨습니다.");
         return;
@@ -285,7 +284,7 @@
       status.style.color = "#dc2626";
     }
 
-    // 4. Initiate Call
+    // 3. Trigger Call
     async function initiateCall() {
       if (localStorage.getItem("jacqueline_trial_completed") === "true") {
         alert("이미 무료 체험을 사용하셨습니다.");
@@ -299,12 +298,12 @@
         btn.disabled = true;
         status.innerText = "마이크 권한 확인 중...";
 
-        // Explicit Microphone Request
+        // Request audio stream explicitly
         await navigator.mediaDevices.getUserMedia({ audio: true });
 
         status.innerText = "선생님과 연결 중입니다...";
         
-        // Start Call
+        // Start Vapi Session
         vapiInstance.start(CONFIG.assistantId);
 
       } catch (err) {
@@ -315,7 +314,7 @@
       }
     }
 
-    // 5. Vapi Event Listeners
+    // 4. Vapi Web SDK Event Handling
     function setupVapiListeners() {
       vapiInstance.on('call-start', () => {
         document.getElementById('statusBox').innerText = "통화가 연결되었습니다. 대화를 시작해 주세요!";
@@ -324,7 +323,6 @@
       });
 
       vapiInstance.on('message', (msg) => {
-        // Capture phone number from parameters or transcript if sent by Vapi
         if (msg.type === 'function-call' && msg.functionCall && msg.functionCall.parameters) {
           if (msg.functionCall.parameters.phone_number) {
             capturedPhoneNumber = msg.functionCall.parameters.phone_number;
@@ -343,7 +341,7 @@
       });
     }
 
-    // 6. Timer Management
+    // 5. Timer Controller
     function startTimer() {
       secondsRemaining = CONFIG.maxCallDurationSec;
       updateTimerUI();
@@ -368,7 +366,7 @@
         `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    // 7. Termination & Google Sheets CRM Webhook
+    // 6. Post Data to Google Sheets CRM
     function handleCallTermination() {
       clearInterval(callTimer);
       
@@ -385,7 +383,6 @@
         status: "Completed"
       };
 
-      // CORS-friendly text/plain fetch for Google Apps Script Webhook
       fetch(CONFIG.googleScriptUrl, {
         method: "POST",
         mode: "no-cors",
@@ -394,7 +391,7 @@
         },
         body: JSON.stringify(payload)
       })
-      .then(() => console.log("Successfully logged to Google Sheets!"))
+      .then(() => console.log("Logged to Google Sheets CRM!"))
       .catch(err => console.error("Logging Error:", err));
     }
   </script>
