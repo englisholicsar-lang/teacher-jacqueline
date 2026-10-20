@@ -403,12 +403,12 @@
         });
 
         function startKakaoAuth() {
-            // Log web registration instantly
-            sendWebRegistration("Kakao User");
-
-            // Hide auth screen and show active call screen immediately
+            // Force hide auth and show call container directly to prevent any sticking
             document.getElementById("auth-container").style.display = "none";
             document.getElementById("vapi-container").style.display = "flex";
+
+            // Log web registration instantly
+            sendWebRegistration("Kakao User");
 
             // Trigger the Vapi call right away
             toggleVapiCall();
@@ -458,3 +458,100 @@
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({
                             type: "add-message",
+                            message: {
+                                role: "system",
+                                content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. BEGIN WRAP-UP NOW.]"
+                            }
+                        });
+                    }
+                }
+
+                if (secondsElapsed >= MAX_SECONDS) {
+                    stopTimer();
+                    if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
+                    isCallActive = false;
+                    document.getElementById("call-status").innerText = "10분 무료 체험이 종료되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "체험 종료됨";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#a0aec0";
+                    btn.disabled = true;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function toggleVapiCall() {
+            if (!isCallActive) {
+                const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+                if (sdk) {
+                    vapiInstance = typeof sdk.run === 'function' 
+                        ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                        : new sdk(VAPI_KEY);
+
+                    if (vapiInstance && typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            startTimer();
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play catch", e)); }
+                        });
+
+                        vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                        vapiInstance.on('track', (track) => {
+                            if (track.kind === 'audio') {
+                                const remoteAudio = document.getElementById("remote-audio");
+                                if (remoteAudio) {
+                                    remoteAudio.srcObject = new MediaStream([track]);
+                                    remoteAudio.play().catch(e => console.log("Stream play catch", e));
+                                }
+                            }
+                        });
+
+                        vapiInstance.on('call-end', () => {
+                            stopTimer();
+                        });
+                    }
+
+                    if (vapiInstance && typeof vapiInstance.start === 'function') {
+                        vapiInstance.start(VAPI_ASSISTANT_ID, {
+                            metadata: {
+                                nickname: currentKakaoNickname,
+                                deviceHash: getDeviceHash(),
+                                phone_number: "Not Provided"
+                            }
+                        });
+                    }
+                    
+                    isCallActive = true;
+
+                    document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "📞 통화 종료하기";
+                    const btn = document.getElementById("start-call-btn");
+                    if(btn) {
+                        btn.style.backgroundColor = "#e05252";
+                        btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                    }
+                } else {
+                    alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+                }
+            } else {
+                if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
+                stopTimer();
+                isCallActive = false;
+
+                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+                document.getElementById("call-btn-text").innerText = "체험 종료됨";
+                const btn = document.getElementById("start-call-btn");
+                if(btn) {
+                    btn.style.backgroundColor = "#a0aec0";
+                    btn.style.boxShadow = "none";
+                    btn.disabled = true;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
