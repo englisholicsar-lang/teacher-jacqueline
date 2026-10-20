@@ -2,95 +2,385 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Englisholic - Teacher Jacqueline Free Trial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teacher Jacqueline - Free Trial</title>
+    
+    <!-- Open Graph Meta Tags for KakaoTalk Link Preview -->
+    <meta property="og:title" content="Teacher Jacqueline - Free Trial">
+    <meta property="og:description" content="재클린 선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
+    <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/og_preview.png">
+    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
+    <meta property="og:type" content="website">
+
     <!-- Kakao SDK -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+    <!-- Official Vapi Web SDK Async Injector -->
+    <script>
+      var vapiInstance = null;
+      (function (d, t) {
+        var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+        g.defer = true;
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+      })(document, "script");
+    </script>
+
     <style>
-        body {
-            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-            background-color: #f4f7f6;
+        :root {
+            --bg-base: #f0f6ff;
+            --primary-navy: #0e2a47;
+            --sub-text: #4a637d;
+            --box-bg: #eaf3fe;
+            --box-border: #d4e5f9;
+            --kakao-yellow: #fee500;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            -webkit-tap-highlight-color: transparent;
         }
-        .container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            background-color: var(--bg-base);
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0px 20px 20px 20px;
+            color: var(--primary-navy);
+        }
+
+        .bg-wave-top {
+            position: absolute;
+            top: 0;
+            right: 0;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
+            height: auto;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .bg-wave-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .dot-pattern-left {
+            position: absolute;
+            top: 220px;
+            left: 10px;
+            width: 45px;
+            height: 80px;
+            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
+            background-size: 10px 10px;
+            z-index: 0;
+        }
+
+        .dot-pattern-right {
+            position: absolute;
+            top: 80px;
+            right: 10px;
+            width: 45px;
+            height: 80px;
+            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
+            background-size: 10px 10px;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
-        h1 { color: #0e2a47; font-size: 22px; margin-bottom: 10px; }
-        p { color: #4a637d; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
-        .btn-kakao {
-            background-color: #fee500;
-            color: #191919;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
+
+        .upper-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 100%;
+            margin-top: 6px;
+        }
+
+        .logo-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            margin-bottom: 8px;
         }
-        .btn-kakao:hover { background-color: #fdd835; }
-        #vapi-container { display: none; flex-direction: column; align-items: center; }
+
+        .logo-img {
+            height: 75px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 115px;
+            height: 115px;
+            margin-bottom: 8px;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0c2a4a;
+            margin-bottom: 2px;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitle {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #4a637d;
+        }
+
+        .timer-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .timer-display {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0e2a47;
+            background-color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 2px solid #d4e5f9;
+            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            line-height: 1.2;
+            -webkit-appearance: none;
+        }
+
+        .bottom-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .info-box {
+            width: 100%;
+            background-color: var(--box-bg);
+            border: 1px solid var(--box-border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
+        }
+
+        .info-box-text {
+            width: 100%;
+            text-align: center;
+            line-height: 1.45;
+        }
+
+        .kakao-btn {
+            width: 100%;
+            background-color: var(--kakao-yellow);
+            color: #000000;
+            border: none;
+            padding: 15px 18px;
+            border-radius: 14px;
+            font-size: 16.5px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        #vapi-container {
+            display: none;
+            width: 100%;
+        }
+
+        .call-btn {
+            width: 100%;
+            background-color: #2ecc71;
+            color: #ffffff;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container" id="auth-container">
-        <h1>Teacher Jacqueline 10분 무료 체험</h1>
-        <p>재클린 선생님과 실시간 AI 영어 회화 레벨 테스트를 시작해 보세요!</p>
-        <button class="btn-kakao" onclick="startKakaoAuth()">
-            <span>카카오 1초 로그인 후 시작하기</span>
-        </button>
+    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+
+    <div class="dot-pattern-left"></div>
+    <div class="dot-pattern-right"></div>
+
+    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
+
+    <!-- PAGE 1: AUTH GATE -->
+    <div id="auth-container" class="container">
+        <div class="upper-group">
+            <div class="logo-wrapper">
+                <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
+            </div>
+            <div class="avatar-container">
+                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+            </div>
+            <h1 class="title">Teacher Jacqueline</h1>
+            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+        </div>
+
+        <div class="bottom-group">
+            <div class="info-box">
+                <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #1a3c61;">
+                    원활한 통화를 위해 마이크 권한을<br>허용해 주세요.
+                </span>
+            </div>
+            <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
+                <span class="kakao-btn-icon">💬</span>
+                <span id="btn-text-content">무료 체험 통화 시작하기</span>
+            </button>
+        </div>
     </div>
 
-    <div class="container" id="vapi-container">
-        <h1>체험 진행 중...</h1>
-        <p>재클린 선생님이 연결되었습니다. 마이크를 켜고 대화를 나누세요!</p>
-        <button style="background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;" onclick="endCallManually()">통화 종료하기</button>
+    <!-- PAGE 2: ACTIVE CALL SCREEN -->
+    <div id="vapi-container" class="container">
+        <div class="upper-group">
+            <div class="logo-wrapper">
+                <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
+            </div>
+            <div class="avatar-container">
+                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+            </div>
+            <h1 class="title">Teacher Jacqueline</h1>
+            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
+            
+            <div class="timer-wrapper">
+                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
+            </div>
+        </div>
+
+        <div class="bottom-group">
+            <div class="info-box" style="margin-bottom: 12px;">
+                <div class="info-box-text">
+                    <div style="font-size: 14.5px; font-weight: 800; color: #0e2a47; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <span>🔊</span> <span>스피커폰 통화</span> <span style="font-size: 12px; color: #64748b; font-weight: 600;">(기본 설정)</span>
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61; margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <span>🎧</span> <span>블루투스 / 이어폰은 <strong style="color: #d9381e;">통화 시작 전</strong></span>
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61; margin-top: 1px;">
+                        연결해 주세요!
+                    </div>
+                </div>
+            </div>
+
+            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
+                <span id="call-btn-text">📞 통화 시작하기</span>
+            </button>
+        </div>
     </div>
 
-    <!-- Vapi Web SDK -->
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
     <script>
-        // --- CONFIGURATION ---
-        const GAS_URL = "YOUR_NEW_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE"; // <-- Paste your new deployment URL here
-        const KAKAO_CLIENT_ID = "YOUR_KAKAO_JAVASCRIPT_KEY_HERE";         
-        const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";  
+        const GAS_URL = "YOUR_NEW_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE"; // <-- Paste your current Apps Script Web App URL here
+        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
+        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+        const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
+        let isCallActive = false;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        const MAX_SECONDS = 600;
+        
         let currentKakaoNickname = "Student";
-        let vapiInstance = null;
 
+        // Generate robust device hash fingerprint
         function getDeviceHash() {
             let hash = localStorage.getItem("englisholic_device_hash");
             if (!hash) {
-                hash = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                const rawString = [navigator.userAgent, navigator.language, screen.width + "x" + screen.height, screen.colorDepth, new Date().getTimezoneOffset()].join("|");
+                let h = 0;
+                for (let i = 0; i < rawString.length; i++) {
+                    h = (h << 5) - h + rawString.charCodeAt(i);
+                    h |= 0;
+                }
+                hash = "DEV-" + Math.abs(h).toString(16).toUpperCase();
                 localStorage.setItem("englisholic_device_hash", hash);
             }
             return hash;
         }
 
-        // Secure server-side check on load to prevent abuse
+        // Secure server-side check on load against Google Sheets to prevent abuse
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
                     Kakao.init(KAKAO_CLIENT_ID);
                 }
             } catch (e) {
-                console.log("Kakao init note:", e);
+                console.log("Kakao init warning:", e);
             }
 
             const deviceHash = getDeviceHash();
@@ -101,8 +391,10 @@
 
                 if (!result.allowed) {
                     document.getElementById("auth-container").innerHTML = `
-                        <h2 style="color: #0e2a47; font-size: 18px; margin-bottom: 10px;">체험 완료 안내</h2>
-                        <p style="color: #4a637d; font-size: 14px;">이 기기에서는 이미 무료 체험을 완료하셨습니다.<br>추가 문의나 재참여 관련 문의는 고객센터로 연락해 주세요!</p>
+                        <div style="padding: 40px 10px;">
+                            <h2 style="color: #0e2a47; font-size: 20px; margin-bottom: 12px;">체험 완료 안내</h2>
+                            <p style="color: #4a637d; font-size: 14.5px; line-height: 1.5;">이 기기에서는 이미 무료 체험을 완료하셨습니다.<br>정규 수업 등록 및 문의는 공식 채널을 이용해 주세요!</p>
+                        </div>
                     `;
                 }
             } catch (err) {
@@ -111,6 +403,9 @@
         });
 
         function startKakaoAuth() {
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("vapi-container").style.display = "flex";
+
             try {
                 if (typeof Kakao !== "undefined" && Kakao.isInitialized()) {
                     Kakao.Auth.login({
@@ -120,26 +415,22 @@
                                 success: function(res) {
                                     currentKakaoNickname = res.properties?.nickname || res.kakao_account?.profile?.nickname || "Kakao User";
                                     sendWebRegistration(currentKakaoNickname);
-                                    initializeVapiCall();
                                 },
                                 fail: function(error) {
                                     sendWebRegistration("Guest User");
-                                    initializeVapiCall();
                                 }
                             });
                         },
                         fail: function(err) {
                             sendWebRegistration("Guest User");
-                            initializeVapiCall();
                         }
                     });
                 } else {
                     sendWebRegistration("Guest User");
-                    initializeVapiCall();
                 }
             } catch (e) {
+                console.log("Kakao auth note:", e);
                 sendWebRegistration("Guest User");
-                initializeVapiCall();
             }
         }
 
@@ -158,35 +449,124 @@
             }).catch(err => console.log("Web reg log error:", err));
         }
 
-        function initializeVapiCall() {
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("vapi-container").style.display = "flex";
-
-            if (window.vapiSDK) {
-                vapiInstance = window.vapiSDK.run({
-                    apiKey: "YOUR_VAPI_PUBLIC_API_KEY_HERE", 
-                    assistant: VAPI_ASSISTANT_ID,
-                    config: {
-                        metadata: {
-                            nickname: currentKakaoNickname,
-                            deviceHash: getDeviceHash(),
-                            phone_number: "Not Provided"
-                        }
-                    }
-                });
-
-                vapiInstance.on('call-end', () => {
-                    alert("체험이 종료되었습니다. 이용해주셔서 감사합니다!");
-                    window.location.reload();
-                });
-            }
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
         }
 
-        function endCallManually() {
-            if (vapiInstance && typeof vapiInstance.stop === 'function') {
-                vapiInstance.stop();
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed === 300) { 
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({
+                            type: "add-message",
+                            message: {
+                                role: "system",
+                                content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]"
+                            }
+                        });
+                    }
+                }
+
+                if (secondsElapsed === 540) { 
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({
+                            type: "add-message",
+                            message: {
+                                role: "system",
+                                content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. BEGIN WRAP-UP NOW.]"
+                            }
+                        });
+                    }
+                }
+
+                if (secondsElapsed >= MAX_SECONDS) {
+                    stopTimer();
+                    if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
+                    isCallActive = false;
+                    document.getElementById("call-status").innerText = "10분 무료 체험이 종료되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "체험 종료됨";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#a0aec0";
+                    btn.disabled = true;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function toggleVapiCall() {
+            if (!isCallActive) {
+                const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+                if (sdk) {
+                    vapiInstance = typeof sdk.run === 'function' 
+                        ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                        : new sdk(VAPI_KEY);
+
+                    if (vapiInstance && typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            startTimer();
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play catch", e)); }
+                        });
+
+                        vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                        vapiInstance.on('track', (track) => {
+                            if (track.kind === 'audio') {
+                                const remoteAudio = document.getElementById("remote-audio");
+                                if (remoteAudio) {
+                                    remoteAudio.srcObject = new MediaStream([track]);
+                                    remoteAudio.play().catch(e => console.log("Stream play catch", e));
+                                }
+                            }
+                        });
+
+                        vapiInstance.on('call-end', () => {
+                            stopTimer();
+                        });
+                    }
+
+                    if (vapiInstance && typeof vapiInstance.start === 'function') {
+                        vapiInstance.start(VAPI_ASSISTANT_ID, {
+                            metadata: {
+                                nickname: currentKakaoNickname,
+                                deviceHash: getDeviceHash(),
+                                phone_number: "Not Provided"
+                            }
+                        });
+                    }
+                    
+                    isCallActive = true;
+
+                    document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "📞 통화 종료하기";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#e05252";
+                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                } else {
+                    alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+                }
+            } else {
+                if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
+                stopTimer();
+                isCallActive = false;
+
+                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+                document.getElementById("call-btn-text").innerText = "체험 종료됨";
+                const btn = document.getElementById("start-call-btn");
+                btn.style.backgroundColor = "#a0aec0";
+                btn.style.boxShadow = "none";
+                btn.disabled = true;
             }
-            window.location.reload();
         }
     </script>
 </body>
