@@ -345,6 +345,12 @@
         </div>
 
         <div class="bottom-group">
+            <!-- Audio guidance clarification box -->
+            <div class="info-box" style="margin-bottom: 12px;">
+                <span class="info-box-icon">💡</span>
+                <span class="info-box-text">기본 스피커폰으로 진행됩니다.<br>이어폰(유선/블루투스) 사용 시 더 선명합니다.</span>
+            </div>
+
             <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
                 <span id="call-btn-text">📞 통화 시작하기</span>
             </button>
@@ -454,6 +460,20 @@
             timerInterval = setInterval(() => {
                 secondsElapsed++;
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                // --- 9-MINUTE SYSTEM ALERT INJECTION ---
+                if (secondsElapsed === 540) {
+                    if (vapiInstance) {
+                        vapiInstance.send({
+                            type: "add-message",
+                            message: {
+                                role: "system",
+                                content: "[SYSTEM ALERT: 9 MINUTES REACHED]"
+                            }
+                        });
+                    }
+                }
+
                 if (secondsElapsed >= MAX_SECONDS) {
                     stopTimer();
                     if (vapiInstance) vapiInstance.stop();
@@ -483,90 +503,3 @@
                 try {
                     const devices = await navigator.mediaDevices.enumerateDevices();
                     const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
-                    
-                    let targetDevice = null;
-                    if (isSpeakerOn) {
-                        targetDevice = audioOutputs.find(d => d.label.toLowerCase().includes('speaker') || d.label.toLowerCase().includes('스피커'));
-                    } else {
-                        targetDevice = audioOutputs.find(d => d.label.toLowerCase().includes('earpiece') || d.label.toLowerCase().includes('receiver') || d.deviceId === 'default');
-                    }
-
-                    if (targetDevice) {
-                        await remoteAudio.setSinkId(targetDevice.deviceId);
-                    }
-                    speakerBtn.classList.toggle("active", isSpeakerOn);
-                    speakerBtnText.innerText = isSpeakerOn ? "🔊 귀에 대고 통화하기" : "🔊 스피커폰 켜기";
-                } catch (e) { 
-                    console.warn("Sink switching note:", e);
-                    speakerBtn.classList.toggle("active", isSpeakerOn);
-                    speakerBtnText.innerText = isSpeakerOn ? "🔊 귀에 대고 통화하기" : "🔊 스피커폰 켜기";
-                }
-            } else {
-                speakerBtn.classList.toggle("active", isSpeakerOn);
-                speakerBtnText.innerText = isSpeakerOn ? "🔊 귀에 대고 통화하기" : "🔊 스피커폰 켜기";
-            }
-        }
-
-        function toggleVapiCall() {
-            if (!isCallActive) {
-                if (window.vapiSDK) {
-                    vapiInstance = window.vapiSDK.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID });
-
-                    vapiInstance.on('call-start', () => {
-                        startTimer();
-                        document.getElementById("speaker-btn").style.display = "flex";
-                        const remoteAudio = document.getElementById("remote-audio");
-                        if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play catch", e)); }
-                    });
-
-                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
-
-                    vapiInstance.on('track', (track) => {
-                        if (track.kind === 'audio') {
-                            const remoteAudio = document.getElementById("remote-audio");
-                            if (remoteAudio) {
-                                remoteAudio.srcObject = new MediaStream([track]);
-                                remoteAudio.play().catch(e => console.log("Stream play catch", e));
-                            }
-                        }
-                    });
-
-                    vapiInstance.on('call-end', () => {
-                        stopTimer();
-                        document.getElementById("speaker-btn").style.display = "none";
-                    });
-
-                    // Start Vapi Call directly with single permission prompt
-                    vapiInstance.start(VAPI_ASSISTANT_ID, {
-                        metadata: {
-                            nickname: currentKakaoNickname,
-                            deviceHash: getDeviceHash()
-                        }
-                    });
-                    isCallActive = true;
-
-                    document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
-                    document.getElementById("call-btn-text").innerText = "🚫 통화 종료하기";
-                    const btn = document.getElementById("start-call-btn");
-                    btn.style.backgroundColor = "#e05252";
-                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                } else {
-                    alert("Vapi SDK 로딩 실패");
-                }
-            } else {
-                if (vapiInstance) vapiInstance.stop();
-                stopTimer();
-                isCallActive = false;
-
-                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
-                document.getElementById("call-btn-text").innerText = "체험 종료됨";
-                document.getElementById("speaker-btn").style.display = "none";
-                const btn = document.getElementById("start-call-btn");
-                btn.style.backgroundColor = "#a0aec0";
-                btn.style.boxShadow = "none";
-                btn.disabled = true;
-            }
-        }
-    </script>
-</body>
-</html>
