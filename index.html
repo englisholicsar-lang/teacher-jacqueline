@@ -67,24 +67,24 @@
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
     <script>
         // --- CONFIGURATION ---
-        const GAS_URL = "YOUR_NEW_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE"; // <-- Paste your deployment URL here
-        const KAKAO_CLIENT_ID = "YOUR_KAKAO_JAVASCRIPT_KEY_HERE";         // <-- Your Kakao JS key
-        const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";  // <-- Your Vapi Assistant ID
+        const GAS_URL = "YOUR_NEW_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE"; // <-- Paste your new deployment URL here
+        const KAKAO_CLIENT_ID = "YOUR_KAKAO_JAVASCRIPT_KEY_HERE";         
+        const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";  
 
         let currentKakaoNickname = "Student";
         let vapiInstance = null;
 
-        // Generate unique browser fingerprint/device hash to prevent abuse
         function getDeviceHash() {
             let hash = localStorage.getItem("englisholic_device_hash");
             if (!hash) {
-                hash = 'dev_' + Math.random().toString(36.2) + Date.now().toString(36);
+                hash = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
                 localStorage.setItem("englisholic_device_hash", hash);
             }
             return hash;
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        // Secure server-side check on load to prevent abuse
+        window.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
                     Kakao.init(KAKAO_CLIENT_ID);
@@ -93,13 +93,20 @@
                 console.log("Kakao init note:", e);
             }
 
-            // --- REPEAT TRIAL BLOCKER CHECK ---
             const deviceHash = getDeviceHash();
-            if (localStorage.getItem("englisholic_trial_completed_" + deviceHash)) {
-                document.getElementById("auth-container").innerHTML = `
-                    <h2 style="color: #0e2a47; font-size: 18px; margin-bottom: 10px;">체험 완료 안내</h2>
-                    <p style="color: #4a637d; font-size: 14px;">이 기기에서는 이미 10분 무료 체험을 완료하셨습니다.<br>정규 수업 등록 및 문의는 공식 홈페이지를 이용해 주세요!</p>
-                `;
+
+            try {
+                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
+                let result = await response.json();
+
+                if (!result.allowed) {
+                    document.getElementById("auth-container").innerHTML = `
+                        <h2 style="color: #0e2a47; font-size: 18px; margin-bottom: 10px;">체험 완료 안내</h2>
+                        <p style="color: #4a637d; font-size: 14px;">이 기기에서는 이미 무료 체험을 완료하셨습니다.<br>추가 문의나 재참여 관련 문의는 고객센터로 연락해 주세요!</p>
+                    `;
+                }
+            } catch (err) {
+                console.log("Server verification check failed", err);
             }
         });
 
@@ -116,14 +123,12 @@
                                     initializeVapiCall();
                                 },
                                 fail: function(error) {
-                                    console.log("Kakao user info fetch failed, proceeding as Guest", error);
                                     sendWebRegistration("Guest User");
                                     initializeVapiCall();
                                 }
                             });
                         },
                         fail: function(err) {
-                            console.log("Kakao login failed, proceeding as Guest", err);
                             sendWebRegistration("Guest User");
                             initializeVapiCall();
                         }
@@ -133,7 +138,6 @@
                     initializeVapiCall();
                 }
             } catch (e) {
-                console.log("Auth catch note:", e);
                 sendWebRegistration("Guest User");
                 initializeVapiCall();
             }
@@ -160,7 +164,7 @@
 
             if (window.vapiSDK) {
                 vapiInstance = window.vapiSDK.run({
-                    apiKey: "YOUR_VAPI_PUBLIC_API_KEY_HERE", // <-- Your Vapi Public API Key
+                    apiKey: "YOUR_VAPI_PUBLIC_API_KEY_HERE", 
                     assistant: VAPI_ASSISTANT_ID,
                     config: {
                         metadata: {
@@ -171,9 +175,7 @@
                     }
                 });
 
-                // Listen for call termination to lock device
                 vapiInstance.on('call-end', () => {
-                    localStorage.setItem("englisholic_trial_completed_" + getDeviceHash(), "true");
                     alert("체험이 종료되었습니다. 이용해주셔서 감사합니다!");
                     window.location.reload();
                 });
@@ -184,7 +186,6 @@
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
                 vapiInstance.stop();
             }
-            localStorage.setItem("englisholic_trial_completed_" + getDeviceHash(), "true");
             window.location.reload();
         }
     </script>
