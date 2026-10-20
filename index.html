@@ -5,16 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Teacher Jacqueline - 1:1 English Talk</title>
 
-  <!-- ⚡ KAKAOTALK AUTO-REDIRECT (RUNS IMMEDIATELY IN HEAD) -->
+  <!-- 1. KAKAOTALK BYPASS REDIRECT (HEAD EXECUTION) -->
   <script>
     (function forceExternalBrowser() {
       var ua = navigator.userAgent.toLowerCase();
-      var isKakao = ua.indexOf('kakaotalk') > -1;
-
-      if (isKakao) {
+      if (ua.indexOf('kakaotalk') > -1) {
         var rawUrl = window.location.href;
         var cleanUrl = rawUrl.replace(/^https?:\/\//, '');
-
         if (ua.indexOf('android') > -1) {
           window.location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end;';
         } else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) {
@@ -32,7 +29,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -54,7 +51,6 @@
       text-align: center;
     }
 
-    /* Logo Container styling matching original */
     .logo-container {
       margin-bottom: 24px;
       display: flex;
@@ -69,7 +65,6 @@
       object-fit: contain;
     }
 
-    /* Avatar Ring styling matching original */
     .avatar-container {
       width: 130px;
       height: 130px;
@@ -132,7 +127,6 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.2s ease;
       box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
     }
 
@@ -147,14 +141,13 @@
 <body>
 
   <div class="card">
-    <!-- LOCAL REPOSITORY LOGO -->
+    <!-- LOCAL IMAGE FILE PATHS WITH AUTOMATIC EXTENSION FALLBACKS -->
     <div class="logo-container">
-      <img src="logo.png" alt="Englisholic Innovative English" onError="this.onerror=null; this.src='logo.jpg';" />
+      <img src="logo.png" alt="Englisholic" onError="this.onerror=null; this.src='logo.jpg';" />
     </div>
 
-    <!-- LOCAL REPOSITORY JACQUELINE AVATAR -->
     <div class="avatar-container">
-      <img src="jacqueline.jpg" alt="Teacher Jacqueline" onError="this.onerror=null; this.src='jacqueline.png';" />
+      <img src="jacqueline.png" alt="Teacher Jacqueline" onError="this.onerror=null; this.src='jacqueline.jpg';" />
     </div>
 
     <h1 class="title">Teacher Jacqueline</h1>
@@ -173,9 +166,9 @@
 
   <script>
     const CONFIG = {
-      vapiApiKey: "YOUR_VAPI_PUBLIC_KEY",                   // Insert Vapi Public Key (pk_...)
+      vapiApiKey: "YOUR_VAPI_PUBLIC_KEY",                   // Replace with Vapi Public Key (pk_...)
       assistantId: "ab0d16c5-842d-40c6-8fa4-055fee015089", // Finalized Assistant ID
-      googleScriptUrl: "YOUR_GOOGLE_APPS_SCRIPT_EXEC_URL", // Insert Code.gs /exec URL
+      googleScriptUrl: "YOUR_GOOGLE_APPS_SCRIPT_EXEC_URL", // Replace with Google Apps Script /exec URL
       maxCallDurationSec: 600                              // 10 Minutes
     };
 
@@ -185,6 +178,7 @@
     let deviceFingerprint = "";
     let capturedPhoneNumber = "N/A";
 
+    // CANVAS FINGERPRINTING FOR STRICT TRIAL LIMITING
     function generateFingerprint() {
       try {
         const canvas = document.createElement('canvas');
@@ -199,8 +193,7 @@
         const b64 = canvas.toDataURL();
         let hash = 0;
         for (let i = 0; i < b64.length; i++) {
-          const char = b64.charCodeAt(i);
-          hash = ((hash << 5) - hash) + char;
+          hash = ((hash << 5) - hash) + b64.charCodeAt(i);
           hash |= 0;
         }
         return "FP-" + Math.abs(hash) + "-" + (navigator.hardwareConcurrency || 4) + "-" + screen.width + "x" + screen.height;
@@ -212,15 +205,14 @@
     window.addEventListener('DOMContentLoaded', () => {
       deviceFingerprint = generateFingerprint();
 
-      if (localStorage.getItem("jacqueline_trial_completed") === "true") {
+      // Check both localStorage key AND fingerprint lock
+      if (localStorage.getItem("jacqueline_trial_completed") === "true" || localStorage.getItem(deviceFingerprint) === "done") {
         lockTrial("이미 1회 무료 체험을 완료하셨습니다.");
         return;
       }
 
       if (window.vapiSDK) {
-        vapiInstance = window.vapiSDK.run({
-          apiKey: CONFIG.vapiApiKey
-        });
+        vapiInstance = window.vapiSDK.run({ apiKey: CONFIG.vapiApiKey });
         setupVapiListeners();
       }
     });
@@ -235,7 +227,7 @@
     }
 
     async function initiateCall() {
-      if (localStorage.getItem("jacqueline_trial_completed") === "true") {
+      if (localStorage.getItem("jacqueline_trial_completed") === "true" || localStorage.getItem(deviceFingerprint) === "done") {
         alert("이미 무료 체험을 사용하셨습니다.");
         return;
       }
@@ -246,17 +238,16 @@
       try {
         btn.disabled = true;
         status.innerText = "마이크 권한 확인 중...";
-
         await navigator.mediaDevices.getUserMedia({ audio: true });
 
         status.innerText = "선생님과 연결 중입니다...";
         vapiInstance.start(CONFIG.assistantId);
 
       } catch (err) {
-        console.error("Mic Request Error:", err);
+        console.error("Mic Access Error:", err);
         btn.disabled = false;
         status.innerText = "마이크 권한이 거부되었거나 연결에 실패했습니다.";
-        alert("마이크 접근 권한이 필요합니다. 브라우저 설정에서 권한을 허용해 주세요.");
+        alert("마이크 접근 권한이 필요합니다. 브라우저 설정에서 마이크를 허용해 주세요.");
       }
     }
 
@@ -268,15 +259,11 @@
       });
 
       vapiInstance.on('message', (msg) => {
-        if (msg.type === 'function-call' && msg.functionCall && msg.functionCall.parameters) {
-          if (msg.functionCall.parameters.phone_number) {
-            capturedPhoneNumber = msg.functionCall.parameters.phone_number;
-          }
+        if (msg.type === 'function-call' && msg.functionCall?.parameters?.phone_number) {
+          capturedPhoneNumber = msg.functionCall.parameters.phone_number;
         } else if (msg.type === 'transcript' && msg.transcript) {
           const matched = msg.transcript.match(/01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}/);
-          if (matched) {
-            capturedPhoneNumber = matched[0];
-          }
+          if (matched) capturedPhoneNumber = matched[0];
         }
       });
 
@@ -301,16 +288,14 @@
 
         if (secondsRemaining <= 0) {
           clearInterval(callTimer);
-          if (vapiInstance) {
-            vapiInstance.stop();
-          }
+          if (vapiInstance) vapiInstance.stop();
         }
       }, 1000);
     }
 
     function updateTimerUI() {
       const mins = Math.floor(secondsRemaining / 60);
-      const secs = settings = secondsRemaining % 60;
+      const secs = secondsRemaining % 60;
       document.getElementById('timerDisplay').innerText = 
         `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
@@ -318,7 +303,9 @@
     function handleCallTermination() {
       clearInterval(callTimer);
       
+      // Store trial completion locks locally
       localStorage.setItem("jacqueline_trial_completed", "true");
+      localStorage.setItem(deviceFingerprint, "done");
       lockTrial("통화가 종료되었습니다. 무료 체험이 완료되었습니다.");
 
       const durationSpentSec = CONFIG.maxCallDurationSec - secondsRemaining;
@@ -331,12 +318,11 @@
         status: "Completed"
       };
 
+      // CORS-safe text/plain payload to Google Apps Script
       fetch(CONFIG.googleScriptUrl, {
         method: "POST",
         mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       })
       .then(() => console.log("Logged to Google Sheets CRM!"))
