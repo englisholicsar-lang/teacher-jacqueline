@@ -12,9 +12,21 @@
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
-    <!-- Kakao SDK & Vapi Web SDK -->
+    <!-- Kakao SDK -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+
+    <!-- Official Vapi Web SDK Async Injector -->
+    <script>
+      var vapiInstance = null;
+      (function (d, t) {
+        var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+        g.defer = true;
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+      })(document, "script");
+    </script>
 
     <style>
         :root {
@@ -227,4 +239,271 @@
             font-size: 16.5px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(254, 229, 0,
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        #vapi-container {
+            display: none;
+            width: 100%;
+        }
+
+        .call-btn {
+            width: 100%;
+            background-color: #2ecc71;
+            color: #ffffff;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+
+    <div class="dot-pattern-left"></div>
+    <div class="dot-pattern-right"></div>
+
+    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
+
+    <!-- PAGE 1: AUTH GATE -->
+    <div id="auth-container" class="container">
+        <div class="upper-group">
+            <div class="logo-wrapper">
+                <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
+            </div>
+            <div class="avatar-container">
+                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+            </div>
+            <h1 class="title">Teacher Jacqueline</h1>
+            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+        </div>
+
+        <div class="bottom-group">
+            <div class="info-box">
+                <span class="info-box-icon">🎙️</span>
+                <span class="info-box-text">원활한 통화를 위해 마이크 권한을<br>허용해 주세요.</span>
+            </div>
+            <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
+                <span class="kakao-btn-icon">💬</span>
+                <span id="btn-text-content">무료 체험 통화 시작하기</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- PAGE 2: ACTIVE CALL SCREEN -->
+    <div id="vapi-container" class="container">
+        <div class="upper-group">
+            <div class="logo-wrapper">
+                <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
+            </div>
+            <div class="avatar-container">
+                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+            </div>
+            <h1 class="title">Teacher Jacqueline</h1>
+            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
+            
+            <div class="timer-wrapper">
+                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
+            </div>
+        </div>
+
+        <div class="bottom-group">
+            <div class="info-box" style="margin-bottom: 12px;">
+                <span class="info-box-icon">🔊</span>
+                <span class="info-box-text">
+                    스피커폰으로 통화가 시작됩니다.<br>
+                    더 선명한 통화를 원하시면 <strong style="color: #d9381e;">통화 시작 전</strong> 이어폰을 미리 연결해 주세요!
+                </span>
+            </div>
+
+            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
+                <span id="call-btn-text">📞 통화 시작하기</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxTN4JtTD8eTbhv9A7QJ4d4vQGVdWEta6RpNaLKOyosvNUHakuwrc7mAHGj4OKF744q-g/exec";
+        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
+        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+        const VAPI_ASSISTANT_ID = "7b61af6b-87fe-47cb-a37b-f047f5b6fe8c";
+
+        let isCallActive = false;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        const MAX_SECONDS = 600;
+        
+        let currentKakaoNickname = "Guest";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
+                    Kakao.init(KAKAO_CLIENT_ID);
+                }
+            } catch (e) {
+                console.log("Kakao init warning:", e);
+            }
+        });
+
+        function getDeviceHash() {
+            const rawString = [navigator.userAgent, navigator.language, screen.width + "x" + screen.height, screen.colorDepth, new Date().getTimezoneOffset()].join("|");
+            let hash = 0;
+            for (let i = 0; i < rawString.length; i++) {
+                hash = (hash << 5) - hash + rawString.charCodeAt(i);
+                hash |= 0;
+            }
+            return "DEV-" + Math.abs(hash).toString(16).toUpperCase();
+        }
+
+        function startKakaoAuth() {
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("vapi-container").style.display = "flex";
+
+            try {
+                if (typeof Kakao !== "undefined" && Kakao.isInitialized()) {
+                    Kakao.API.request({
+                        url: '/v2/user/me',
+                        success: function(res) {
+                            currentKakaoNickname = res.properties?.nickname || res.kakao_account?.profile?.nickname || "Kakao User";
+                        }
+                    });
+                }
+            } catch (e) {
+                console.log("Kakao background fetch note:", e);
+            }
+        }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed === 540) {
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({
+                            type: "add-message",
+                            message: {
+                                role: "system",
+                                content: "[SYSTEM ALERT: 9 MINUTES REACHED]"
+                            }
+                        });
+                    }
+                }
+
+                if (secondsElapsed >= MAX_SECONDS) {
+                    stopTimer();
+                    if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
+                    isCallActive = false;
+                    document.getElementById("call-status").innerText = "10분 무료 체험이 종료되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "체험 종료됨";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#a0aec0";
+                    btn.disabled = true;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function toggleVapiCall() {
+            if (!isCallActive) {
+                const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+                if (sdk) {
+                    vapiInstance = typeof sdk.run === 'function' 
+                        ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                        : new sdk(VAPI_KEY);
+
+                    if (vapiInstance && typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            startTimer();
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play catch", e)); }
+                        });
+
+                        vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                        vapiInstance.on('track', (track) => {
+                            if (track.kind === 'audio') {
+                                const remoteAudio = document.getElementById("remote-audio");
+                                if (remoteAudio) {
+                                    remoteAudio.srcObject = new MediaStream([track]);
+                                    remoteAudio.play().catch(e => console.log("Stream play catch", e));
+                                }
+                            }
+                        });
+
+                        vapiInstance.on('call-end', () => {
+                            stopTimer();
+                        });
+                    }
+
+                    if (typeof vapiInstance.start === 'function') {
+                        vapiInstance.start(VAPI_ASSISTANT_ID, {
+                            metadata: {
+                                nickname: currentKakaoNickname,
+                                deviceHash: getDeviceHash()
+                            }
+                        });
+                    }
+                    
+                    isCallActive = true;
+
+                    document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                    document.getElementById("call-btn-text").innerText = "📞 통화 종료하기";
+                    const btn = document.getElementById("start-call-btn");
+                    btn.style.backgroundColor = "#e05252";
+                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                } else {
+                    alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+                }
+            } else {
+                if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
+                stopTimer();
+                isCallActive = false;
+
+                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+                document.getElementById("call-btn-text").innerText = "체험 종료됨";
+                const btn = document.getElementById("start-call-btn");
+                btn.style.backgroundColor = "#a0aec0";
+                btn.style.boxShadow = "none";
+                btn.disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>
