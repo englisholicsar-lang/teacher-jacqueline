@@ -209,13 +209,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 12px;
             box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
         }
 
         .info-box-icon {
-            font-size: 24px;
+            font-size: 22px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -226,7 +226,7 @@
             font-weight: 700;
             color: #1a3c61;
             line-height: 1.35;
-            text-align: left;
+            text-align: center;
         }
 
         .kakao-btn {
@@ -336,8 +336,8 @@
             <div class="info-box" style="margin-bottom: 12px;">
                 <span class="info-box-icon">🔊</span>
                 <span class="info-box-text">
-                    스피커폰으로 통화가 시작됩니다.<br>
-                    더 선명한 통화를 원하시면 <strong style="color: #d9381e;">통화 시작 전</strong> 이어폰을 미리 연결해 주세요!
+                    스피커폰 통화<br>
+                    <span style="font-size: 12.5px; color: #4a637d;">🎧 블루투스/이어폰은 <strong style="color: #d9381e;">통화 시작 전</strong> 연결해 주세요!</span>
                 </span>
             </div>
 
@@ -411,13 +411,26 @@
                 secondsElapsed++;
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
                 
-                if (secondsElapsed === 540) {
+                // --- REAL-TIME WEBSOCKET TIME ALERT BRIDGES ---
+                if (secondsElapsed === 300) { // 5 Minute Mark
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({
                             type: "add-message",
                             message: {
                                 role: "system",
-                                content: "[SYSTEM ALERT: 9 MINUTES REACHED]"
+                                content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]"
+                            }
+                        });
+                    }
+                }
+
+                if (secondsElapsed === 540) { // 9 Minute Mark
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({
+                            type: "add-message",
+                            message: {
+                                role: "system",
+                                content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. BEGIN WRAP-UP NOW.]"
                             }
                         });
                     }
@@ -472,7 +485,7 @@
                         });
                     }
 
-                    if (typeof vapiInstance.start === 'function') {
+                    if (vapiInstance && typeof vapiInstance.start === 'function') {
                         vapiInstance.start(VAPI_ASSISTANT_ID, {
                             metadata: {
                                 nickname: currentKakaoNickname,
