@@ -316,4 +316,145 @@
                 <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
             </div>
             <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</
+            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
+            
+            <div class="timer-wrapper">
+                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
+            </div>
+        </div>
+
+        <div class="bottom-group">
+            <div class="info-box" style="margin-bottom: 12px;">
+                <div class="info-box-text">
+                    <div style="font-size: 14.5px; font-weight: 800; color: #0e2a47; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <span>🔊</span> <span>스피커폰 통화</span> <span style="font-size: 12px; color: #64748b; font-weight: 600;">(기본 설정)</span>
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61; margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <span>🎧</span> <span>블루투스 / 이어폰은 <strong style="color: #d9381e;">통화 시작 전</strong></span>
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61; margin-top: 1px;">
+                        연결해 주세요!
+                    </div>
+                </div>
+            </div>
+
+            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
+                <span id="call-btn-text">📞 통화 시작하기</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzrwVybS-yoymGHrOXVLH-cadsOu9-vg8wMphJn4ktt-kc8iULEIp5PFjHxjmx4dTUAgg/exec";
+        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
+        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+        const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
+
+        let isCallActive = false;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        const MAX_SECONDS = 600;
+        
+        let currentKakaoNickname = "Student";
+
+        // Generate robust device hash fingerprint
+        function getDeviceHash() {
+            let hash = localStorage.getItem("englisholic_device_hash");
+            if (!hash) {
+                const rawString = [navigator.userAgent, navigator.language, screen.width + "x" + screen.height, screen.colorDepth, new Date().getTimezoneOffset()].join("|");
+                let h = 0;
+                for (let i = 0; i < rawString.length; i++) {
+                    h = (h << 5) - h + rawString.charCodeAt(i);
+                    h |= 0;
+                }
+                hash = "DEV-" + Math.abs(h).toString(16).toUpperCase();
+                localStorage.setItem("englisholic_device_hash", hash);
+            }
+            return hash;
+        }
+
+        // Secure server-side check on load against Google Sheets to prevent abuse
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
+                    Kakao.init(KAKAO_CLIENT_ID);
+                }
+            } catch (e) {
+                console.log("Kakao init warning:", e);
+            }
+
+            const deviceHash = getDeviceHash();
+
+            try {
+                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
+                let result = await response.json();
+
+                if (result && result.allowed === false) {
+                    document.getElementById("auth-container").innerHTML = `
+                        <div style="padding: 40px 10px;">
+                            <h2 style="color: #0e2a47; font-size: 20px; margin-bottom: 12px;">체험 완료 안내</h2>
+                            <p style="color: #4a637d; font-size: 14.5px; line-height: 1.5;">이 기기에서는 이미 무료 체험을 완료하셨습니다.<br>정규 수업 등록 및 문의는 공식 채널을 이용해 주세요!</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.log("Server verification check failed", err);
+            }
+        });
+
+        function startKakaoAuth() {
+            // Log web registration instantly
+            sendWebRegistration("Kakao User");
+
+            // Hide auth screen and show active call screen immediately
+            document.getElementById("auth-container").style.display = "none";
+            document.getElementById("vapi-container").style.display = "flex";
+
+            // Trigger the Vapi call right away
+            toggleVapiCall();
+        }
+
+        function sendWebRegistration(nickname) {
+            const payload = {
+                type: "web-registration",
+                kakaoNickname: nickname,
+                deviceHash: getDeviceHash()
+            };
+
+            fetch(GAS_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.log("Web reg log error:", err));
+        }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed === 300) { 
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({
+                            type: "add-message",
+                            message: {
+                                role: "system",
+                                content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]"
+                            }
+                        });
+                    }
+                }
+
+                if (secondsElapsed === 540) { 
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({
+                            type: "add-message",
