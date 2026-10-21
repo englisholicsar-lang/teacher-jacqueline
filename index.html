@@ -130,7 +130,7 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwQSyl5toXZDDP4vlV5CQVEvSYoJDT_NTX-_uyf022HHDSFb91YYtbDRktjN0V3A-1q/exec";
-        const KAKAO_CLIENT_ID = "d6a8e81dd43654f83fecafecdb24cc6d";
+        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
@@ -208,9 +208,24 @@
             if (!isUserAllowed) return;
 
             if (callState === 'IDLE') {
-                if (typeof Kakao !== "undefined" && Kakao.isInitialized()) {
+                if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
+                    proceedWithCall();
+                    return;
+                }
+
+                let loginCompleted = false;
+                setTimeout(() => {
+                    if (!loginCompleted && callState === 'IDLE') {
+                        loginCompleted = true;
+                        proceedWithCall();
+                    }
+                }, 1500);
+
+                try {
                     Kakao.Auth.login({
                         success: function(authObj) {
+                            if (loginCompleted) return;
+                            loginCompleted = true;
                             Kakao.API.request({
                                 url: '/v2/user/me',
                                 success: function(res) {
@@ -226,12 +241,18 @@
                             });
                         },
                         fail: function(err) {
-                            alert("카카오 로그인이 필요합니다."); 
+                            if (loginCompleted) return;
+                            loginCompleted = true;
+                            proceedWithCall();
                         }
                     });
-                } else {
-                    proceedWithCall();
+                } catch(e) {
+                    if (!loginCompleted) {
+                        loginCompleted = true;
+                        proceedWithCall();
+                    }
                 }
+
             } else if (callState === 'ACTIVE') {
                 if (vapiInstance && typeof vapiInstance.stop === 'function') {
                     vapiInstance.stop();
@@ -314,4 +335,87 @@
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         }
 
-        function
+        function startVapiCall() {
+            if (!isUserAllowed) return;
+
+            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+            if (sdk) {
+                vapiInstance = typeof sdk.run === 'function' 
+                    ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                    : new sdk(VAPI_KEY);
+
+                if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    vapiInstance.on('call-start', () => {
+                        startTimer();
+                        const remoteAudio = document.getElementById("remote-audio");
+                        if (remoteAudio) { 
+                            remoteAudio.volume = 1.0;
+                            remoteAudio.play().catch(e => console.log("Audio play", e)); 
+                        }
+                    });
+
+                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) {
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.volume = 1.0;
+                                remoteAudio.play().catch(e => console.log("Stream play", e));
+                            }
+                        }
+                    });
+
+                    vapiInstance.on('call-end', () => {
+                        stopTimer();
+                        endCallUI();
+                    });
+                }
+
+                if (vapiInstance && typeof vapiInstance.start === 'function') {
+                    vapiInstance.start(VAPI_ASSISTANT_ID, {
+                        metadata: {
+                            nickname: cachedKakaoNickname,
+                            deviceHash: getDeviceHash()
+                        }
+                    });
+                }
+                
+                callState = 'ACTIVE';
+                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                document.getElementById("notice-box").innerHTML = `
+                    <div class="info-box-text">
+                        <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🔊 스피커폰 통화 (볼륨 조절 가능)</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: #1a3c61; margin-top: 2px;">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+                    </div>
+                `;
+                const btn = document.getElementById("action-btn");
+                btn.style.backgroundColor = "#e05252";
+                btn.style.color = "#ffffff";
+                btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                document.getElementById("btn-text-content").innerText = "📞 통화 종료하기";
+            } else {
+                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+            }
+        }
+
+        function endCallUI() {
+            stopTimer();
+            callState = 'ENDED';
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            document.getElementById("notice-box").innerHTML = `
+                <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #1a3c61;">
+                    무료 체험에 참여해주셔서 감사합니다!<br>정규 수업 등록 문의는 공식 채널을 이용해 주세요.
+                </span>
+            `;
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#a0aec0";
+            btn.style.color = "#ffffff";
+            btn.style.boxShadow = "none";
+            btn.disabled = true;
+            document.getElementById("btn-text-content").innerText = "체험 종료됨";
+        }
+    </script>
+</body>
+</html>
