@@ -236,22 +236,17 @@
             gap: 8px;
         }
 
-        #vapi-container {
-            display: none;
-            width: 100%;
-        }
-
         .call-btn {
             width: 100%;
-            background-color: #2ecc71;
-            color: #ffffff;
+            background-color: var(--kakao-yellow);
+            color: #000000;
             border: none;
-            padding: 16px 20px;
+            padding: 15px 18px;
             border-radius: 14px;
-            font-size: 17px;
+            font-size: 16.5px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -280,8 +275,8 @@
 
     <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
 
-    <!-- PAGE 1: AUTH GATE -->
-    <div id="auth-container" class="container">
+    <!-- MAIN CONTAINER -->
+    <div id="main-container" class="container">
         <div class="upper-group">
             <div class="logo-wrapper">
                 <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
@@ -290,72 +285,40 @@
                 <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
             </div>
             <h1 class="title">Teacher Jacqueline</h1>
-            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+            <p id="call-status" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+            
+            <div id="timer-wrapper" class="timer-wrapper" style="display: none;">
+                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
+            </div>
         </div>
 
         <div class="bottom-group">
-            <div class="info-box">
+            <div id="notice-box" class="info-box">
                 <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #1a3c61;">
                     원활한 통화를 위해 마이크 권한을<br>허용해 주세요.
                 </span>
             </div>
-            <button id="login-btn" class="kakao-btn" onclick="startKakaoAuth()">
+
+            <button id="action-btn" class="kakao-btn" onclick="handleMainAction()">
                 <span class="kakao-btn-icon">💬</span>
                 <span id="btn-text-content">무료 체험 통화 시작하기</span>
             </button>
         </div>
     </div>
 
-    <!-- PAGE 2: ACTIVE CALL SCREEN -->
-    <div id="vapi-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-            <div class="avatar-container">
-                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
-            </div>
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">아래 버튼을 눌러 통화를 시작하세요!</p>
-            
-            <div class="timer-wrapper">
-                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
-            </div>
-        </div>
-
-        <div class="bottom-group">
-            <div class="info-box" style="margin-bottom: 12px;">
-                <div class="info-box-text">
-                    <div style="font-size: 14.5px; font-weight: 800; color: #0e2a47; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                        <span>🔊</span> <span>스피커폰 통화</span> <span style="font-size: 12px; color: #64748b; font-weight: 600;">(기본 설정)</span>
-                    </div>
-                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61; margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                        <span>🎧</span> <span>블루투스 / 이어폰은 <strong style="color: #d9381e;">통화 시작 전</strong></span>
-                    </div>
-                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61; margin-top: 1px;">
-                        연결해 주세요!
-                    </div>
-                </div>
-            </div>
-
-            <button id="start-call-btn" class="call-btn" onclick="toggleVapiCall()">
-                <span id="call-btn-text">📞 통화 시작하기</span>
-            </button>
-        </div>
-    </div>
-
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzrwVybS-yoymGHrOXVLH-cadsOu9-vg8wMphJn4ktt-kc8iULEIp5PFjHxjmx4dTUAgg/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxSChmOBff_9drCBN7dkGVXRFfcu8JVB7EPCoGQpdisTeZezmqE1JY1FdUTBGG-p7f7BQ/exec";
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
-        let isCallActive = false;
+        let callState = 'IDLE'; // 'IDLE', 'ACTIVE', 'ENDED'
         let timerInterval = null;
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
         
-        let currentKakaoNickname = "Kakao User";
+        let cachedKakaoId = "N/A";
+        let cachedKakaoNickname = "Kakao User";
 
         function getDeviceHash() {
             let hash = localStorage.getItem("englisholic_device_hash");
@@ -372,11 +335,13 @@
             return hash;
         }
 
-        // Strict Server-Side Lockout Check on Load
+        // Initialize Kakao & Check Lockout on Load
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
-                    Kakao.init(KAKAO_CLIENT_ID);
+                if (typeof Kakao !== "undefined") {
+                    if (!Kakao.isInitialized()) {
+                        Kakao.init(KAKAO_CLIENT_ID);
+                    }
                 }
             } catch (e) {
                 console.log("Kakao init warning:", e);
@@ -389,10 +354,27 @@
                 let result = await response.json();
 
                 if (result && result.allowed === false) {
-                    document.getElementById("auth-container").innerHTML = `
-                        <div style="padding: 40px 20px; background: #ffffff; border-radius: 16px; border: 1px solid #d4e5f9; box-shadow: 0 4px 15px rgba(12,42,74,0.08); margin-top: 40px;">
-                            <h2 style="color: #0e2a47; font-size: 20px; margin-bottom: 12px; font-weight: 800;">체험 완료 안내</h2>
-                            <p style="color: #4a637d; font-size: 14.5px; line-height: 1.5; font-weight: 600;">이 기기에서는 이미 무료 체험을 완료하셨습니다.<br><br>정규 수업 등록 및 문의는 공식 채널을 이용해 주세요!</p>
+                    // Redesigned Lockout UI with Logo, Notice Box, and Call Center Link Button
+                    document.getElementById("main-container").innerHTML = `
+                        <div class="upper-group" style="margin-top: 10px;">
+                            <div class="logo-wrapper">
+                                <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
+                            </div>
+                            <div class="avatar-container">
+                                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+                            </div>
+                            <h1 class="title">Teacher Jacqueline</h1>
+                            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+                        </div>
+                        <div class="bottom-group" style="margin-top: 20px;">
+                            <div class="info-box" style="padding: 16px;">
+                                <span class="info-box-text" style="font-size: 14px; font-weight: 700; color: #0e2a47; line-height: 1.5;">
+                                    무료 체험 수업은 기기당 1회만 가능합니다.<br>이미 무료 체험을 완료하셨습니다!
+                                </span>
+                            </div>
+                            <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2);">
+                                <span>📞 고객센터 문의하기 (1877-5079)</span>
+                            </a>
                         </div>
                     `;
                 }
@@ -401,27 +383,57 @@
             }
         });
 
-        function startKakaoAuth() {
-            // Prime audio context immediately inside KakaoTalk in-app touch gesture
-            const remoteAudio = document.getElementById("remote-audio");
-            if (remoteAudio) {
-                remoteAudio.play().catch(e => console.log("Audio unlock catch", e));
+        function handleMainAction() {
+            if (callState === 'IDLE') {
+                // Try fetching Kakao Profile if inside KakaoTalk
+                try {
+                    if (typeof Kakao !== "undefined" && Kakao.Auth && Kakao.Auth.getAccessToken()) {
+                        Kakao.API.request({
+                            url: '/v2/user/me',
+                            success: function(res) {
+                                cachedKakaoId = res.id ? res.id.toString() : "N/A";
+                                if (res.properties && res.properties.nickname) {
+                                    cachedKakaoNickname = res.properties.nickname;
+                                }
+                                proceedWithCall();
+                            },
+                            fail: function(error) {
+                                proceedWithCall();
+                            }
+                        });
+                    } else {
+                        proceedWithCall();
+                    }
+                } catch (e) {
+                    proceedWithCall();
+                }
+            } else if (callState === 'ACTIVE') {
+                // Hang up call
+                if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                    vapiInstance.stop();
+                }
+                endCallUI();
             }
-
-            // Log web registration instantly
-            sendWebRegistration(currentKakaoNickname);
-
-            // Hide auth screen and show active call screen immediately
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("vapi-container").style.display = "flex";
-
-            // Trigger the Vapi call right away
-            toggleVapiCall();
         }
 
-        function sendWebRegistration(nickname) {
+        function proceedWithCall() {
+            // Unlock audio context for mobile webview
+            const remoteAudio = document.getElementById("remote-audio");
+            if (remoteAudio) {
+                remoteAudio.play().catch(e => console.log("Audio unlock", e));
+            }
+
+            // Log web registration with real Kakao ID and Nickname
+            sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
+
+            // Start Vapi Call
+            startVapiCall();
+        }
+
+        function sendWebRegistration(kakaoId, nickname) {
             const payload = {
                 type: "web-registration",
+                kakaoId: kakaoId,
                 kakaoNickname: nickname,
                 deviceHash: getDeviceHash()
             };
@@ -443,6 +455,8 @@
         function startTimer() {
             if (timerInterval) clearInterval(timerInterval);
             secondsElapsed = 0;
+            document.getElementById("timer-wrapper").style.display = "flex";
+
             timerInterval = setInterval(() => {
                 secondsElapsed++;
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
@@ -474,12 +488,7 @@
                 if (secondsElapsed >= MAX_SECONDS) {
                     stopTimer();
                     if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
-                    isCallActive = false;
-                    document.getElementById("call-status").innerText = "10분 무료 체험이 종료되었습니다.";
-                    document.getElementById("call-btn-text").innerText = "체험 종료됨";
-                    const btn = document.getElementById("start-call-btn");
-                    btn.style.backgroundColor = "#a0aec0";
-                    btn.disabled = true;
+                    endCallUI();
                 }
             }, 1000);
         }
@@ -488,74 +497,82 @@
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         }
 
-        function toggleVapiCall() {
-            if (!isCallActive) {
-                const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
-                if (sdk) {
-                    vapiInstance = typeof sdk.run === 'function' 
-                        ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
-                        : new sdk(VAPI_KEY);
+        function startVapiCall() {
+            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+            if (sdk) {
+                vapiInstance = typeof sdk.run === 'function' 
+                    ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                    : new sdk(VAPI_KEY);
 
-                    if (vapiInstance && typeof vapiInstance.on === 'function') {
-                        vapiInstance.on('call-start', () => {
-                            startTimer();
+                if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    vapiInstance.on('call-start', () => {
+                        startTimer();
+                        const remoteAudio = document.getElementById("remote-audio");
+                        if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play", e)); }
+                    });
+
+                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
-                            if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play catch", e)); }
-                        });
-
-                        vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
-
-                        vapiInstance.on('track', (track) => {
-                            if (track.kind === 'audio') {
-                                const remoteAudio = document.getElementById("remote-audio");
-                                if (remoteAudio) {
-                                    remoteAudio.srcObject = new MediaStream([track]);
-                                    remoteAudio.play().catch(e => console.log("Stream play catch", e));
-                                }
+                            if (remoteAudio) {
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.play().catch(e => console.log("Stream play", e));
                             }
-                        });
+                        }
+                    });
 
-                        vapiInstance.on('call-end', () => {
-                            stopTimer();
-                        });
-                    }
-
-                    if (vapiInstance && typeof vapiInstance.start === 'function') {
-                        vapiInstance.start(VAPI_ASSISTANT_ID, {
-                            metadata: {
-                                nickname: currentKakaoNickname,
-                                deviceHash: getDeviceHash(),
-                                phone_number: "Not Provided"
-                            }
-                        });
-                    }
-                    
-                    isCallActive = true;
-
-                    document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
-                    document.getElementById("call-btn-text").innerText = "📞 통화 종료하기";
-                    const btn = document.getElementById("start-call-btn");
-                    if(btn) {
-                        btn.style.backgroundColor = "#e05252";
-                        btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                    }
-                } else {
-                    alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+                    vapiInstance.on('call-end', () => {
+                        stopTimer();
+                        endCallUI();
+                    });
                 }
+
+                if (vapiInstance && typeof vapiInstance.start === 'function') {
+                    vapiInstance.start(VAPI_ASSISTANT_ID, {
+                        metadata: {
+                            nickname: cachedKakaoNickname,
+                            deviceHash: getDeviceHash(),
+                            phone_number: "Not Provided"
+                        }
+                    });
+                }
+                
+                // Switch to Active Call UI (Red hangup button)
+                callState = 'ACTIVE';
+                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                document.getElementById("notice-box").innerHTML = `
+                    <div class="info-box-text">
+                        <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🔊 스피커폰 통화 (기본 설정)</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: #1a3c61; margin-top: 2px;">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+                    </div>
+                `;
+                const btn = document.getElementById("action-btn");
+                btn.style.backgroundColor = "#e05252";
+                btn.style.color = "#ffffff";
+                btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                document.getElementById("btn-text-content").innerText = "📞 통화 종료하기";
             } else {
-                if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
-                stopTimer();
-                isCallActive = false;
-
-                document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
-                document.getElementById("call-btn-text").innerText = "체험 종료됨";
-                const btn = document.getElementById("start-call-btn");
-                if(btn) {
-                    btn.style.backgroundColor = "#a0aec0";
-                    btn.style.boxShadow = "none";
-                    btn.disabled = true;
-                }
+                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
             }
+        }
+
+        function endCallUI() {
+            stopTimer();
+            callState = 'ENDED';
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            document.getElementById("notice-box").innerHTML = `
+                <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #1a3c61;">
+                    무료 체험에 참여해주셔서 감사합니다!<br>정규 수업 등록 문의는 공식 채널을 이용해 주세요.
+                </span>
+            `;
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#a0aec0";
+            btn.style.color = "#ffffff";
+            btn.style.boxShadow = "none";
+            btn.disabled = true;
+            document.getElementById("btn-text-content").innerText = "체험 종료됨";
         }
     </script>
 </body>
