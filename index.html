@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Jacqueline - Free Trial</title>
     
-    <!-- Open Graph Meta Tags for KakaoTalk Link Preview -->
     <meta property="og:title" content="Teacher Jacqueline - Free Trial">
     <meta property="og:description" content="재클린 선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
     <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/og_preview.png">
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
-    <!-- Kakao SDK -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 
-    <!-- Official Vapi Web SDK Async Injector -->
     <script>
       var vapiInstance = null;
       (function (d, t) {
@@ -59,189 +56,32 @@
             color: var(--primary-navy);
         }
 
-        .bg-wave-top {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.8;
-        }
+        .bg-wave-top, .bg-wave-bottom { position: absolute; width: 100%; max-width: 500px; height: auto; z-index: 0; pointer-events: none; opacity: 0.8; }
+        .bg-wave-top { top: 0; right: 0; }
+        .bg-wave-bottom { bottom: 0; left: 0; }
 
-        .bg-wave-bottom {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.8;
-        }
+        .dot-pattern-left { position: absolute; top: 220px; left: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
+        .dot-pattern-right { position: absolute; top: 80px; right: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
 
-        .dot-pattern-left {
-            position: absolute;
-            top: 220px;
-            left: 10px;
-            width: 45px;
-            height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 10px 10px;
-            z-index: 0;
-        }
+        .container { position: relative; z-index: 1; width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .upper-group { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 6px; }
+        .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .logo-img { height: 75px; width: auto; object-fit: contain; }
+        .avatar-container { position: relative; width: 115px; height: 115px; margin-bottom: 8px; }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); }
+        .title { font-size: 22px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
+        .subtitle { font-size: 13.5px; font-weight: 600; color: #4a637d; }
 
-        .dot-pattern-right {
-            position: absolute;
-            top: 80px;
-            right: 10px;
-            width: 45px;
-            height: 80px;
-            background-image: radial-gradient(#c2dcfc 2px, transparent 2px);
-            background-size: 10px 10px;
-            z-index: 0;
-        }
+        .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 12px; }
+        .timer-display { font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 380px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
+        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
+        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
+        .info-box-text { width: 100%; text-align: center; line-height: 1.45; }
 
-        .upper-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            margin-top: 6px;
-        }
+        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-
-        .logo-img {
-            height: 75px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .avatar-container {
-            position: relative;
-            width: 115px;
-            height: 115px;
-            margin-bottom: 8px;
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #ffffff;
-            box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4);
-        }
-
-        .title {
-            font-size: 22px;
-            font-weight: 800;
-            color: #0c2a4a;
-            margin-bottom: 2px;
-            letter-spacing: -0.3px;
-        }
-
-        .subtitle {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #4a637d;
-        }
-
-        .timer-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .timer-display {
-            font-size: 18px;
-            font-weight: 800;
-            color: #0e2a47;
-            background-color: #ffffff;
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 2px solid #d4e5f9;
-            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            line-height: 1.2;
-            -webkit-appearance: none;
-        }
-
-        .bottom-group {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 24px;
-        }
-
-        .info-box {
-            width: 100%;
-            background-color: var(--box-bg);
-            border: 1px solid var(--box-border);
-            border-radius: 14px;
-            padding: 12px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03);
-        }
-
-        .info-box-text {
-            width: 100%;
-            text-align: center;
-            line-height: 1.45;
-        }
-
-        .kakao-btn {
-            width: 100%;
-            background-color: var(--kakao-yellow);
-            color: #000000;
-            border: none;
-            padding: 15px 18px;
-            border-radius: 14px;
-            font-size: 16.5px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
 <body>
@@ -256,10 +96,8 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Audio element with explicit hardware volume control binding -->
     <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
-    <!-- MAIN CONTAINER -->
     <div id="main-container" class="container">
         <div class="upper-group">
             <div class="logo-wrapper">
@@ -285,22 +123,21 @@
 
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()">
                 <span class="kakao-btn-icon">💬</span>
-                <span id="btn-text-content">무료 체험 통화 시작하기</span>
+                <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
             </button>
         </div>
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxSChmOBff_9drCBN7dkGVXRFfcu8JVB7EPCoGQpdisTeZezmqE1JY1FdUTBGG-p7f7BQ/exec";
+        const GAS_URL = "YOUR_NEW_GAS_URL_HERE";
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
-        let callState = 'IDLE'; // 'IDLE', 'ACTIVE', 'ENDED'
-        let isUserAllowed = true; // Strict lockout guard
+        let callState = 'IDLE'; 
+        let isUserAllowed = true; 
         let timerInterval = null;
         let secondsElapsed = 0;
-        const MAX_SECONDS = 600;
         
         let cachedKakaoId = "N/A";
         let cachedKakaoNickname = "Kakao User";
@@ -320,7 +157,6 @@
             return hash;
         }
 
-        // Initialize Kakao & Strict Lockout Check on Load
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (typeof Kakao !== "undefined") {
@@ -339,7 +175,7 @@
                 let result = await response.json();
 
                 if (result && result.allowed === false) {
-                    isUserAllowed = false; // Block execution completely
+                    isUserAllowed = false; 
                     document.getElementById("main-container").innerHTML = `
                         <div class="upper-group" style="margin-top: 10px;">
                             <div class="logo-wrapper">
@@ -372,25 +208,28 @@
             if (!isUserAllowed) return;
 
             if (callState === 'IDLE') {
-                try {
-                    if (typeof Kakao !== "undefined" && Kakao.Auth && Kakao.Auth.getAccessToken()) {
-                        Kakao.API.request({
-                            url: '/v2/user/me',
-                            success: function(res) {
-                                cachedKakaoId = res.id ? res.id.toString() : "N/A";
-                                if (res.properties && res.properties.nickname) {
-                                    cachedKakaoNickname = res.properties.nickname;
+                if (typeof Kakao !== "undefined" && Kakao.isInitialized()) {
+                    Kakao.Auth.login({
+                        success: function(authObj) {
+                            Kakao.API.request({
+                                url: '/v2/user/me',
+                                success: function(res) {
+                                    cachedKakaoId = res.id ? res.id.toString() : "N/A";
+                                    if (res.properties && res.properties.nickname) {
+                                        cachedKakaoNickname = res.properties.nickname;
+                                    }
+                                    proceedWithCall();
+                                },
+                                fail: function(error) {
+                                    proceedWithCall(); 
                                 }
-                                proceedWithCall();
-                            },
-                            fail: function(error) {
-                                proceedWithCall();
-                            }
-                        });
-                    } else {
-                        proceedWithCall();
-                    }
-                } catch (e) {
+                            });
+                        },
+                        fail: function(err) {
+                            alert("카카오 로그인이 필요합니다."); 
+                        }
+                    });
+                } else {
                     proceedWithCall();
                 }
             } else if (callState === 'ACTIVE') {
@@ -427,7 +266,7 @@
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
-            }).catch(err => console.log("Web reg log error:", err));
+            }).catch(err => console.log("Web reg error:", err));
         }
 
         function formatTime(secs) {
@@ -447,29 +286,23 @@
                 
                 if (secondsElapsed === 300) { 
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        vapiInstance.send({
-                            type: "add-message",
-                            message: {
-                                role: "system",
-                                content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]"
-                            }
-                        });
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
                     }
                 }
 
                 if (secondsElapsed === 540) { 
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        vapiInstance.send({
-                            type: "add-message",
-                            message: {
-                                role: "system",
-                                content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. NOTE: PHONE NUMBER ALREADY COLLECTED AT START OF CLASS. DO NOT ASK FOR PHONE NUMBER AGAIN. FOCUS ENTIRELY ON WRAPPING UP THE CONVERSATION WARMLY, PRAISING STUDENT'S ENGLISH, AND TELLING THEM TO CHECK THEIR LESSON FEEDBACK REPORT SOON.]"
-                            }
-                        });
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. FOCUS ENTIRELY ON WRAPPING UP.]" }});
                     }
                 }
 
-                if (secondsElapsed >= MAX_SECONDS) {
+                if (secondsElapsed === 585) { 
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN. DO NOT ANSWER ANY MORE QUESTIONS.]" }});
+                    }
+                }
+
+                if (secondsElapsed >= 600) { 
                     stopTimer();
                     if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
                     endCallUI();
@@ -520,7 +353,6 @@
                 }
 
                 if (vapiInstance && typeof vapiInstance.start === 'function') {
-                    // --- CLEANED METADATA FIX: Removed hardcoded placeholder phone number ---
                     vapiInstance.start(VAPI_ASSISTANT_ID, {
                         metadata: {
                             nickname: cachedKakaoNickname,
