@@ -236,23 +236,6 @@
             gap: 8px;
         }
 
-        .call-btn {
-            width: 100%;
-            background-color: var(--kakao-yellow);
-            color: #000000;
-            border: none;
-            padding: 15px 18px;
-            border-radius: 14px;
-            font-size: 16.5px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
         iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn {
             display: none !important;
             visibility: hidden !important;
@@ -273,7 +256,8 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
+    <!-- Audio element with explicit hardware volume control binding -->
+    <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
     <!-- MAIN CONTAINER -->
     <div id="main-container" class="container">
@@ -313,6 +297,7 @@
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
         let callState = 'IDLE'; // 'IDLE', 'ACTIVE', 'ENDED'
+        let isUserAllowed = true; // Strict lockout guard
         let timerInterval = null;
         let secondsElapsed = 0;
         const MAX_SECONDS = 600;
@@ -335,7 +320,7 @@
             return hash;
         }
 
-        // Initialize Kakao & Check Lockout on Load
+        // Initialize Kakao & Strict Lockout Check on Load
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (typeof Kakao !== "undefined") {
@@ -354,7 +339,8 @@
                 let result = await response.json();
 
                 if (result && result.allowed === false) {
-                    // Redesigned Lockout UI with Logo, Notice Box, and Call Center Link Button
+                    isUserAllowed = false; // Block execution completely
+                    // Redesigned Lockout UI with Lock Emoji, Logo, Notice Box, and Call Center Link Button
                     document.getElementById("main-container").innerHTML = `
                         <div class="upper-group" style="margin-top: 10px;">
                             <div class="logo-wrapper">
@@ -369,7 +355,7 @@
                         <div class="bottom-group" style="margin-top: 20px;">
                             <div class="info-box" style="padding: 16px;">
                                 <span class="info-box-text" style="font-size: 14px; font-weight: 700; color: #0e2a47; line-height: 1.5;">
-                                    무료 체험 수업은 기기당 1회만 가능합니다.<br>이미 무료 체험을 완료하셨습니다!
+                                    🔒 무료 체험 수업은 1회만 가능합니다.
                                 </span>
                             </div>
                             <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2);">
@@ -384,6 +370,9 @@
         });
 
         function handleMainAction() {
+            // Strict guard: if user is not allowed, do nothing
+            if (!isUserAllowed) return;
+
             if (callState === 'IDLE') {
                 // Try fetching Kakao Profile if inside KakaoTalk
                 try {
@@ -417,9 +406,12 @@
         }
 
         function proceedWithCall() {
-            // Unlock audio context for mobile webview
+            if (!isUserAllowed) return;
+
+            // Unlock audio context and bind volume control explicitly
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
+                remoteAudio.volume = 1.0;
                 remoteAudio.play().catch(e => console.log("Audio unlock", e));
             }
 
@@ -479,7 +471,7 @@
                             type: "add-message",
                             message: {
                                 role: "system",
-                                content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. BEGIN WRAP-UP NOW.]"
+                                content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. NOTE: PHONE NUMBER ALREADY COLLECTED AT START OF CLASS. DO NOT ASK FOR PHONE NUMBER AGAIN. FOCUS ENTIRELY ON WRAPPING UP THE CONVERSATION WARMLY, PRAISING STUDENT'S ENGLISH, AND TELLING THEM TO CHECK THEIR LESSON FEEDBACK REPORT SOON.]"
                             }
                         });
                     }
@@ -498,6 +490,8 @@
         }
 
         function startVapiCall() {
+            if (!isUserAllowed) return;
+
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
                 vapiInstance = typeof sdk.run === 'function' 
@@ -508,7 +502,10 @@
                     vapiInstance.on('call-start', () => {
                         startTimer();
                         const remoteAudio = document.getElementById("remote-audio");
-                        if (remoteAudio) { remoteAudio.play().catch(e => console.log("Audio play", e)); }
+                        if (remoteAudio) { 
+                            remoteAudio.volume = 1.0;
+                            remoteAudio.play().catch(e => console.log("Audio play", e)); 
+                        }
                     });
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
@@ -518,6 +515,7 @@
                             const remoteAudio = document.getElementById("remote-audio");
                             if (remoteAudio) {
                                 remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.volume = 1.0;
                                 remoteAudio.play().catch(e => console.log("Stream play", e));
                             }
                         }
@@ -544,7 +542,7 @@
                 document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 document.getElementById("notice-box").innerHTML = `
                     <div class="info-box-text">
-                        <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🔊 스피커폰 통화 (기본 설정)</div>
+                        <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🔊 스피커폰 통화 (볼륨 조절 가능)</div>
                         <div style="font-size: 12.5px; font-weight: 700; color: #1a3c61; margin-top: 2px;">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
                     </div>
                 `;
