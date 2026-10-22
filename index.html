@@ -122,7 +122,6 @@
                 </span>
             </div>
 
-            <!-- BUTTON IS NOW DISABLED BY DEFAULT UNTIL VERIFICATION FINISHES -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <span class="kakao-btn-icon">💬</span>
                 <span id="btn-text-content">⏳ 인증 상태 확인 중...</span>
@@ -131,14 +130,13 @@
     </div>
 
     <script>
-        // NEW GOOGLE APPS SCRIPT URL INJECTED HERE
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyGhPtQ-XPnqBJjjTNge1sX6j542dmLXX3YH9lpSeH987_4oqyJ0BI9dZ5Z5mJr6Y-6/exec";
+        // 🚨 IMPORTANT: PASTE YOUR BRAND NEW DEPLOYMENT URL HERE!
+        const GAS_URL = "YOUR_NEW_GAS_URL_HERE"; 
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
         let callState = 'IDLE'; 
-        // DEFAULT TO FALSE TO PREVENT THE BYPASS BUG
         let isUserAllowed = false; 
         let timerInterval = null;
         let secondsElapsed = 0;
@@ -203,7 +201,6 @@
                         </div>
                     `;
                 } else {
-                    // USER IS CLEARED TO CALL - UNLOCK THE BUTTON
                     isUserAllowed = true;
                     const btn = document.getElementById("action-btn");
                     btn.disabled = false;
@@ -211,7 +208,6 @@
                 }
             } catch (err) {
                 console.log("Server verification check failed", err);
-                // IF SERVER BLIPS, FAIL-OPEN SO REAL STUDENTS AREN'T BLOCKED
                 isUserAllowed = true;
                 const btn = document.getElementById("action-btn");
                 btn.disabled = false;
@@ -220,7 +216,6 @@
         });
 
         function handleMainAction() {
-            // INSTANT HARD BLOCK IF NOT ALLOWED
             if (!isUserAllowed) return;
 
             if (callState === 'IDLE') {
@@ -390,10 +385,19 @@
                 }
 
                 if (vapiInstance && typeof vapiInstance.start === 'function') {
+                    // THE FIX: Calculate live Guam time dynamically and pass it to Vapi
+                    const now = new Date();
+                    const guamTime = new Intl.DateTimeFormat('en-US', { 
+                        timeZone: 'Pacific/Guam', 
+                        hour: 'numeric', 
+                        minute: '2-digit' 
+                    }).format(now);
+
                     vapiInstance.start(VAPI_ASSISTANT_ID, {
                         metadata: {
                             nickname: cachedKakaoNickname,
-                            deviceHash: getDeviceHash()
+                            deviceHash: getDeviceHash(),
+                            liveGuamTime: guamTime // Injects the live time into the AI's brain!
                         }
                     });
                 }
