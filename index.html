@@ -214,15 +214,14 @@
             }
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
 
-            // Explicitly warm up the microphone and speaker routing for Bluetooth on tap
-            try {
-                const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                window.localAudioStream = localStream; // keep active
-            } catch (err) {
-                console.log("Mic pre-warm warning:", err);
+            // Single unified audio context & speaker unlock on tap (No extra getUserMedia spam)
+            const remoteAudio = document.getElementById("remote-audio");
+            if (remoteAudio) {
+                remoteAudio.volume = 1.0;
+                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
             }
 
             if (callState === 'IDLE') {
