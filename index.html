@@ -200,19 +200,34 @@
                 console.log("Kakao init warning:", e);
             }
 
-            // 🛠️ SECRET KNOCK BACKDOOR 🛠️
+            // 🛠️ SECRET KNOCK BACKDOOR (MOBILE OPTIMIZED) 🛠️
             let tapCount = 0;
+            let tapTimer = null;
             const avatar = document.getElementById('dev-avatar');
             if (avatar) {
-                avatar.addEventListener('click', () => {
+                // Prevent mobile browsers from zooming or saving the image on rapid taps
+                avatar.style.webkitTouchCallout = "none";
+                avatar.style.userSelect = "none";
+                avatar.style.webkitUserSelect = "none";
+                avatar.style.touchAction = "manipulation";
+
+                // Use pointerdown to register raw touches instantly
+                avatar.addEventListener('pointerdown', () => {
                     tapCount++;
+                    
+                    // Reset the counter if you stop tapping for 1.5 seconds
+                    clearTimeout(tapTimer);
+                    tapTimer = setTimeout(() => { tapCount = 0; }, 1500);
+
                     if (tapCount === 5) {
                         isUserAllowed = true;
                         const btn = document.getElementById("action-btn");
-                        btn.disabled = false;
-                        btn.style.backgroundColor = "#e05252";
-                        btn.style.color = "#ffffff";
-                        document.getElementById("btn-text-content").innerText = "🛠️ Admin Override Active";
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.style.backgroundColor = "#e05252";
+                            btn.style.color = "#ffffff";
+                            document.getElementById("btn-text-content").innerText = "🛠️ Admin Override Active";
+                        }
                         alert("VIP Admin Access Granted.");
                     }
                 });
