@@ -79,7 +79,8 @@
         .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
         .info-box-text { width: 100%; text-align: center; line-height: 1.45; }
 
-        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
+        .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
 
         iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
@@ -121,21 +122,24 @@
                 </span>
             </div>
 
-            <button id="action-btn" class="kakao-btn" onclick="handleMainAction()">
+            <!-- BUTTON IS NOW DISABLED BY DEFAULT UNTIL VERIFICATION FINISHES -->
+            <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <span class="kakao-btn-icon">💬</span>
-                <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
+                <span id="btn-text-content">⏳ 인증 상태 확인 중...</span>
             </button>
         </div>
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzmOCCn6Lo7w8_r467GY1XM0UZMf4oJHgPuebPK-HjNjt2IAAns8sqLJmw_w8aiNXxU/exec";
+        // NEW GOOGLE APPS SCRIPT URL INJECTED HERE
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyGhPtQ-XPnqBJjjTNge1sX6j542dmLXX3YH9lpSeH987_4oqyJ0BI9dZ5Z5mJr6Y-6/exec";
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
         let callState = 'IDLE'; 
-        let isUserAllowed = true; 
+        // DEFAULT TO FALSE TO PREVENT THE BYPASS BUG
+        let isUserAllowed = false; 
         let timerInterval = null;
         let secondsElapsed = 0;
         
@@ -198,13 +202,25 @@
                             </a>
                         </div>
                     `;
+                } else {
+                    // USER IS CLEARED TO CALL - UNLOCK THE BUTTON
+                    isUserAllowed = true;
+                    const btn = document.getElementById("action-btn");
+                    btn.disabled = false;
+                    document.getElementById("btn-text-content").innerText = "카카오 로그인 및 통화 시작";
                 }
             } catch (err) {
                 console.log("Server verification check failed", err);
+                // IF SERVER BLIPS, FAIL-OPEN SO REAL STUDENTS AREN'T BLOCKED
+                isUserAllowed = true;
+                const btn = document.getElementById("action-btn");
+                btn.disabled = false;
+                document.getElementById("btn-text-content").innerText = "카카오 로그인 및 통화 시작";
             }
         });
 
         function handleMainAction() {
+            // INSTANT HARD BLOCK IF NOT ALLOWED
             if (!isUserAllowed) return;
 
             if (callState === 'IDLE') {
