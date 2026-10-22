@@ -162,13 +162,36 @@
             }
         }
 
-        // Strict Gatekeeper Check on Page Load
+        function showLockoutUI() {
+            isUserAllowed = false;
+            document.getElementById("main-container").innerHTML = `
+                <div class="upper-group" style="margin-top: 10px;">
+                    <div class="logo-wrapper">
+                        <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
+                    </div>
+                    <div class="avatar-container">
+                        <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+                    </div>
+                    <h1 class="title">Teacher Jacqueline</h1>
+                    <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+                </div>
+                <div class="bottom-group" style="margin-top: 20px;">
+                    <div class="info-box" style="padding: 16px;">
+                        <span class="info-box-text" style="font-size: 14px; font-weight: 700; color: #0e2a47; line-height: 1.5;">
+                            🔒 무료 체험 수업은 1회만 가능합니다.
+                        </span>
+                    </div>
+                    <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2);">
+                        <span>📞 고객센터 문의하기 (1877-5079)</span>
+                    </a>
+                </div>
+            `;
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                if (typeof Kakao !== "undefined") {
-                    if (!Kakao.isInitialized()) {
-                        Kakao.init(KAKAO_CLIENT_ID);
-                    }
+                if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
+                    Kakao.init(KAKAO_CLIENT_ID);
                 }
             } catch (e) {
                 console.log("Kakao init warning:", e);
@@ -178,48 +201,26 @@
             const btn = document.getElementById("action-btn");
             const btnText = document.getElementById("btn-text-content");
 
+            // Page Load Check
             try {
                 let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
                 let result = await response.json();
 
                 if (result && result.allowed === false) {
-                    isUserAllowed = false; 
-                    document.getElementById("main-container").innerHTML = `
-                        <div class="upper-group" style="margin-top: 10px;">
-                            <div class="logo-wrapper">
-                                <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
-                            </div>
-                            <div class="avatar-container">
-                                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
-                            </div>
-                            <h1 class="title">Teacher Jacqueline</h1>
-                            <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
-                        </div>
-                        <div class="bottom-group" style="margin-top: 20px;">
-                            <div class="info-box" style="padding: 16px;">
-                                <span class="info-box-text" style="font-size: 14px; font-weight: 700; color: #0e2a47; line-height: 1.5;">
-                                    🔒 무료 체험 수업은 1회만 가능합니다.
-                                </span>
-                            </div>
-                            <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2);">
-                                <span>📞 고객센터 문의하기 (1877-5079)</span>
-                            </a>
-                        </div>
-                    `;
+                    showLockoutUI();
                 } else {
                     isUserAllowed = true;
                     btn.disabled = false;
                     btnText.innerText = "카카오 로그인 및 통화 시작";
                 }
             } catch (err) {
-                console.log("Server verification check failed", err);
+                // If the check fails on load, let them use the button (which has the STRICT check)
                 isUserAllowed = true;
                 btn.disabled = false;
                 btnText.innerText = "카카오 로그인 및 통화 시작";
             }
         });
 
-        // Strict Sequential Kakao Auth Login Gate
         function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -230,37 +231,70 @@
             }
 
             if (callState === 'IDLE') {
+                const btn = document.getElementById("action-btn");
+                const btnText = document.getElementById("btn-text-content");
+                
+                btn.disabled = true;
+                btnText.innerText = "⏳ 데이터베이스 확인 중...";
+
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
-                    proceedWithCall();
+                    alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
+                    btn.disabled = false;
+                    btnText.innerText = "카카오 로그인 및 통화 시작";
                     return;
                 }
 
-                // Force strict waiting for Kakao Auth popup grant screen
-                try {
-                    Kakao.Auth.login({
-                        success: function(authObj) {
-                            Kakao.API.request({
-                                url: '/v2/user/me',
-                                success: function(res) {
-                                    cachedKakaoId = res.id ? res.id.toString() : "N/A";
-                                    if (res.properties && res.properties.nickname) {
-                                        cachedKakaoNickname = res.properties.nickname;
-                                    }
-                                    proceedWithCall();
-                                },
-                                fail: function(error) {
-                                    proceedWithCall(); 
+                Kakao.Auth.login({
+                    success: function(authObj) {
+                        Kakao.API.request({
+                            url: '/v2/user/me',
+                            success: async function(res) {
+                                cachedKakaoId = res.id ? res.id.toString() : "N/A";
+                                if (res.properties && res.properties.nickname) {
+                                    cachedKakaoNickname = res.properties.nickname;
                                 }
-                            });
-                        },
-                        fail: function(err) {
-                            console.log("Kakao login cancelled or failed:", err);
-                            alert("카카오 로그인 인증이 필요합니다.");
-                        }
-                    });
-                } catch(e) {
-                    proceedWithCall();
-                }
+
+                                // 🚨 STRICT FAIL-CLOSED DATABASE CHECK 🚨
+                                try {
+                                    const deviceHash = getDeviceHash();
+                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}`);
+                                    
+                                    let text = await response.text();
+                                    let result;
+                                    try {
+                                        result = JSON.parse(text);
+                                    } catch(e) {
+                                        // Blocks the call and shows exactly why it failed
+                                        alert("데이터베이스 응답 오류: " + text.substring(0, 50));
+                                        btn.disabled = false;
+                                        btnText.innerText = "카카오 로그인 및 통화 시작";
+                                        return; 
+                                    }
+
+                                    if (result && result.allowed === false) {
+                                        showLockoutUI(); 
+                                    } else {
+                                        proceedWithCall(); 
+                                    }
+                                } catch(err) {
+                                    // Halts execution completely on network error
+                                    alert("서버 연결 실패: " + err.message);
+                                    btn.disabled = false;
+                                    btnText.innerText = "카카오 로그인 및 통화 시작";
+                                }
+                            },
+                            fail: function(error) {
+                                alert("카카오 프로필을 가져오지 못했습니다.");
+                                btn.disabled = false;
+                                btnText.innerText = "카카오 로그인 및 통화 시작";
+                            }
+                        });
+                    },
+                    fail: function(err) {
+                        btn.disabled = false;
+                        btnText.innerText = "카카오 로그인 및 통화 시작";
+                    }
+                });
 
             } else if (callState === 'ACTIVE') {
                 if (vapiInstance && typeof vapiInstance.stop === 'function') {
@@ -338,8 +372,6 @@
         }
 
         function startVapiCall() {
-            if (!isUserAllowed) return;
-
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
                 vapiInstance = typeof sdk.run === 'function' 
