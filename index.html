@@ -205,17 +205,13 @@
             let tapTimer = null;
             const avatar = document.getElementById('dev-avatar');
             if (avatar) {
-                // Prevent mobile browsers from zooming or saving the image on rapid taps
                 avatar.style.webkitTouchCallout = "none";
                 avatar.style.userSelect = "none";
                 avatar.style.webkitUserSelect = "none";
                 avatar.style.touchAction = "manipulation";
 
-                // Use pointerdown to register raw touches instantly
                 avatar.addEventListener('pointerdown', () => {
                     tapCount++;
-                    
-                    // Reset the counter if you stop tapping for 1.5 seconds
                     clearTimeout(tapTimer);
                     tapTimer = setTimeout(() => { tapCount = 0; }, 1500);
 
@@ -238,7 +234,8 @@
             const btnText = document.getElementById("btn-text-content");
 
             try {
-                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
+                // Timestamp added to bust cache
+                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${new Date().getTime()}`);
                 let result = await response.json();
 
                 // Case-insensitive hash check
@@ -294,7 +291,8 @@
 
                                 try {
                                     const deviceHash = getDeviceHash();
-                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}`);
+                                    // Timestamp added to bust cache
+                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${new Date().getTime()}`);
                                     
                                     let text = await response.text();
                                     let result;
