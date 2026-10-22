@@ -68,7 +68,7 @@
         .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
         .logo-img { height: 75px; width: auto; object-fit: contain; }
         .avatar-container { position: relative; width: 115px; height: 115px; margin-bottom: 8px; }
-        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); cursor: pointer; }
         .title { font-size: 22px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
         .subtitle { font-size: 13.5px; font-weight: 600; color: #4a637d; }
 
@@ -105,7 +105,7 @@
                 <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
             </div>
             <div class="avatar-container">
-                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+                <img class="avatar-img" id="dev-avatar" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
             </div>
             <h1 class="title">Teacher Jacqueline</h1>
             <p id="call-status" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
@@ -135,7 +135,6 @@
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
-        // 🚨 VIP ADMIN BYPASS CREDENTIALS
         const ADMIN_KAKAO_ID = "5138574735";
         const ADMIN_DEVICE_HASH = "dev_o8usv4vz4pmvgwa9ft";
 
@@ -201,6 +200,24 @@
                 console.log("Kakao init warning:", e);
             }
 
+            // 🛠️ SECRET KNOCK BACKDOOR 🛠️
+            let tapCount = 0;
+            const avatar = document.getElementById('dev-avatar');
+            if (avatar) {
+                avatar.addEventListener('click', () => {
+                    tapCount++;
+                    if (tapCount === 5) {
+                        isUserAllowed = true;
+                        const btn = document.getElementById("action-btn");
+                        btn.disabled = false;
+                        btn.style.backgroundColor = "#e05252";
+                        btn.style.color = "#ffffff";
+                        document.getElementById("btn-text-content").innerText = "🛠️ Admin Override Active";
+                        alert("VIP Admin Access Granted.");
+                    }
+                });
+            }
+
             const deviceHash = getDeviceHash();
             const btn = document.getElementById("action-btn");
             const btnText = document.getElementById("btn-text-content");
@@ -209,8 +226,8 @@
                 let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
                 let result = await response.json();
 
-                // Bypasses initial page load block if your device hash is detected
-                if (result && result.allowed === false && deviceHash !== ADMIN_DEVICE_HASH) {
+                // Case-insensitive hash check
+                if (result && result.allowed === false && deviceHash.toLowerCase() !== ADMIN_DEVICE_HASH.toLowerCase()) {
                     showLockoutUI();
                 } else {
                     isUserAllowed = true;
@@ -237,8 +254,11 @@
                 const btn = document.getElementById("action-btn");
                 const btnText = document.getElementById("btn-text-content");
                 
-                btn.disabled = true;
-                btnText.innerText = "⏳ 데이터베이스 확인 중...";
+                // Keep visually unlocked if admin backdoor was used
+                if (btnText.innerText !== "🛠️ Admin Override Active") {
+                    btn.disabled = true;
+                    btnText.innerText = "⏳ 데이터베이스 확인 중...";
+                }
 
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                     alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
@@ -266,18 +286,20 @@
                                     try {
                                         result = JSON.parse(text);
                                     } catch(e) {
-                                        showLockoutUI();
+                                        if (btnText.innerText !== "🛠️ Admin Override Active") showLockoutUI();
+                                        else proceedWithCall();
                                         return; 
                                     }
 
-                                    // Bypasses core database lock if your Kakao ID or Device Hash is detected
-                                    if (result && result.allowed === false && deviceHash !== ADMIN_DEVICE_HASH && cachedKakaoId !== ADMIN_KAKAO_ID) {
-                                        showLockoutUI(); 
+                                    if (result && result.allowed === false && deviceHash.toLowerCase() !== ADMIN_DEVICE_HASH.toLowerCase() && cachedKakaoId !== ADMIN_KAKAO_ID) {
+                                        if (btnText.innerText !== "🛠️ Admin Override Active") showLockoutUI();
+                                        else proceedWithCall();
                                     } else {
                                         proceedWithCall(); 
                                     }
                                 } catch(err) {
-                                    showLockoutUI();
+                                    if (btnText.innerText !== "🛠️ Admin Override Active") showLockoutUI();
+                                    else proceedWithCall();
                                 }
                             },
                             fail: function(error) {
