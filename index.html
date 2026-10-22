@@ -130,8 +130,8 @@
     </div>
 
     <script>
-        // 🚨 IMPORTANT: PASTE YOUR BRAND NEW DEPLOYMENT URL HERE!
-        const GAS_URL = "YOUR_NEW_GAS_URL_HERE"; 
+        // Your newly deployed Apps Script URL
+        const GAS_URL = "https://script.google.com/macros/s/AKfycby4eY6zCdRRE_3x4su1_6uIg3PQ6DXU5sd4x6sW6WiakmbzU-8DtP3w6GG99ubETJMj/exec";
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
@@ -159,7 +159,38 @@
             return hash;
         }
 
+        // Detect if user is trapped inside KakaoTalk's in-app browser
+        function checkKakaoInAppBrowser() {
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.indexOf('kakaotalk') > -1) {
+                document.getElementById("main-container").innerHTML = `
+                    <div class="upper-group" style="margin-top: 10px;">
+                        <div class="logo-wrapper">
+                            <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
+                        </div>
+                        <div class="avatar-container">
+                            <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+                        </div>
+                        <h1 class="title">Teacher Jacqueline</h1>
+                        <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+                    </div>
+                    <div class="bottom-group" style="margin-top: 20px;">
+                        <div class="info-box" style="padding: 16px;">
+                            <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.5;">
+                                ⚠️ 카카오톡 내장 브라우저에서는 마이크와 블루투스 연결이 불안정할 수 있습니다.<br><br>우측 상단 <b>[ ⋮ 또는 점 3개 메뉴]</b>를 누르고<br><b>[다른 브라우저로 열기]</b>를 선택해 주세요!
+                            </span>
+                        </div>
+                    </div>
+                `;
+                return true;
+            }
+            return false;
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
+            // Stop execution if inside Kakao in-app browser to protect audio/mic
+            if (checkKakaoInAppBrowser()) return;
+
             try {
                 if (typeof Kakao !== "undefined") {
                     if (!Kakao.isInitialized()) {
@@ -218,6 +249,13 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
+            // Early audio context unlock for Bluetooth / mobile speakers on user tap
+            const remoteAudio = document.getElementById("remote-audio");
+            if (remoteAudio) {
+                remoteAudio.volume = 1.0;
+                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
+            }
+
             if (callState === 'IDLE') {
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                     proceedWithCall();
@@ -274,13 +312,6 @@
 
         function proceedWithCall() {
             if (!isUserAllowed) return;
-
-            const remoteAudio = document.getElementById("remote-audio");
-            if (remoteAudio) {
-                remoteAudio.volume = 1.0;
-                remoteAudio.play().catch(e => console.log("Audio unlock", e));
-            }
-
             sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
             startVapiCall();
         }
@@ -385,7 +416,6 @@
                 }
 
                 if (vapiInstance && typeof vapiInstance.start === 'function') {
-                    // THE FIX: Calculate live Guam time dynamically and pass it to Vapi
                     const now = new Date();
                     const guamTime = new Intl.DateTimeFormat('en-US', { 
                         timeZone: 'Pacific/Guam', 
@@ -397,7 +427,7 @@
                         metadata: {
                             nickname: cachedKakaoNickname,
                             deviceHash: getDeviceHash(),
-                            liveGuamTime: guamTime // Injects the live time into the AI's brain!
+                            liveGuamTime: guamTime
                         }
                     });
                 }
