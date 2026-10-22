@@ -135,6 +135,10 @@
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
+        // 🚨 VIP ADMIN BYPASS CREDENTIALS
+        const ADMIN_KAKAO_ID = "5138574735";
+        const ADMIN_DEVICE_HASH = "dev_o8usv4vz4pmvgwa9ft";
+
         let callState = 'IDLE'; 
         let isUserAllowed = false; 
         let timerInterval = null;
@@ -201,12 +205,12 @@
             const btn = document.getElementById("action-btn");
             const btnText = document.getElementById("btn-text-content");
 
-            // Page Load Check
             try {
                 let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
                 let result = await response.json();
 
-                if (result && result.allowed === false) {
+                // Bypasses initial page load block if your device hash is detected
+                if (result && result.allowed === false && deviceHash !== ADMIN_DEVICE_HASH) {
                     showLockoutUI();
                 } else {
                     isUserAllowed = true;
@@ -214,7 +218,6 @@
                     btnText.innerText = "카카오 로그인 및 통화 시작";
                 }
             } catch (err) {
-                // If the check fails on load, let them use the button (which has the STRICT check)
                 isUserAllowed = true;
                 btn.disabled = false;
                 btnText.innerText = "카카오 로그인 및 통화 시작";
@@ -254,7 +257,6 @@
                                     cachedKakaoNickname = res.properties.nickname;
                                 }
 
-                                // 🚨 STRICT FAIL-CLOSED DATABASE CHECK 🚨
                                 try {
                                     const deviceHash = getDeviceHash();
                                     let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}`);
@@ -264,18 +266,17 @@
                                     try {
                                         result = JSON.parse(text);
                                     } catch(e) {
-                                        // Transitions to the call center UI if GAS returns an HTML error
                                         showLockoutUI();
                                         return; 
                                     }
 
-                                    if (result && result.allowed === false) {
+                                    // Bypasses core database lock if your Kakao ID or Device Hash is detected
+                                    if (result && result.allowed === false && deviceHash !== ADMIN_DEVICE_HASH && cachedKakaoId !== ADMIN_KAKAO_ID) {
                                         showLockoutUI(); 
                                     } else {
                                         proceedWithCall(); 
                                     }
                                 } catch(err) {
-                                    // Transitions gracefully to the call center UI instead of an alert popup on "Failed to fetch"
                                     showLockoutUI();
                                 }
                             },
