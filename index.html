@@ -68,7 +68,7 @@
         .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
         .logo-img { height: 75px; width: auto; object-fit: contain; }
         .avatar-container { position: relative; width: 115px; height: 115px; margin-bottom: 8px; }
-        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); cursor: pointer; }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); }
         .title { font-size: 22px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
         .subtitle { font-size: 13.5px; font-weight: 600; color: #4a637d; }
 
@@ -105,7 +105,7 @@
                 <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
             </div>
             <div class="avatar-container">
-                <img class="avatar-img" id="dev-avatar" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
             </div>
             <h1 class="title">Teacher Jacqueline</h1>
             <p id="call-status" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
@@ -134,9 +134,6 @@
         const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
-
-        const ADMIN_KAKAO_ID = "5138574735";
-        const ADMIN_DEVICE_HASH = "dev_o8usv4vz4pmvgwa9ft";
 
         let callState = 'IDLE'; 
         let isUserAllowed = false; 
@@ -200,46 +197,16 @@
                 console.log("Kakao init warning:", e);
             }
 
-            // 🛠️ SECRET KNOCK BACKDOOR (MOBILE OPTIMIZED) 🛠️
-            let tapCount = 0;
-            let tapTimer = null;
-            const avatar = document.getElementById('dev-avatar');
-            if (avatar) {
-                avatar.style.webkitTouchCallout = "none";
-                avatar.style.userSelect = "none";
-                avatar.style.webkitUserSelect = "none";
-                avatar.style.touchAction = "manipulation";
-
-                avatar.addEventListener('pointerdown', () => {
-                    tapCount++;
-                    clearTimeout(tapTimer);
-                    tapTimer = setTimeout(() => { tapCount = 0; }, 1500);
-
-                    if (tapCount === 5) {
-                        isUserAllowed = true;
-                        const btn = document.getElementById("action-btn");
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.style.backgroundColor = "#e05252";
-                            btn.style.color = "#ffffff";
-                            document.getElementById("btn-text-content").innerText = "🛠️ Admin Override Active";
-                        }
-                        alert("VIP Admin Access Granted.");
-                    }
-                });
-            }
-
             const deviceHash = getDeviceHash();
             const btn = document.getElementById("action-btn");
             const btnText = document.getElementById("btn-text-content");
 
+            // Page Load Check
             try {
-                // Timestamp added to bust cache
-                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${new Date().getTime()}`);
+                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
                 let result = await response.json();
 
-                // Case-insensitive hash check
-                if (result && result.allowed === false && deviceHash.toLowerCase() !== ADMIN_DEVICE_HASH.toLowerCase()) {
+                if (result && result.allowed === false) {
                     showLockoutUI();
                 } else {
                     isUserAllowed = true;
@@ -247,6 +214,7 @@
                     btnText.innerText = "카카오 로그인 및 통화 시작";
                 }
             } catch (err) {
+                // If the check fails on load, let them use the button (which has the STRICT check)
                 isUserAllowed = true;
                 btn.disabled = false;
                 btnText.innerText = "카카오 로그인 및 통화 시작";
@@ -266,11 +234,8 @@
                 const btn = document.getElementById("action-btn");
                 const btnText = document.getElementById("btn-text-content");
                 
-                // Keep visually unlocked if admin backdoor was used
-                if (btnText.innerText !== "🛠️ Admin Override Active") {
-                    btn.disabled = true;
-                    btnText.innerText = "⏳ 데이터베이스 확인 중...";
-                }
+                btn.disabled = true;
+                btnText.innerText = "⏳ 데이터베이스 확인 중...";
 
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                     alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
@@ -289,30 +254,33 @@
                                     cachedKakaoNickname = res.properties.nickname;
                                 }
 
+                                // 🚨 STRICT FAIL-CLOSED DATABASE CHECK 🚨
                                 try {
                                     const deviceHash = getDeviceHash();
-                                    // Timestamp added to bust cache
-                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${new Date().getTime()}`);
+                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}`);
                                     
                                     let text = await response.text();
                                     let result;
                                     try {
                                         result = JSON.parse(text);
                                     } catch(e) {
-                                        if (btnText.innerText !== "🛠️ Admin Override Active") showLockoutUI();
-                                        else proceedWithCall();
+                                        // Blocks the call and shows exactly why it failed
+                                        alert("데이터베이스 응답 오류: " + text.substring(0, 50));
+                                        btn.disabled = false;
+                                        btnText.innerText = "카카오 로그인 및 통화 시작";
                                         return; 
                                     }
 
-                                    if (result && result.allowed === false && deviceHash.toLowerCase() !== ADMIN_DEVICE_HASH.toLowerCase() && cachedKakaoId !== ADMIN_KAKAO_ID) {
-                                        if (btnText.innerText !== "🛠️ Admin Override Active") showLockoutUI();
-                                        else proceedWithCall();
+                                    if (result && result.allowed === false) {
+                                        showLockoutUI(); 
                                     } else {
                                         proceedWithCall(); 
                                     }
                                 } catch(err) {
-                                    if (btnText.innerText !== "🛠️ Admin Override Active") showLockoutUI();
-                                    else proceedWithCall();
+                                    // Halts execution completely on network error
+                                    alert("서버 연결 실패: " + err.message);
+                                    btn.disabled = false;
+                                    btnText.innerText = "카카오 로그인 및 통화 시작";
                                 }
                             },
                             fail: function(error) {
