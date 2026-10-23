@@ -201,9 +201,8 @@
             const btn = document.getElementById("action-btn");
             const btnText = document.getElementById("btn-text-content");
 
-            // Page Load Check
             try {
-                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}`);
+                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`);
                 let result = await response.json();
 
                 if (result && result.allowed === false) {
@@ -214,7 +213,6 @@
                     btnText.innerText = "카카오 로그인 및 통화 시작";
                 }
             } catch (err) {
-                // If the check fails on load, let them use the button (which has the STRICT check)
                 isUserAllowed = true;
                 btn.disabled = false;
                 btnText.innerText = "카카오 로그인 및 통화 시작";
@@ -254,17 +252,15 @@
                                     cachedKakaoNickname = res.properties.nickname;
                                 }
 
-                                // 🚨 STRICT FAIL-CLOSED DATABASE CHECK 🚨
                                 try {
                                     const deviceHash = getDeviceHash();
-                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}`);
+                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${Date.now()}`);
                                     
                                     let text = await response.text();
                                     let result;
                                     try {
                                         result = JSON.parse(text);
                                     } catch(e) {
-                                        // Blocks the call and shows exactly why it failed
                                         alert("데이터베이스 응답 오류: " + text.substring(0, 50));
                                         btn.disabled = false;
                                         btnText.innerText = "카카오 로그인 및 통화 시작";
@@ -277,7 +273,6 @@
                                         proceedWithCall(); 
                                     }
                                 } catch(err) {
-                                    // Halts execution completely on network error
                                     alert("서버 연결 실패: " + err.message);
                                     btn.disabled = false;
                                     btnText.innerText = "카카오 로그인 및 통화 시작";
@@ -297,9 +292,6 @@
                 });
 
             } else if (callState === 'ACTIVE') {
-                if (vapiInstance && typeof vapiInstance.stop === 'function') {
-                    vapiInstance.stop();
-                }
                 endCallUI();
             }
         }
@@ -360,8 +352,6 @@
                 }
 
                 if (secondsElapsed >= 600) { 
-                    stopTimer();
-                    if (vapiInstance && typeof vapiInstance.stop === 'function') vapiInstance.stop();
                     endCallUI();
                 }
             }, 1000);
@@ -402,7 +392,6 @@
                     });
 
                     vapiInstance.on('call-end', () => {
-                        stopTimer();
                         endCallUI();
                     });
                 }
@@ -444,6 +433,9 @@
 
         function endCallUI() {
             stopTimer();
+            if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                try { vapiInstance.stop(); } catch(e) {}
+            }
             callState = 'ENDED';
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             document.getElementById("notice-box").innerHTML = `
