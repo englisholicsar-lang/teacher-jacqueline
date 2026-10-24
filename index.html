@@ -17,7 +17,7 @@
       var vapiInstance = null;
       (function (d, t) {
         var g = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
+            s = d.getElementsByTagName(t)[0];
         g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
         g.defer = true;
         g.async = true;
@@ -76,11 +76,82 @@
         .timer-display { font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
-        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
-        .info-box-text { width: 100%; text-align: center; line-height: 1.45; }
+        
+        /* Mic Notice Box Styling */
+        .info-box { 
+            width: 100%; 
+            background-color: var(--box-bg); 
+            border: 1px solid var(--box-border); 
+            border-radius: 14px; 
+            padding: 14px 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 12px; 
+            margin-bottom: 12px; 
+            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); 
+        }
+        .mic-icon-wrapper {
+            font-size: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .info-box-text { 
+            text-align: left; 
+            font-size: 14.5px; 
+            font-weight: 700; 
+            color: #0e2a47; 
+            line-height: 1.4; 
+        }
 
-        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
-        .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
+        /* Action Button Styling (Centered Shield + Text) */
+        .kakao-btn { 
+            width: 100%; 
+            background-color: var(--kakao-yellow); 
+            color: #000000; 
+            border: none; 
+            padding: 15px 18px; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            transition: all 0.2s ease; 
+        }
+        .kakao-btn:disabled { 
+            background-color: #94a3b8; 
+            box-shadow: none; 
+            cursor: not-allowed; 
+            color: #ffffff; 
+        }
+        
+        /* Shield Icon matching Image 2 */
+        .shield-icon {
+            width: 24px;
+            height: 24px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(56, 189, 248, 0.3);
+        }
+        .shield-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
         iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
@@ -97,7 +168,8 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
+    <!-- Audio element explicitly configured for mobile media session and hardware volume rocker routing -->
+    <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -116,15 +188,20 @@
         </div>
 
         <div class="bottom-group">
+            <!-- Updated Mic Notice Box with Mic Emoji and Shortened Wording -->
             <div id="notice-box" class="info-box">
-                <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #1a3c61;">
-                    원활한 통화를 위해 마이크 권한을<br>허용해 주세요.
+                <div class="mic-icon-wrapper">🎙️</div>
+                <span class="info-box-text">
+                    통화를 위해 마이크 권한을 허용해 주세요.
                 </span>
             </div>
 
+            <!-- Updated Action Button with Shield Icon, No Chat Bubble, and Centered Text -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
-                <span class="kakao-btn-icon">💬</span>
-                <span id="btn-text-content">⏳ 인증 상태 확인 중...</span>
+                <div class="shield-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <span id="btn-text-content">인증 상태 확인 중...</span>
             </button>
         </div>
     </div>
@@ -176,12 +253,12 @@
                     <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
                 </div>
                 <div class="bottom-group" style="margin-top: 20px;">
-                    <div class="info-box" style="padding: 16px;">
-                        <span class="info-box-text" style="font-size: 14px; font-weight: 700; color: #0e2a47; line-height: 1.5;">
+                    <div class="info-box" style="padding: 16px; justify-content: center;">
+                        <span class="info-box-text" style="text-align: center; color: #0e2a47;">
                             🔒 무료 체험 수업은 1회만 가능합니다.
                         </span>
                     </div>
-                    <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2);">
+                    <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2); justify-content: center;">
                         <span>📞 고객센터 문의하기 (1877-5079)</span>
                     </a>
                 </div>
@@ -222,8 +299,10 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
+            // Unlock audio stream context for mobile hardware volume rocker mapping
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
+                remoteAudio.muted = false;
                 remoteAudio.volume = 1.0;
                 remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
             }
@@ -373,6 +452,7 @@
                         startTimer();
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
+                            remoteAudio.muted = false;
                             remoteAudio.volume = 1.0;
                             remoteAudio.play().catch(e => console.log("Audio play", e)); 
                         }
@@ -380,11 +460,13 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
+                    // Attach WebRTC audio track to the media element so volume rockers control call audio
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
                             if (remoteAudio) {
                                 remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.muted = false;
                                 remoteAudio.volume = 1.0;
                                 remoteAudio.play().catch(e => console.log("Stream play", e));
                             }
@@ -416,9 +498,10 @@
                 callState = 'ACTIVE';
                 document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 document.getElementById("notice-box").innerHTML = `
+                    <div class="mic-icon-wrapper">🔊</div>
                     <div class="info-box-text">
-                        <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🔊 스피커폰 통화 (볼륨 조절 가능)</div>
-                        <div style="font-size: 12.5px; font-weight: 700; color: #1a3c61; margin-top: 2px;">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0e2a47;">스피커폰 통화 (볼륨 조절 가능)</div>
+                        <div style="font-size: 12px; font-weight: 700; color: #1a3c61; margin-top: 2px;">이어폰은 통화 시작 전 연결해 주세요!</div>
                     </div>
                 `;
                 const btn = document.getElementById("action-btn");
@@ -439,12 +522,13 @@
             callState = 'ENDED';
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             document.getElementById("notice-box").innerHTML = `
+                <div class="mic-icon-wrapper">🎉</div>
                 <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #1a3c61;">
                     무료 체험에 참여해주셔서 감사합니다!<br>정규 수업 등록 문의는 공식 채널을 이용해 주세요.
                 </span>
             `;
             const btn = document.getElementById("action-btn");
-            btn.style.backgroundColor = "#a0aec0";
+            btn.style.backgroundColor = "#94a3b8";
             btn.style.color = "#ffffff";
             btn.style.boxShadow = "none";
             btn.disabled = true;
