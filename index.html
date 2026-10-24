@@ -119,7 +119,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Hidden audio element configured with playsinline and explicit audio context/sink handling for mobile volume rocker routing -->
+    <!-- Dedicated audio element for routing WebRTC remote streams to hardware volume rocker -->
     <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -238,7 +238,6 @@
                 } else {
                     isUserAllowed = true;
                     btn.disabled = false;
-                    // Replace shield with brownish-black Kakao-style chat bubble SVG
                     btn.innerHTML = `
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                         <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
@@ -257,8 +256,10 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
+            // Immediate audio context unlock on user tap for mobile hardware routing
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
+                remoteAudio.muted = false;
                 remoteAudio.volume = 1.0;
                 remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
             }
@@ -267,7 +268,6 @@
                 const btn = document.getElementById("action-btn");
                 
                 btn.disabled = true;
-                // Replace with Blue Shield + Check Mark SVG
                 btn.innerHTML = `
                     <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
                         <circle cx="12" cy="12" r="12" fill="#60a5fa" />
@@ -438,7 +438,7 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
-                    // Volume rocker fix: properly binds the incoming WebRTC audio track to the HTML audio element with media session routing
+                    // Volume rocker fix: Direct stream attachment to the pre-unlocked audio element
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
@@ -446,7 +446,9 @@
                                 remoteAudio.muted = false;
                                 remoteAudio.srcObject = new MediaStream([track]);
                                 remoteAudio.volume = 1.0;
-                                remoteAudio.play().catch(e => console.log("Stream play", e));
+                                remoteAudio.play().then(() => {
+                                    console.log("Audio track playing successfully");
+                                }).catch(e => console.log("Audio track play error:", e));
                             }
                         }
                     });
@@ -484,7 +486,7 @@
                     </div>
                 `;
 
-                // Active call hang-up button (touch responsive, white phone icon, no shield)
+                // Active call hang-up button
                 const btn = document.getElementById("action-btn");
                 btn.style.backgroundColor = "#e05252";
                 btn.style.color = "#ffffff";
@@ -516,7 +518,7 @@
                 </div>
             `;
             
-            // Call button connecting to 1877-5079 with green background, larger white phone icon, and "고객센터 문의하기" text
+            // Call button connecting to 1877-5079 with green background, larger phone icon, and simplified text
             const btn = document.getElementById("action-btn");
             btn.style.backgroundColor = "#10b981";
             btn.style.color = "#ffffff";
