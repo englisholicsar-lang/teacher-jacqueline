@@ -76,82 +76,13 @@
         .timer-display { font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
-        
-        /* Notice Box Styling: Centered contents with perfect alignment */
-        .info-box { 
-            width: 100%; 
-            background-color: var(--box-bg); 
-            border: 1px solid var(--box-border); 
-            border-radius: 14px; 
-            padding: 14px 16px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
-            margin-bottom: 12px; 
-            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); 
-            text-align: center;
-        }
-        .notice-line {
-            font-size: 14.5px;
-            font-weight: 700;
-            color: #0e2a47;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            width: 100%;
-            line-height: 1.4;
-        }
-        /* Style for the initial one-line notice box */
-        .info-box.initial-notice {
-            flex-direction: row;
-            justify-content: flex-start;
-            gap: 12px;
-            text-align: left;
-        }
-        .info-box.initial-notice .mic-icon-wrapper {
-            font-size: 24px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .info-box.initial-notice .info-box-text {
-            text-align: left;
-            font-size: 14.5px;
-            font-weight: 700;
-            color: #0e2a47;
-            line-height: 1.4;
-        }
+        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
+        .info-box-text { width: 100%; text-align: center; line-height: 1.45; }
 
-        /* Action Button Styling */
-        .kakao-btn { 
-            width: 100%; 
-            background-color: var(--kakao-yellow); 
-            color: #000000; 
-            border: none; 
-            padding: 15px 18px; 
-            border-radius: 14px; 
-            font-size: 16px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            transition: all 0.2s ease; 
-        }
-        .kakao-btn:disabled { 
-            background-color: #94a3b8; 
-            box-shadow: none; 
-            cursor: not-allowed; 
-            color: #ffffff; 
-        }
-        
-        /* Shield Icon for Login Button Only */
+        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
+        .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
+
+        /* Initial Blue Shield Icon - strictly for the very first page */
         .shield-icon {
             width: 24px;
             height: 24px;
@@ -188,8 +119,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Audio element explicitly configured for mobile media session and hardware volume rocker routing -->
-    <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
+    <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -209,12 +139,14 @@
 
         <div class="bottom-group">
             <!-- Initial Mic Notice Box -->
-            <div id="notice-box" class="info-box initial-notice">
-                <div class="mic-icon-wrapper">🎙️</div>
-                <span class="info-box-text">통화를 위해 마이크 권한을 허용해 주세요.</span>
+            <div id="notice-box" class="info-box" style="justify-content: flex-start; gap: 12px; padding: 14px 16px;">
+                <div style="font-size: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">🎙️</div>
+                <span class="info-box-text" style="text-align: left; font-size: 14.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
+                    마이크 권한을 허용해 주세요.
+                </span>
             </div>
 
-            <!-- Action Button with Shield Icon (First Page Only) -->
+            <!-- Action Button (Initial state with plain blue shield) -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -272,13 +204,14 @@
                 </div>
                 <div class="bottom-group" style="margin-top: 20px;">
                     <div class="info-box" style="padding: 16px; justify-content: center;">
-                        <span class="info-box-text" style="text-align: center; color: #0e2a47;">
+                        <span class="info-box-text" style="text-align: center; color: #0e2a47; white-space: nowrap; font-size: 13.5px;">
                             🔒 무료 체험 수업은 1회만 가능합니다.
                         </span>
                     </div>
-                    <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2); justify-content: center;">
-                        <span>📞 고객센터 문의하기 (1877-5079)</span>
-                    </a>
+                    <button class="kakao-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2); justify-content: center;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        <span>고객센터 문의하기 (1877-5079)</span>
+                    </button>
                 </div>
             `;
         }
@@ -294,7 +227,6 @@
 
             const deviceHash = getDeviceHash();
             const btn = document.getElementById("action-btn");
-            const btnText = document.getElementById("btn-text-content");
 
             try {
                 let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`);
@@ -305,24 +237,17 @@
                 } else {
                     isUserAllowed = true;
                     btn.disabled = false;
-                    
-                    // Replace the button's entire inner HTML to retain the shield but update text
+                    // Replace shield with brownish-black Kakao-style chat bubble SVG
                     btn.innerHTML = `
-                        <div class="shield-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        </div>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                         <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                     `;
                 }
             } catch (err) {
                 isUserAllowed = true;
                 btn.disabled = false;
-                
-                // Replace the button's entire inner HTML to retain the shield but update text
                 btn.innerHTML = `
-                    <div class="shield-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                     <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                 `;
             }
@@ -331,10 +256,8 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
-            // Unlock audio stream context for mobile hardware volume rocker mapping
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
-                remoteAudio.muted = false;
                 remoteAudio.volume = 1.0;
                 remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
             }
@@ -343,21 +266,21 @@
                 const btn = document.getElementById("action-btn");
                 
                 btn.disabled = true;
-                // Maintain shield icon, update text
+                // Replace with Blue Shield + Check Mark SVG
                 btn.innerHTML = `
-                    <div class="shield-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <span id="btn-text-content">⏳ 데이터베이스 확인 중...</span>
+                    <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
+                        <circle cx="12" cy="12" r="12" fill="#60a5fa" />
+                        <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span id="btn-text-content">데이터베이스 확인 중...</span>
                 `;
 
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                     alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
                     btn.disabled = false;
                     btn.innerHTML = `
-                        <div class="shield-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        </div>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                         <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                     `;
                     return;
@@ -385,9 +308,7 @@
                                         alert("데이터베이스 응답 오류: " + text.substring(0, 50));
                                         btn.disabled = false;
                                         btn.innerHTML = `
-                                            <div class="shield-icon">
-                                                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                            </div>
+                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                                             <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                                         `;
                                         return; 
@@ -402,9 +323,7 @@
                                     alert("서버 연결 실패: " + err.message);
                                     btn.disabled = false;
                                     btn.innerHTML = `
-                                        <div class="shield-icon">
-                                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                        </div>
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                                         <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                                     `;
                                 }
@@ -413,9 +332,7 @@
                                 alert("카카오 프로필을 가져오지 못했습니다.");
                                 btn.disabled = false;
                                 btn.innerHTML = `
-                                    <div class="shield-icon">
-                                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                    </div>
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                                     <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                                 `;
                             }
@@ -424,9 +341,7 @@
                     fail: function(err) {
                         btn.disabled = false;
                         btn.innerHTML = `
-                            <div class="shield-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            </div>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
                             <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                         `;
                     }
@@ -514,7 +429,6 @@
                         startTimer();
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
-                            remoteAudio.muted = false;
                             remoteAudio.volume = 1.0;
                             remoteAudio.play().catch(e => console.log("Audio play", e)); 
                         }
@@ -522,13 +436,12 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
-                    // Attach WebRTC audio track to the media element so volume rockers control call audio
+                    // Volume rocker fix: binds WebRTC audio track to the HTML audio element
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
                             if (remoteAudio) {
                                 remoteAudio.srcObject = new MediaStream([track]);
-                                remoteAudio.muted = false;
                                 remoteAudio.volume = 1.0;
                                 remoteAudio.play().catch(e => console.log("Stream play", e));
                             }
@@ -560,17 +473,15 @@
                 callState = 'ACTIVE';
                 document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 
-                // Ensure notice box styling supports the centered layout
-                const noticeBox = document.getElementById("notice-box");
-                noticeBox.className = "info-box";
-                
-                // Updated 2-line Notice Box perfectly centered
-                noticeBox.innerHTML = `
-                    <div class="notice-line">🔊 스피커폰으로 기본 설정되었습니다.</div>
-                    <div class="notice-line">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+                // Centered 2-line Notice Box for Active Call
+                document.getElementById("notice-box").innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%;">
+                        <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47; display: flex; align-items: center; gap: 6px;">🔊 스피커폰으로 기본 설정되었습니다.</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: #1a3c61; display: flex; align-items: center; gap: 6px;">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+                    </div>
                 `;
 
-                // Re-write the entire button innerHTML to remove the shield div completely
+                // Active call hang-up button (touch responsive, white phone icon, no shield)
                 const btn = document.getElementById("action-btn");
                 btn.style.backgroundColor = "#e05252";
                 btn.style.color = "#ffffff";
@@ -594,22 +505,25 @@
             callState = 'ENDED';
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             
-            const noticeBox = document.getElementById("notice-box");
-            noticeBox.className = "info-box";
-            noticeBox.innerHTML = `
-                <div class="notice-line" style="justify-content: center;">🎉 무료 체험에 참여해주셔서 감사합니다!</div>
-                <div class="notice-line" style="justify-content: center; font-size: 13px; color: #4a637d;">정규 수업 등록 문의는 공식 채널을 이용해 주세요.</div>
+            // Notice box for call ended with Rocket emoji and 2-line layout
+            document.getElementById("notice-box").innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
+                    <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🚀 무료 체험에 참여해 주셔서 감사합니다!</div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61;">수업 문의는 아래 통화 버튼을 눌러 주세요.</div>
+                </div>
             `;
             
+            // Call button connecting to 1877-5079 with white phone icon
             const btn = document.getElementById("action-btn");
-            btn.style.backgroundColor = "#94a3b8";
+            btn.style.backgroundColor = "#0e2a47";
             btn.style.color = "#ffffff";
-            btn.style.boxShadow = "none";
-            btn.disabled = true;
+            btn.style.boxShadow = "0 4px 12px rgba(14,42,71,0.2)";
+            btn.disabled = false;
+            btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
             
-            // Re-write the entire button innerHTML to ensure no shield div is present
             btn.innerHTML = `
-                <span id="btn-text-content">체험 종료됨</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                <span id="btn-text-content">고객센터 문의하기 (1877-5079)</span>
             `;
         }
     </script>
