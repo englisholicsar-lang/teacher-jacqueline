@@ -76,13 +76,62 @@
         .timer-display { font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
-        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
-        .info-box-text { width: 100%; text-align: center; line-height: 1.45; }
+        
+        /* Mic Notice Box Styling */
+        .info-box { 
+            width: 100%; 
+            background-color: var(--box-bg); 
+            border: 1px solid var(--box-border); 
+            border-radius: 14px; 
+            padding: 14px 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 12px; 
+            margin-bottom: 12px; 
+            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); 
+        }
+        .mic-icon-wrapper {
+            font-size: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .info-box-text { 
+            text-align: left; 
+            font-size: 14.5px; 
+            font-weight: 700; 
+            color: #0e2a47; 
+            line-height: 1.4; 
+        }
 
-        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
-        .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
-
-        /* Initial Blue Shield Icon - strictly for the very first page */
+        /* Action Button Styling (Centered Shield + Text) */
+        .kakao-btn { 
+            width: 100%; 
+            background-color: var(--kakao-yellow); 
+            color: #000000; 
+            border: none; 
+            padding: 15px 18px; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            transition: all 0.2s ease; 
+        }
+        .kakao-btn:disabled { 
+            background-color: #94a3b8; 
+            box-shadow: none; 
+            cursor: not-allowed; 
+            color: #ffffff; 
+        }
+        
+        /* Shield Icon matching Image 2 */
         .shield-icon {
             width: 24px;
             height: 24px;
@@ -119,8 +168,8 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Hidden audio element configured with playsinline and explicit audio context/sink handling for mobile volume rocker routing -->
-    <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
+    <!-- Audio element explicitly configured for mobile media session and hardware volume rocker routing -->
+    <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -139,17 +188,17 @@
         </div>
 
         <div class="bottom-group">
-            <!-- Initial Mic Notice Box -->
-            <div id="notice-box" class="info-box" style="justify-content: flex-start; gap: 12px; padding: 14px 16px;">
-                <div style="font-size: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">🎙️</div>
-                <span class="info-box-text" style="text-align: left; font-size: 14.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
-                    마이크 권한을 허용해 주세요.
+            <!-- Updated Mic Notice Box with Mic Emoji and Shortened Wording -->
+            <div id="notice-box" class="info-box">
+                <div class="mic-icon-wrapper">🎙️</div>
+                <span class="info-box-text">
+                    통화를 위해 마이크 권한을 허용해 주세요.
                 </span>
             </div>
 
-            <!-- Action Button (Initial state with plain blue shield) -->
+            <!-- Updated Action Button with Shield Icon, No Chat Bubble, and Centered Text -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
-                <div class="shield-icon" id="btn-icon-wrapper">
+                <div class="shield-icon">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <span id="btn-text-content">인증 상태 확인 중...</span>
@@ -164,7 +213,7 @@
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
         let callState = 'IDLE'; 
-        let isUserAllowed = true; 
+        let isUserAllowed = false; 
         let timerInterval = null;
         let secondsElapsed = 0;
         
@@ -205,19 +254,18 @@
                 </div>
                 <div class="bottom-group" style="margin-top: 20px;">
                     <div class="info-box" style="padding: 16px; justify-content: center;">
-                        <span class="info-box-text" style="text-align: center; color: #0e2a47; white-space: nowrap; font-size: 13.5px;">
+                        <span class="info-box-text" style="text-align: center; color: #0e2a47;">
                             🔒 무료 체험 수업은 1회만 가능합니다.
                         </span>
                     </div>
-                    <button class="kakao-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #10b981; color: #ffffff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); justify-content: center;">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                        <span style="font-size: 17px;">고객센터 문의하기</span>
-                    </button>
+                    <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2); justify-content: center;">
+                        <span>📞 고객센터 문의하기 (1877-5079)</span>
+                    </a>
                 </div>
             `;
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
                     Kakao.init(KAKAO_CLIENT_ID);
@@ -226,55 +274,50 @@
                 console.log("Kakao init warning:", e);
             }
 
-            const btn = document.getElementById("action-btn");
-
-            // Instantly unlock and transition button state so it never freezes
-            setTimeout(() => {
-                btn.removeAttribute("disabled");
-                const iconWrapper = document.getElementById("btn-icon-wrapper");
-                if (iconWrapper) {
-                    iconWrapper.className = "";
-                    iconWrapper.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>`;
-                }
-                document.getElementById("btn-text-content").innerText = "카카오 로그인 및 통화 시작";
-            }, 400);
-
-            // Non-blocking background check for lockout status
             const deviceHash = getDeviceHash();
-            fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`)
-                .then(res => res.json())
-                .then(result => {
-                    if (result && result.allowed === false) {
-                        showLockoutUI();
-                    }
-                })
-                .catch(err => console.log("Background check skipped:", err));
+            const btn = document.getElementById("action-btn");
+            const btnText = document.getElementById("btn-text-content");
+
+            try {
+                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`);
+                let result = await response.json();
+
+                if (result && result.allowed === false) {
+                    showLockoutUI();
+                } else {
+                    isUserAllowed = true;
+                    btn.disabled = false;
+                    btnText.innerText = "카카오 로그인 및 통화 시작";
+                }
+            } catch (err) {
+                isUserAllowed = true;
+                btn.disabled = false;
+                btnText.innerText = "카카오 로그인 및 통화 시작";
+            }
         });
 
         function handleMainAction() {
             if (!isUserAllowed) return;
 
+            // Unlock audio stream context for mobile hardware volume rocker mapping
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
+                remoteAudio.muted = false;
                 remoteAudio.volume = 1.0;
                 remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
             }
 
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
-                btn.setAttribute("disabled", "true");
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
-                        <circle cx="12" cy="12" r="12" fill="#60a5fa" />
-                        <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span id="btn-text-content">데이터베이스 확인 중...</span>
-                `;
+                const btnText = document.getElementById("btn-text-content");
+                
+                btn.disabled = true;
+                btnText.innerText = "⏳ 데이터베이스 확인 중...";
 
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                     alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
-                    btn.removeAttribute("disabled");
+                    btn.disabled = false;
+                    btnText.innerText = "카카오 로그인 및 통화 시작";
                     return;
                 }
 
@@ -291,12 +334,15 @@
                                 try {
                                     const deviceHash = getDeviceHash();
                                     let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${Date.now()}`);
+                                    
                                     let text = await response.text();
                                     let result;
                                     try {
                                         result = JSON.parse(text);
                                     } catch(e) {
-                                        proceedWithCall();
+                                        alert("데이터베이스 응답 오류: " + text.substring(0, 50));
+                                        btn.disabled = false;
+                                        btnText.innerText = "카카오 로그인 및 통화 시작";
                                         return; 
                                     }
 
@@ -306,29 +352,21 @@
                                         proceedWithCall(); 
                                     }
                                 } catch(err) {
-                                    proceedWithCall();
+                                    alert("서버 연결 실패: " + err.message);
+                                    btn.disabled = false;
+                                    btnText.innerText = "카카오 로그인 및 통화 시작";
                                 }
                             },
                             fail: function(error) {
                                 alert("카카오 프로필을 가져오지 못했습니다.");
-                                btn.removeAttribute("disabled");
-                                btn.innerHTML = `
-                                    <div class="shield-icon" id="btn-icon-wrapper">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                                    </div>
-                                    <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                                `;
+                                btn.disabled = false;
+                                btnText.innerText = "카카오 로그인 및 통화 시작";
                             }
                         });
                     },
                     fail: function(err) {
-                        btn.removeAttribute("disabled");
-                        btn.innerHTML = `
-                            <div class="shield-icon" id="btn-icon-wrapper">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                            </div>
-                            <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                        `;
+                        btn.disabled = false;
+                        btnText.innerText = "카카오 로그인 및 통화 시작";
                     }
                 });
 
@@ -381,4 +419,121 @@
                 }
 
                 if (secondsElapsed === 540) { 
-                    if (vapiInstance && typeof vapiInstance.send === 'fun
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. FOCUS ENTIRELY ON WRAPPING UP.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 585) { 
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN. DO NOT ANSWER ANY MORE QUESTIONS.]" }});
+                    }
+                }
+
+                if (secondsElapsed >= 600) { 
+                    endCallUI();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function startVapiCall() {
+            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+            if (sdk) {
+                vapiInstance = typeof sdk.run === 'function' 
+                    ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                    : new sdk(VAPI_KEY);
+
+                if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    vapiInstance.on('call-start', () => {
+                        startTimer();
+                        const remoteAudio = document.getElementById("remote-audio");
+                        if (remoteAudio) { 
+                            remoteAudio.muted = false;
+                            remoteAudio.volume = 1.0;
+                            remoteAudio.play().catch(e => console.log("Audio play", e)); 
+                        }
+                    });
+
+                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                    // Attach WebRTC audio track to the media element so volume rockers control call audio
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) {
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.muted = false;
+                                remoteAudio.volume = 1.0;
+                                remoteAudio.play().catch(e => console.log("Stream play", e));
+                            }
+                        }
+                    });
+
+                    vapiInstance.on('call-end', () => {
+                        endCallUI();
+                    });
+                }
+
+                if (vapiInstance && typeof vapiInstance.start === 'function') {
+                    const now = new Date();
+                    const guamTime = new Intl.DateTimeFormat('en-US', { 
+                        timeZone: 'Pacific/Guam', 
+                        hour: 'numeric', 
+                        minute: '2-digit' 
+                    }).format(now);
+
+                    vapiInstance.start(VAPI_ASSISTANT_ID, {
+                        metadata: {
+                            nickname: cachedKakaoNickname,
+                            deviceHash: getDeviceHash(),
+                            liveGuamTime: guamTime
+                        }
+                    });
+                }
+                
+                callState = 'ACTIVE';
+                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                document.getElementById("notice-box").innerHTML = `
+                    <div class="mic-icon-wrapper">🔊</div>
+                    <div class="info-box-text">
+                        <div style="font-size: 14px; font-weight: 800; color: #0e2a47;">스피커폰 통화 (볼륨 조절 가능)</div>
+                        <div style="font-size: 12px; font-weight: 700; color: #1a3c61; margin-top: 2px;">이어폰은 통화 시작 전 연결해 주세요!</div>
+                    </div>
+                `;
+                const btn = document.getElementById("action-btn");
+                btn.style.backgroundColor = "#e05252";
+                btn.style.color = "#ffffff";
+                btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                document.getElementById("btn-text-content").innerText = "📞 통화 종료하기";
+            } else {
+                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+            }
+        }
+
+        function endCallUI() {
+            stopTimer();
+            if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                try { vapiInstance.stop(); } catch(e) {}
+            }
+            callState = 'ENDED';
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            document.getElementById("notice-box").innerHTML = `
+                <div class="mic-icon-wrapper">🎉</div>
+                <span class="info-box-text" style="font-size: 13.5px; font-weight: 700; color: #1a3c61;">
+                    무료 체험에 참여해주셔서 감사합니다!<br>정규 수업 등록 문의는 공식 채널을 이용해 주세요.
+                </span>
+            `;
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#94a3b8";
+            btn.style.color = "#ffffff";
+            btn.style.boxShadow = "none";
+            btn.disabled = true;
+            document.getElementById("btn-text-content").innerText = "체험 종료됨";
+        }
+    </script>
+</body>
+</html>
