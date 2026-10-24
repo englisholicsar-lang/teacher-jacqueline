@@ -77,12 +77,10 @@
 
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
         .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
-        .info-box-text { width: 100%; text-align: center; line-height: 1.45; }
-
+        
         .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
         .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
 
-        /* Initial Blue Shield Icon - strictly for the very first page */
         .shield-icon {
             width: 24px;
             height: 24px;
@@ -119,8 +117,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- AUDIO FIX: Rendered but invisible instead of display:none, allowing OS volume rocker control -->
-    <audio id="remote-audio" autoplay playsinline style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;"></audio>
+    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -139,12 +136,14 @@
         </div>
 
         <div class="bottom-group">
-            <!-- Initial Mic Notice Box -->
-            <div id="notice-box" class="info-box" style="justify-content: flex-start; gap: 12px; padding: 14px 16px;">
-                <div style="font-size: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">🎙️</div>
-                <span class="info-box-text" style="text-align: left; font-size: 14.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
-                    마이크 권한을 허용해 주세요.
-                </span>
+            <!-- Initial Speaker/Earphone Notice Box -->
+            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 8px; padding: 14px 16px; align-items: flex-start;">
+                <div style="font-size: 14.5px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">🔊</span> 스피커폰으로 기본 설정되었습니다.
+                </div>
+                <div style="font-size: 14.5px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!
+                </div>
             </div>
 
             <!-- Action Button (Initial state with plain blue shield) -->
@@ -205,7 +204,7 @@
                 </div>
                 <div class="bottom-group" style="margin-top: 20px;">
                     <div class="info-box" style="padding: 16px; justify-content: center;">
-                        <span class="info-box-text" style="text-align: center; color: #0e2a47; white-space: nowrap; font-size: 13.5px;">
+                        <span style="text-align: center; color: #0e2a47; white-space: nowrap; font-size: 13.5px;">
                             🔒 무료 체험 수업은 1회만 가능합니다.
                         </span>
                     </div>
@@ -416,19 +415,10 @@
                             remoteAudio.volume = 1.0;
                             remoteAudio.play().catch(e => console.log("Audio play", e)); 
                         }
-                        
-                        // MEDIA SESSION FIX: Explicitly registers the active session so the OS locks the volume keys
-                        if ('mediaSession' in navigator) {
-                            navigator.mediaSession.metadata = new MediaMetadata({
-                                title: 'Teacher Jacqueline',
-                                artist: 'Englisholic'
-                            });
-                        }
                     });
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
-                    // AUDIO TRACK FIX: Properly route incoming stream to the absolute-positioned audio element
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
@@ -466,10 +456,13 @@
                 callState = 'ACTIVE';
                 document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 
+                // Active Call Mic Permission Notice
                 document.getElementById("notice-box").innerHTML = `
-                    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%;">
-                        <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47; display: flex; align-items: center; gap: 6px;">🔊 스피커폰으로 기본 설정되었습니다.</div>
-                        <div style="font-size: 12.5px; font-weight: 700; color: #1a3c61; display: flex; align-items: center; gap: 6px;">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+                    <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                        <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                        <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
+                            마이크 권한을 허용해 주세요.
+                        </span>
                     </div>
                 `;
 
