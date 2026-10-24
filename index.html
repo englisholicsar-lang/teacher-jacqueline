@@ -76,13 +76,61 @@
         .timer-display { font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
-        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
-        .info-box-text { width: 100%; text-align: center; line-height: 1.45; }
+        
+        /* Notice Box Styling: Centered contents with perfect alignment */
+        .info-box { 
+            width: 100%; 
+            background-color: var(--box-bg); 
+            border: 1px solid var(--box-border); 
+            border-radius: 14px; 
+            padding: 14px 16px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            margin-bottom: 12px; 
+            box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); 
+            text-align: center;
+        }
+        .notice-line {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #0e2a47;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            line-height: 1.4;
+        }
 
-        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
-        .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
-
-        /* Initial Blue Shield Icon - strictly for the very first page */
+        /* Action Button Styling */
+        .kakao-btn { 
+            width: 100%; 
+            background-color: var(--kakao-yellow); 
+            color: #000000; 
+            border: none; 
+            padding: 15px 18px; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            transition: all 0.2s ease; 
+        }
+        .kakao-btn:disabled { 
+            background-color: #94a3b8; 
+            box-shadow: none; 
+            cursor: not-allowed; 
+            color: #ffffff; 
+        }
+        
+        /* Shield Icon for Login Button Only */
         .shield-icon {
             width: 24px;
             height: 24px;
@@ -119,7 +167,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Dedicated audio element for routing WebRTC remote streams to hardware volume rocker -->
+    <!-- Audio element explicitly bound for volume rocker hardware routing -->
     <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -140,14 +188,11 @@
 
         <div class="bottom-group">
             <!-- Initial Mic Notice Box -->
-            <div id="notice-box" class="info-box" style="justify-content: flex-start; gap: 12px; padding: 14px 16px;">
-                <div style="font-size: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">🎙️</div>
-                <span class="info-box-text" style="text-align: left; font-size: 14.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
-                    마이크 권한을 허용해 주세요.
-                </span>
+            <div id="notice-box" class="info-box">
+                <div class="notice-line">🎙️ 마이크 권한을 허용해 주세요.</div>
             </div>
 
-            <!-- Action Button (Initial state with plain blue shield) -->
+            <!-- Action Button with Shield Icon (First Page Only) -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -205,14 +250,14 @@
                 </div>
                 <div class="bottom-group" style="margin-top: 20px;">
                     <div class="info-box" style="padding: 16px; justify-content: center;">
-                        <span class="info-box-text" style="text-align: center; color: #0e2a47; white-space: nowrap; font-size: 13.5px;">
+                        <span class="info-box-text" style="text-align: center; color: #0e2a47; white-space: nowrap;">
                             🔒 무료 체험 수업은 1회만 가능합니다.
                         </span>
                     </div>
-                    <button class="kakao-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #10b981; color: #ffffff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); justify-content: center;">
+                    <a href="tel:1877-5079" class="kakao-btn" style="text-decoration: none; margin-top: 8px; background-color: #10b981; color: #ffffff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); justify-content: center;">
                         <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
                         <span style="font-size: 17px;">고객센터 문의하기</span>
-                    </button>
+                    </a>
                 </div>
             `;
         }
@@ -256,7 +301,6 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
-            // Immediate audio context unlock on user tap for mobile hardware routing
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
                 remoteAudio.muted = false;
@@ -438,7 +482,7 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
-                    // Volume rocker fix: Direct stream attachment to the pre-unlocked audio element
+                    // Working Volume Rocker Fix: direct assignment of the remote audio track to the HTML audio element's srcObject
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
@@ -446,9 +490,7 @@
                                 remoteAudio.muted = false;
                                 remoteAudio.srcObject = new MediaStream([track]);
                                 remoteAudio.volume = 1.0;
-                                remoteAudio.play().then(() => {
-                                    console.log("Audio track playing successfully");
-                                }).catch(e => console.log("Audio track play error:", e));
+                                remoteAudio.play().catch(e => console.log("Audio play error:", e));
                             }
                         }
                     });
