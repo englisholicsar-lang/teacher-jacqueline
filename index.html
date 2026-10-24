@@ -77,7 +77,7 @@
 
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
         
-        /* Notice Box: Clean single-line layout */
+        /* Notice Box: 한 줄 정렬 유지 */
         .info-box { 
             width: 100%; 
             background-color: var(--box-bg); 
@@ -102,7 +102,6 @@
         .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
         .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
 
-        /* Initial Blue Shield Icon - strictly for the very first page */
         .shield-icon {
             width: 24px;
             height: 24px;
@@ -139,7 +138,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Hidden audio element for volume rocker WebRTC stream binding -->
+    <!-- 볼륨 락커 및 오디오 스트림 바인딩용 오디오 요소 -->
     <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -159,18 +158,18 @@
         </div>
 
         <div class="bottom-group">
-            <!-- Initial Mic Notice Box (Single line layout) -->
+            <!-- 마이크 안내 박스 (한 줄 정렬) -->
             <div id="notice-box" class="info-box">
                 <div style="font-size: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">🎙️</div>
                 <span class="info-box-text">마이크 권한을 허용해 주세요.</span>
             </div>
 
-            <!-- Action Button -->
-            <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
+            <!-- 실행 버튼 (즉시 활성화) -->
+            <button id="action-btn" class="kakao-btn" onclick="handleMainAction()">
                 <div class="shield-icon">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <span id="btn-text-content">인증 상태 확인 중...</span>
+                <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
             </button>
         </div>
     </div>
@@ -182,7 +181,6 @@
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
         let callState = 'IDLE'; 
-        let isUserAllowed = true; 
         let timerInterval = null;
         let secondsElapsed = 0;
         
@@ -209,7 +207,6 @@
         }
 
         function showLockoutUI() {
-            isUserAllowed = false;
             document.getElementById("main-container").innerHTML = `
                 <div class="upper-group" style="margin-top: 10px;">
                     <div class="logo-wrapper">
@@ -235,7 +232,7 @@
             `;
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('DOMContentLoaded', () => {
             try {
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
                     Kakao.init(KAKAO_CLIENT_ID);
@@ -243,34 +240,9 @@
             } catch (e) {
                 console.log("Kakao init warning:", e);
             }
-
-            const deviceHash = getDeviceHash();
-            const btn = document.getElementById("action-btn");
-
-            // Instant-unlock safeguard to prevent loading screen freezes
-            isUserAllowed = true;
-            btn.disabled = false;
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-            `;
-
-            // Background check for lockout status
-            try {
-                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`);
-                let result = await response.json();
-
-                if (result && result.allowed === false) {
-                    showLockoutUI();
-                }
-            } catch (err) {
-                console.log("Background check error ignored:", err);
-            }
         });
 
         function handleMainAction() {
-            if (!isUserAllowed) return;
-
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
                 remoteAudio.volume = 1.0;
@@ -279,7 +251,6 @@
 
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
-                
                 btn.disabled = true;
                 btn.innerHTML = `
                     <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
@@ -293,10 +264,6 @@
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                     alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
                     btn.disabled = false;
-                    btn.innerHTML = `
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                        <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                    `;
                     return;
                 }
 
@@ -313,7 +280,6 @@
                                 try {
                                     const deviceHash = getDeviceHash();
                                     let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${Date.now()}`);
-                                    
                                     let text = await response.text();
                                     let result;
                                     try {
@@ -335,19 +301,11 @@
                             fail: function(error) {
                                 alert("카카오 프로필을 가져오지 못했습니다.");
                                 btn.disabled = false;
-                                btn.innerHTML = `
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                                    <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                                `;
                             }
                         });
                     },
                     fail: function(err) {
                         btn.disabled = false;
-                        btn.innerHTML = `
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                            <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                        `;
                     }
                 });
 
@@ -357,7 +315,6 @@
         }
 
         function proceedWithCall() {
-            if (!isUserAllowed) return;
             sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
             startVapiCall();
         }
@@ -441,7 +398,7 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
-                    // Volume rocker fix: properly binds the incoming WebRTC audio track to the HTML audio element with media session routing
+                    // 볼륨 락커 연결을 위한 WebRTC 트랙 바인딩
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
@@ -479,7 +436,6 @@
                 callState = 'ACTIVE';
                 document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 
-                // Centered 2-line Notice Box for Active Call
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%;">
                         <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47; display: flex; align-items: center; gap: 6px;">🔊 스피커폰으로 기본 설정되었습니다.</div>
@@ -487,7 +443,6 @@
                     </div>
                 `;
 
-                // Active call hang-up button
                 const btn = document.getElementById("action-btn");
                 btn.style.backgroundColor = "#e05252";
                 btn.style.color = "#ffffff";
@@ -511,7 +466,6 @@
             callState = 'ENDED';
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             
-            // Notice box for call ended with Rocket emoji and 2-line layout
             document.getElementById("notice-box").innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
                     <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🚀 무료 체험에 참여해 주셔서 감사합니다!</div>
@@ -519,7 +473,6 @@
                 </div>
             `;
             
-            // Call button connecting to 1877-5079 with green background
             const btn = document.getElementById("action-btn");
             btn.style.backgroundColor = "#10b981";
             btn.style.color = "#ffffff";
