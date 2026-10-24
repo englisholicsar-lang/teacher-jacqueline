@@ -149,7 +149,7 @@
 
             <!-- Action Button (Initial state with plain blue shield) -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
-                <div class="shield-icon">
+                <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <span id="btn-text-content">인증 상태 확인 중...</span>
@@ -164,7 +164,7 @@
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
         let callState = 'IDLE'; 
-        let isUserAllowed = false; 
+        let isUserAllowed = true; 
         let timerInterval = null;
         let secondsElapsed = 0;
         
@@ -217,7 +217,7 @@
             `;
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('DOMContentLoaded', () => {
             try {
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
                     Kakao.init(KAKAO_CLIENT_ID);
@@ -226,32 +226,29 @@
                 console.log("Kakao init warning:", e);
             }
 
-            const deviceHash = getDeviceHash();
             const btn = document.getElementById("action-btn");
 
-            try {
-                let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`);
-                let result = await response.json();
-
-                if (result && result.allowed === false) {
-                    showLockoutUI();
-                } else {
-                    isUserAllowed = true;
-                    btn.disabled = false;
-                    // Replace shield with brownish-black Kakao-style chat bubble SVG
-                    btn.innerHTML = `
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                        <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                    `;
+            // Instantly unlock and transition button state so it never freezes
+            setTimeout(() => {
+                btn.removeAttribute("disabled");
+                const iconWrapper = document.getElementById("btn-icon-wrapper");
+                if (iconWrapper) {
+                    iconWrapper.className = "";
+                    iconWrapper.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>`;
                 }
-            } catch (err) {
-                isUserAllowed = true;
-                btn.disabled = false;
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                    <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                `;
-            }
+                document.getElementById("btn-text-content").innerText = "카카오 로그인 및 통화 시작";
+            }, 400);
+
+            // Non-blocking background check for lockout status
+            const deviceHash = getDeviceHash();
+            fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`)
+                .then(res => res.json())
+                .then(result => {
+                    if (result && result.allowed === false) {
+                        showLockoutUI();
+                    }
+                })
+                .catch(err => console.log("Background check skipped:", err));
         });
 
         function handleMainAction() {
@@ -265,9 +262,7 @@
 
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
-                
-                btn.disabled = true;
-                // Replace with Blue Shield + Check Mark SVG
+                btn.setAttribute("disabled", "true");
                 btn.innerHTML = `
                     <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
                         <circle cx="12" cy="12" r="12" fill="#60a5fa" />
@@ -279,11 +274,7 @@
 
                 if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
                     alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
-                    btn.disabled = false;
-                    btn.innerHTML = `
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                        <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                    `;
+                    btn.removeAttribute("disabled");
                     return;
                 }
 
@@ -300,18 +291,12 @@
                                 try {
                                     const deviceHash = getDeviceHash();
                                     let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${Date.now()}`);
-                                    
                                     let text = await response.text();
                                     let result;
                                     try {
                                         result = JSON.parse(text);
                                     } catch(e) {
-                                        alert("데이터베이스 응답 오류: " + text.substring(0, 50));
-                                        btn.disabled = false;
-                                        btn.innerHTML = `
-                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                                            <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                                        `;
+                                        proceedWithCall();
                                         return; 
                                     }
 
@@ -321,28 +306,27 @@
                                         proceedWithCall(); 
                                     }
                                 } catch(err) {
-                                    alert("서버 연결 실패: " + err.message);
-                                    btn.disabled = false;
-                                    btn.innerHTML = `
-                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                                        <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                                    `;
+                                    proceedWithCall();
                                 }
                             },
                             fail: function(error) {
                                 alert("카카오 프로필을 가져오지 못했습니다.");
-                                btn.disabled = false;
+                                btn.removeAttribute("disabled");
                                 btn.innerHTML = `
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                                    <div class="shield-icon" id="btn-icon-wrapper">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                                    </div>
                                     <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                                 `;
                             }
                         });
                     },
                     fail: function(err) {
-                        btn.disabled = false;
+                        btn.removeAttribute("disabled");
                         btn.innerHTML = `
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                            <div class="shield-icon" id="btn-icon-wrapper">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                            </div>
                             <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                         `;
                     }
@@ -489,7 +473,7 @@
                 btn.style.backgroundColor = "#e05252";
                 btn.style.color = "#ffffff";
                 btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                btn.disabled = false; 
+                btn.removeAttribute("disabled"); 
                 
                 btn.innerHTML = `
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
@@ -521,8 +505,8 @@
             btn.style.backgroundColor = "#10b981";
             btn.style.color = "#ffffff";
             btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
-            btn.disabled = false;
-            btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
+            btn.removeAttribute("disabled");
+            btn.setAttribute("onclick", "window.location.href='tel:1877-5079'");
             
             btn.innerHTML = `
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
