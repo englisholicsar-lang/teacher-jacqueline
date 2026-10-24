@@ -77,7 +77,7 @@
 
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
         
-        /* Notice Box Styling */
+        /* Notice Box Styling: Centered contents with perfect alignment */
         .info-box { 
             width: 100%; 
             background-color: var(--box-bg); 
@@ -167,8 +167,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- Audio element with explicit attributes to force hardware media volume control mapping -->
-    <audio id="remote-audio" autoplay playsinline webkit-playsinline></audio>
+    <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -304,10 +303,8 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
-            // Unlock audio context on user touch
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
-                remoteAudio.muted = false;
                 remoteAudio.volume = 1.0;
                 remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
             }
@@ -478,7 +475,6 @@
                         startTimer();
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
-                            remoteAudio.muted = false;
                             remoteAudio.volume = 1.0;
                             remoteAudio.play().catch(e => console.log("Audio play", e)); 
                         }
@@ -486,15 +482,14 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
-                    // Volume rocker fix: Ensuring track event forces audio element active srcObject assignment
+                    // Proven Volume Rocker Mechanism: Direct HTML audio track assignment
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
                             if (remoteAudio) {
-                                remoteAudio.muted = false;
                                 remoteAudio.srcObject = new MediaStream([track]);
                                 remoteAudio.volume = 1.0;
-                                remoteAudio.play().catch(e => console.log("Stream play error:", e));
+                                remoteAudio.play().catch(e => console.log("Stream play", e));
                             }
                         }
                     });
