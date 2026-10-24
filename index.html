@@ -130,7 +130,7 @@
             color: #ffffff; 
         }
         
-        /* Shield Icon for Login Button Only */
+        /* Shield Icon matching Image 2 (First Page Only) */
         .shield-icon {
             width: 24px;
             height: 24px;
@@ -167,6 +167,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
+    <!-- Audio element explicitly configured for mobile media session and hardware volume rocker routing -->
     <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -191,7 +192,7 @@
                 <div class="notice-line">🎙️ 통화를 위해 마이크 권한을 허용해 주세요.</div>
             </div>
 
-            <!-- Action Button with Shield Icon -->
+            <!-- Action Button with Shield Icon (First Page Only) -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -294,6 +295,7 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
+            // Unlock audio stream context for mobile hardware volume rocker mapping
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
                 remoteAudio.muted = false;
@@ -454,6 +456,7 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
+                    // Attach WebRTC audio track to the media element so volume rockers control call audio
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
@@ -491,13 +494,13 @@
                 callState = 'ACTIVE';
                 document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 
-                // Updated 2-line Notice Box with Speaker and Headphone emojis
+                // Updated 2-line Notice Box with Speaker and Headphone emojis, perfectly centered
                 document.getElementById("notice-box").innerHTML = `
                     <div class="notice-line">🔊 스피커폰으로 기본 설정되었습니다.</div>
                     <div class="notice-line">🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
                 `;
 
-                // Updated Hang-up Button (Shield completely removed, pure white phone handset icon matching font height)
+                // Updated Hang-up Button (Shield removed, clickable hang-up, pure white phone SVG matching font height)
                 const btn = document.getElementById("action-btn");
                 btn.style.backgroundColor = "#e05252";
                 btn.style.color = "#ffffff";
