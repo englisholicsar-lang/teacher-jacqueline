@@ -119,6 +119,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
+    <!-- Hidden audio element configured with playsinline and explicit audio context/sink handling for mobile volume rocker routing -->
     <audio id="remote-audio" autoplay playsinline controls volume="1.0" style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -208,9 +209,9 @@
                             🔒 무료 체험 수업은 1회만 가능합니다.
                         </span>
                     </div>
-                    <button class="kakao-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #0e2a47; color: #ffffff; box-shadow: 0 4px 12px rgba(14,42,71,0.2); justify-content: center;">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                        <span>고객센터 문의하기 (1877-5079)</span>
+                    <button class="kakao-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #10b981; color: #ffffff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); justify-content: center;">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        <span style="font-size: 17px;">고객센터 문의하기</span>
                     </button>
                 </div>
             `;
@@ -429,6 +430,7 @@
                         startTimer();
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
+                            remoteAudio.muted = false;
                             remoteAudio.volume = 1.0;
                             remoteAudio.play().catch(e => console.log("Audio play", e)); 
                         }
@@ -436,11 +438,12 @@
 
                     vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
 
-                    // Volume rocker fix: binds WebRTC audio track to the HTML audio element
+                    // Volume rocker fix: properly binds the incoming WebRTC audio track to the HTML audio element with media session routing
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
                             const remoteAudio = document.getElementById("remote-audio");
                             if (remoteAudio) {
+                                remoteAudio.muted = false;
                                 remoteAudio.srcObject = new MediaStream([track]);
                                 remoteAudio.volume = 1.0;
                                 remoteAudio.play().catch(e => console.log("Stream play", e));
@@ -513,17 +516,17 @@
                 </div>
             `;
             
-            // Call button connecting to 1877-5079 with white phone icon
+            // Call button connecting to 1877-5079 with green background, larger white phone icon, and "고객센터 문의하기" text
             const btn = document.getElementById("action-btn");
-            btn.style.backgroundColor = "#0e2a47";
+            btn.style.backgroundColor = "#10b981";
             btn.style.color = "#ffffff";
-            btn.style.boxShadow = "0 4px 12px rgba(14,42,71,0.2)";
+            btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
             btn.disabled = false;
             btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
             
             btn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                <span id="btn-text-content">고객센터 문의하기 (1877-5079)</span>
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                <span id="btn-text-content" style="font-size: 17px;">고객센터 문의하기</span>
             `;
         }
     </script>
