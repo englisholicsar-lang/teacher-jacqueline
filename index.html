@@ -235,7 +235,7 @@
             `;
         }
 
-        // Database check with 3-second safety timer so it never gets permanently stuck
+        // Fast Database check with 800ms lightning-fast fallback so it never hangs
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
@@ -260,7 +260,7 @@
                         <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
                     `;
                 }
-            }, 3000);
+            }, 800);
 
             try {
                 let response = await fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`);
