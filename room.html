@@ -166,9 +166,17 @@
             line-height: 1.4;
         }
 
-        /* Hide default Vapi floating elements */
-        iframe[src*="vapi"], div[id*="vapi-support-button"] {
+        /* Completely banish any injected Vapi floating widgets or buttons */
+        iframe[src*="vapi"], 
+        div[id*="vapi-support-button"], 
+        div[class*="vapi-"], 
+        button[class*="vapi-"],
+        aside[aria-label*="vapi"],
+        #vapi-support-button {
             display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
     </style>
 </head>
