@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
     <style>
         :root {
-            --bg-color: #f0f4f8;
+            --bg-color: #f4f6f9;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
@@ -32,59 +32,40 @@
 
         .container {
             width: 100%;
-            max-width: 440px;
-            padding: 20px;
+            max-width: 420px;
+            padding: 16px;
             box-sizing: border-box;
         }
 
         .card {
             background-color: var(--card-bg);
             border-radius: 24px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-            padding: 36px 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 32px 20px;
             text-align: center;
             position: relative;
         }
 
-        /* Official Englisholic Logo Header */
+        /* Proper Proportional Logo Header */
         .logo-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .logo-img {
-            width: 42px;
-            height: 42px;
+            width: 140px;
+            height: auto;
             object-fit: contain;
-        }
-
-        .logo-text-group {
-            text-align: left;
-        }
-
-        .logo-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: #1e3a8a;
-            line-height: 1.1;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-subtitle {
-            font-size: 11px;
-            font-weight: 600;
-            color: #64748b;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .profile-img-container {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 96px;
+            height: 96px;
             margin: 0 auto 16px auto;
         }
 
@@ -105,27 +86,27 @@
             background: #2563eb;
             color: white;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 12px;
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         h1 {
-            font-size: 22px;
+            font-size: 21px;
             font-weight: 700;
-            margin: 0 0 4px 0;
+            margin: 0 0 6px 0;
             color: var(--text-main);
         }
 
         .sub-desc {
             font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .audio-notice {
@@ -184,13 +165,9 @@
 
     <div class="container">
         <div class="card">
-            <!-- Official Header -->
+            <!-- Proper Header Layout -->
             <div class="logo-container">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-                <div class="logo-text-group">
-                    <div class="logo-title">Englisholic</div>
-                    <div class="logo-subtitle">Innovative English</div>
-                </div>
+                <img src="logo.png" alt="Englisholic" class="logo-img">
             </div>
             
             <div class="profile-img-container">
@@ -238,7 +215,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.allowed) {
-                        // Hide shield badge once verified
                         shieldBadge.style.display = "none";
 
                         mainTitle.innerText = `Teacher ${data.teacher}`;
@@ -251,7 +227,6 @@
                         callBtn.innerHTML = `📞 통화하기 (${data.studentName} 회원님)`;
                         callBtn.disabled = false;
 
-                        // Pre-initialize Vapi SDK instance
                         const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
                         if (window.vapiSDK) {
                             vapiSDKInstance = window.vapiSDK.run({
@@ -280,7 +255,6 @@
                 });
         });
 
-        // Trigger Vapi call cleanly when the yellow button is clicked
         callBtn.addEventListener('click', () => {
             if (callBtn.disabled) return;
             callBtn.innerText = "연결 중...";
