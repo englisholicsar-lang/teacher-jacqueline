@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Englisholic Gateway</title>
     
-    <!-- Kakao / Mobile Link Preview Cards (Updated wording to 입장하기) -->
+    <!-- Kakao / Mobile Link Preview Cards -->
     <meta property="og:title" content="잉글리쉬홀릭 | 1:1 맞춤 영어회화 입장하기">
     <meta property="og:description" content="재클린 선생님과의 실시간 1:1 맞춤 영어회화 클래스룸 입장하기입니다.">
     <meta property="og:image" content="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/og_preview.png">
@@ -28,12 +28,12 @@
             width: 100%; 
             max-width: 410px; 
             min-height: 100vh;
-            padding: 20px 20px 24px 20px; 
+            padding: 10px 20px 20px 20px; /* Reduced top padding to pull everything up */
             box-sizing: border-box; 
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start; /* Aligns content to the top */
             position: relative;
             overflow: hidden;
         }
@@ -42,7 +42,7 @@
         .mobile-screen::before {
             content: "";
             position: absolute;
-            top: 20%;
+            top: 15%;
             left: -15px;
             width: 80px;
             height: 120px;
@@ -54,7 +54,7 @@
         .mobile-screen::after {
             content: "";
             position: absolute;
-            top: 40%;
+            top: 35%;
             right: -15px;
             width: 80px;
             height: 120px;
@@ -73,25 +73,25 @@
             align-items: center;
         }
 
-        /* Brand Logo - Made much larger as requested */
+        /* Brand Logo - High up */
         .brand-container {
-            margin-top: 10px;
-            margin-bottom: 16px;
+            margin-top: 2px;
+            margin-bottom: 10px;
             text-align: center;
         }
         .brand-logo-img {
-            height: 76px; 
+            height: 72px; 
             width: auto;
             object-fit: contain;
         }
 
-        /* Teacher Circle Photo with soft shadow */
+        /* Teacher Circle Photo */
         .teacher-img-container { 
-            width: 106px; 
-            height: 106px; 
+            width: 98px; 
+            height: 98px; 
             border-radius: 50%; 
             overflow: hidden; 
-            margin: 0 auto 10px; 
+            margin: 0 auto 8px; 
             border: 4px solid #ffffff; 
             box-shadow: 0 6px 18px rgba(30, 58, 138, 0.16); 
         }
@@ -102,53 +102,53 @@
         }
 
         .teacher-name { 
-            font-size: 21px; 
+            font-size: 20px; 
             font-weight: 800; 
             color: #0f172a; 
-            margin-bottom: 3px; 
+            margin-bottom: 2px; 
             letter-spacing: -0.5px;
         }
         .teacher-desc { 
-            font-size: 13px; 
+            font-size: 12.5px; 
             color: #475569; 
-            margin-bottom: 16px; 
+            margin-bottom: 12px; 
             font-weight: 500;
         }
 
-        /* Notice Box - Centered text layout */
+        /* Notice Box - Dead-centered */
         .notice-box { 
             background: rgba(255, 255, 255, 0.95); 
             border: 1px solid #e2e8f0; 
             border-radius: 14px; 
-            padding: 13px 16px; 
-            font-size: 12.5px; 
+            padding: 11px 14px; 
+            font-size: 12px; 
             color: #334155; 
-            text-align: center; /* Dead-centered like original */
+            text-align: center; 
             width: 100%;
             box-sizing: border-box;
-            margin-bottom: 14px; 
+            margin-bottom: 12px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .notice-box div { 
             display: flex; 
             align-items: center; 
-            justify-content: center; /* Centers items horizontally */
+            justify-content: center; 
             gap: 6px; 
         }
-        .notice-box div:first-child { margin-bottom: 4px; }
+        .notice-box div:first-child { margin-bottom: 3px; }
 
         /* Phone Input */
         input { 
             width: 100%; 
-            padding: 14px; 
-            margin-bottom: 12px; 
+            padding: 12px; 
+            margin-bottom: 10px; 
             background: #ffffff; 
             border: 1px solid #cbd5e1; 
             color: #0f172a; 
             border-radius: 14px; 
             box-sizing: border-box; 
-            font-size: 15px; 
+            font-size: 14px; 
             text-align: center; 
             font-weight: 700;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02);
@@ -160,9 +160,9 @@
             color: white; 
             border: none; 
             width: 100%; 
-            padding: 16px; 
+            padding: 15px; 
             border-radius: 14px; 
-            font-size: 16px; 
+            font-size: 15px; 
             font-weight: 700; 
             cursor: pointer; 
             display: flex; 
@@ -175,16 +175,16 @@
 
         /* Result Verification Box */
         #resultBox { 
-            margin-top: 12px; 
-            padding: 13px; 
+            margin-top: 10px; 
+            padding: 12px; 
             border-radius: 12px; 
-            font-size: 12.5px; 
+            font-size: 12px; 
             display: none; 
             text-align: left; 
             width: 100%;
             box-sizing: border-box;
             word-break: break-all; 
-            line-height: 1.5;
+            line-height: 1.4;
         }
         .admin-box { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; font-weight: 600; }
         .client-box { background: #eff6ff; color: #1e40af; border: 1px solid #3b82f6; font-weight: 600; }
@@ -194,7 +194,7 @@
 
 <div class="mobile-screen">
     <div class="content-wrapper">
-        <!-- Brand Logo (Enlarged) -->
+        <!-- Brand Logo -->
         <div class="brand-container">
             <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/logo.png" alt="Englisholic" class="brand-logo-img">
         </div>
@@ -206,7 +206,7 @@
         <div class="teacher-name">Teacher Jacqueline</div>
         <div class="teacher-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
 
-        <!-- Notice Box (Dead-centered) -->
+        <!-- Notice Box -->
         <div class="notice-box">
             <div>🔊 스피커폰으로 기본 설정되었습니다.</div>
             <div>🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
