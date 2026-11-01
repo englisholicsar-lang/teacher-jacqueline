@@ -3,118 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Englisholic Gateway Test</title>
+    <title>Englisholic Gateway</title>
     <style>
         body { 
             font-family: 'Apple SD Gothic Neo', -apple-system, sans-serif; 
-            background: #0b1329; 
+            background: #e0f2fe; 
             margin: 0; 
-            padding: 20px; 
+            padding: 0; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             min-height: 100vh; 
         }
-        .mobile-card { 
-            background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%);
+        /* Full mobile screen style matching your original layout */
+        .mobile-screen { 
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0f7ff 40%, #ffffff 100%);
             width: 100%; 
-            max-width: 380px; 
-            border-radius: 24px; 
-            padding: 28px 24px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+            max-width: 420px; 
+            min-height: 100vh;
+            padding: 30px 24px; 
             box-sizing: border-box; 
-            text-align: center; 
-        }
-        .brand-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 16px;
+            justify-content: flex-start;
+        }
+
+        /* Large, prominent logo matching original */
+        .brand-container {
+            margin-top: 10px;
+            margin-bottom: 18px;
+            text-align: center;
         }
         .brand-logo-img {
-            height: 32px; 
+            height: 52px; /* Made it much larger and prominent */
             object-fit: contain;
         }
+
+        /* Teacher Circle Photo */
         .teacher-img-container { 
-            width: 90px; 
-            height: 90px; 
+            width: 110px; 
+            height: 110px; 
             border-radius: 50%; 
             overflow: hidden; 
             margin: 0 auto 12px; 
-            border: 3px solid #ffffff; 
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.12); 
+            border: 4px solid #ffffff; 
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); 
         }
         .teacher-img-container img { 
             width: 100%; 
             height: 100%; 
             object-fit: cover; 
         }
+
         .teacher-name { 
-            font-size: 18px; 
+            font-size: 21px; 
             font-weight: 800; 
             color: #0f172a; 
             margin-bottom: 4px; 
         }
         .teacher-desc { 
-            font-size: 12.5px; 
+            font-size: 13px; 
             color: #475569; 
-            margin-bottom: 16px; 
+            margin-bottom: 24px; 
             font-weight: 500;
         }
+
+        /* Notice Box */
         .notice-box { 
             background: #ffffff; 
             border: 1px solid #e2e8f0; 
-            border-radius: 12px; 
-            padding: 12px 14px; 
-            font-size: 12px; 
+            border-radius: 14px; 
+            padding: 14px 16px; 
+            font-size: 12.5px; 
             color: #334155; 
             text-align: left; 
-            margin-bottom: 16px; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            line-height: 1.5;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            line-height: 1.6;
         }
-        .notice-box div { display: flex; align-items: center; gap: 6px; }
-        .notice-box div:first-child { margin-bottom: 3px; }
+        .notice-box div { display: flex; align-items: center; gap: 8px; }
+        .notice-box div:first-child { margin-bottom: 4px; }
+
+        /* Phone Input */
         input { 
             width: 100%; 
-            padding: 12px; 
-            margin-bottom: 12px; 
+            padding: 14px; 
+            margin-bottom: 14px; 
             background: #ffffff; 
             border: 1px solid #cbd5e1; 
             color: #0f172a; 
-            border-radius: 10px; 
+            border-radius: 14px; 
             box-sizing: border-box; 
-            font-size: 14px; 
+            font-size: 15px; 
             text-align: center; 
             font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
+
+        /* Green Call Button */
         .call-btn { 
             background: #10b981; 
             color: white; 
             border: none; 
             width: 100%; 
-            padding: 14px; 
-            border-radius: 12px; 
-            font-size: 15px; 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-size: 16px; 
             font-weight: 700; 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 8px; 
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); 
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35); 
         }
         .call-btn:hover { background: #059669; }
+
+        /* Result Verification Box */
         #resultBox { 
-            margin-top: 14px; 
-            padding: 12px; 
-            border-radius: 10px; 
-            font-size: 12.5px; 
+            margin-top: 16px; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-size: 13px; 
             display: none; 
             text-align: left; 
+            width: 100%;
+            box-sizing: border-box;
             word-break: break-all; 
-            line-height: 1.4;
+            line-height: 1.5;
         }
         .admin-box { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; font-weight: 600; }
         .client-box { background: #eff6ff; color: #1e40af; border: 1px solid #3b82f6; font-weight: 600; }
@@ -122,13 +141,13 @@
 </head>
 <body>
 
-<div class="mobile-card">
-    <!-- Pulling live logo directly from your GitHub repository raw link -->
+<div class="mobile-screen">
+    <!-- Large prominent brand logo -->
     <div class="brand-container">
         <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/logo.png" alt="Englisholic" class="brand-logo-img">
     </div>
 
-    <!-- Pulling live teacher photo directly from your GitHub repository raw link -->
+    <!-- Teacher Circle Photo -->
     <div class="teacher-img-container">
         <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/jacqueline.png" alt="Teacher Jacqueline">
     </div>
@@ -186,3 +205,14 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     type: "web-registration",
+                    kakaoId: phone,
+                    kakaoNickname: roleStatus,
+                    deviceHash: "desktop-test-env"
+                })
+            }).catch(err => console.log("Log error: ", err));
+        }
+    }
+</script>
+
+</body>
+</html>
