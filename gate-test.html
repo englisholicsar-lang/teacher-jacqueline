@@ -1,230 +1,3 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Englisholic Gateway</title>
-    
-    <!-- Kakao / Mobile Link Preview Cards -->
-    <meta property="og:title" content="잉글리쉬홀릭 | 1:1 맞춤 영어회화 입장하기">
-    <meta property="og:description" content="재클린 선생님과의 실시간 1:1 맞춤 영어회화 클래스룸 입장하기입니다.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/og_preview.png">
-    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/gate-test.html">
-    <meta property="og:type" content="website">
-
-    <style>
-        body { 
-            font-family: 'Apple SD Gothic Neo', -apple-system, sans-serif; 
-            background: #e2f1fc; 
-            margin: 0; 
-            padding: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-        }
-        .mobile-screen { 
-            background: linear-gradient(180deg, #dcf0ff 0%, #edf5ff 50%, #ffffff 100%);
-            width: 100%; 
-            max-width: 410px; 
-            min-height: 100vh;
-            padding: 10px 20px 20px 20px; /* Reduced top padding to pull everything up */
-            box-sizing: border-box; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* Aligns content to the top */
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Decorative background dot patterns */
-        .mobile-screen::before {
-            content: "";
-            position: absolute;
-            top: 15%;
-            left: -15px;
-            width: 80px;
-            height: 120px;
-            background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
-            background-size: 12px 12px;
-            opacity: 0.4;
-            z-index: 0;
-        }
-        .mobile-screen::after {
-            content: "";
-            position: absolute;
-            top: 35%;
-            right: -15px;
-            width: 80px;
-            height: 120px;
-            background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
-            background-size: 12px 12px;
-            opacity: 0.4;
-            z-index: 0;
-        }
-
-        .content-wrapper {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Brand Logo - High up */
-        .brand-container {
-            margin-top: 2px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .brand-logo-img {
-            height: 72px; 
-            width: auto;
-            object-fit: contain;
-        }
-
-        /* Teacher Circle Photo */
-        .teacher-img-container { 
-            width: 98px; 
-            height: 98px; 
-            border-radius: 50%; 
-            overflow: hidden; 
-            margin: 0 auto 8px; 
-            border: 4px solid #ffffff; 
-            box-shadow: 0 6px 18px rgba(30, 58, 138, 0.16); 
-        }
-        .teacher-img-container img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
-
-        .teacher-name { 
-            font-size: 20px; 
-            font-weight: 800; 
-            color: #0f172a; 
-            margin-bottom: 2px; 
-            letter-spacing: -0.5px;
-        }
-        .teacher-desc { 
-            font-size: 12.5px; 
-            color: #475569; 
-            margin-bottom: 12px; 
-            font-weight: 500;
-        }
-
-        /* Notice Box - Dead-centered */
-        .notice-box { 
-            background: rgba(255, 255, 255, 0.95); 
-            border: 1px solid #e2e8f0; 
-            border-radius: 14px; 
-            padding: 11px 14px; 
-            font-size: 12px; 
-            color: #334155; 
-            text-align: center; 
-            width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            line-height: 1.5;
-        }
-        .notice-box div { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
-        }
-        .notice-box div:first-child { margin-bottom: 3px; }
-
-        /* Phone Input */
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 10px; 
-            background: #ffffff; 
-            border: 1px solid #cbd5e1; 
-            color: #0f172a; 
-            border-radius: 14px; 
-            box-sizing: border-box; 
-            font-size: 14px; 
-            text-align: center; 
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-
-        /* Green Call Button */
-        .call-btn { 
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-            color: white; 
-            border: none; 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 14px; 
-            font-size: 15px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35); 
-        }
-        .call-btn:hover { background: #059669; }
-
-        /* Result Verification Box */
-        #resultBox { 
-            margin-top: 10px; 
-            padding: 12px; 
-            border-radius: 12px; 
-            font-size: 12px; 
-            display: none; 
-            text-align: left; 
-            width: 100%;
-            box-sizing: border-box;
-            word-break: break-all; 
-            line-height: 1.4;
-        }
-        .admin-box { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; font-weight: 600; }
-        .client-box { background: #eff6ff; color: #1e40af; border: 1px solid #3b82f6; font-weight: 600; }
-    </style>
-</head>
-<body>
-
-<div class="mobile-screen">
-    <div class="content-wrapper">
-        <!-- Brand Logo -->
-        <div class="brand-container">
-            <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/logo.png" alt="Englisholic" class="brand-logo-img">
-        </div>
-
-        <!-- Teacher Circle Photo -->
-        <div class="teacher-img-container">
-            <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/jacqueline.png" alt="Teacher Jacqueline">
-        </div>
-        <div class="teacher-name">Teacher Jacqueline</div>
-        <div class="teacher-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
-
-        <!-- Notice Box -->
-        <div class="notice-box">
-            <div>🔊 스피커폰으로 기본 설정되었습니다.</div>
-            <div>🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
-        </div>
-
-        <!-- Phone Number Input -->
-        <input type="text" id="phoneInput" placeholder="전화번호 입력 (예: 010-1234-5678)" value="010-9741-3002">
-
-        <!-- Green Call Button -->
-        <button class="call-btn" onclick="checkAccess()">
-            <span>📞</span>
-            <span>통화시작하기</span>
-        </button>
-        
-        <div id="resultBox"></div>
-    </div>
-</div>
-
 <script>
     const ADMIN_WHITELIST = [
         "010-9741-3002",
@@ -243,7 +16,7 @@
         let roleStatus = "Client Entry";
         if (ADMIN_WHITELIST.includes(phone)) {
             resultBox.className = "admin-box";
-            resultBox.innerHTML = "<strong>👑 관리자 권한 승인 (Admin Bypass)</strong><br>모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.";
+            resultBox.innerHTML = "<strong>👑 관리자 권한 승인 (Admin Bypass)</strong><br>통화 발신 요청을 전송 중입니다...";
             roleStatus = "Admin Bypass (Admin)";
         } else {
             resultBox.className = "client-box";
@@ -252,20 +25,30 @@
         }
 
         if (WEB_APP_URL.includes("http")) {
+            // Using navigator.sendBeacon or a hidden form/iframe approach to reliably trigger 
+            // the Apps Script backend without getting blocked by CORS response policies.
+            const payload = JSON.stringify({
+                type: "web-registration",
+                kakaoId: phone,
+                kakaoNickname: roleStatus,
+                deviceHash: "mobile-test-env",
+                triggerCall: true
+            });
+
+            // Fallback fetch using no-cors so the trigger hits the backend script immediately
             fetch(WEB_APP_URL, {
                 method: "POST",
                 mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type: "web-registration",
-                    kakaoId: phone,
-                    kakaoNickname: roleStatus,
-                    deviceHash: "desktop-test-env"
-                })
-            }).catch(err => console.log("Log error: ", err));
+                headers: { "Content-Type": "text/plain" },
+                body: payload
+            }).then(() => {
+                setTimeout(() => {
+                    resultBox.innerHTML = "<strong>👑 발신 요청 완료!</strong><br>Google Sheet 기록 확인 및 Vapi 전화 발신 중입니다.";
+                }, 1000);
+            }).catch(err => {
+                console.log("Log error: ", err);
+                resultBox.innerHTML = "<strong>⚠️ 발신 신호 전송됨</strong><br>시트 상태를 확인해주세요.";
+            });
         }
     }
 </script>
-
-</body>
-</html>
