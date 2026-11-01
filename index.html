@@ -334,28 +334,10 @@
             }
         }
 
-        async function proceedWithCall() {
+        function proceedWithCall() {
             if (!isUserAllowed) return;
-            
-            // Safe, timeout-guarded fetch for coaching notes so it never blocks authentication
-            let coachingNotes = "";
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2000);
-                
-                let response = await fetch(`${GAS_URL}?action=getCoachingNotes&t=${Date.now()}`, {
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-                
-                let json = await response.json();
-                coachingNotes = json.coachingNotes || "";
-            } catch (err) {
-                console.log("Coaching notes fetch bypassed/timed out:", err);
-            }
-
             sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
-            startVapiCall(coachingNotes);
+            startVapiCall();
         }
 
         function sendWebRegistration(kakaoId, nickname) {
@@ -395,6 +377,7 @@
                     }
                 }
 
+                // Precise 9:30 wrap-up system alert trigger
                 if (secondsElapsed === 570) {  
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
@@ -417,7 +400,7 @@
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         }
 
-        function startVapiCall(coachingNotes) {
+        function startVapiCall() {
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
                 vapiInstance = typeof sdk.run === 'function' 
@@ -466,8 +449,7 @@
                         metadata: {
                             nickname: cachedKakaoNickname,
                             deviceHash: getDeviceHash(),
-                            liveGuamTime: guamTime,
-                            coaching_notes: coachingNotes || ""
+                            liveGuamTime: guamTime
                         }
                     });
                 }
