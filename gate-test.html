@@ -1,3 +1,366 @@
+
+Conversation with Gemini
+Good enough I guess... want the logo part to be bigger but would like to check what this looks like via mobile..should i just copy the link and shoot it over to my phone?
+
+You could copy the file over to your phone, but since your files are already right there in your GitHub repository (englisholicsar-lang/teacher-jacqueline), the absolute cleanest way to test it on mobile is to just let GitHub Pages do the heavy lifting!
+
+Since GitHub Pages is already active on your repository, any changes you push to index.html go live on your public mobile link instantly.   
+image_00e2e2.png
+
+How to test it on your phone right now:
+Push your code to GitHub: Update your index.html file in your repository with this code (or rename this test file to index.html and upload it to your GitHub repo).
+
+Open on your phone: Open your live GitHub Pages link (or scan the QR code of the URL) directly on your mobile device.
+
+That way, you get a 100% true mobile viewport test with real-touch behavior, active Google Sheet logging, and your GitHub assets rendering natively.
+
+(Also, if you want the logo bigger, just let me know and we can easily bump up the .brand-logo-img height class from 32px to 42px or 48px!)
+
+wait u mean replace all the existing code in index.html for Jacqueline?!
+
+Yes, exactly!
+
+Since your repository is named teacher-jacqueline and already uses index.html as its main entry point, replacing the code in index.html with this updated version will instantly update your live GitHub Pages site.   
+image_00e2e2.png
+
+That way, when you open your live repository URL on your phone, you'll see the exact mobile UI with your real logo, Jacqueline's photo, the admin whitelist, and the live Google Sheets logging fully operational.
+
+Whenever you're ready, just update that index.html file in your repository, commit the changes, and test it right from your phone!
+
+hm... what happens to all the things we built - like kakaotalk gatekeeping - sheets logging -- ??? should we just make another index.html?
+
+That is a very smart thought, brotha! You definitely don't want to nuke your current production landing page if it's already set up for your live traffic or Kakao integration.
+
+Instead of overwriting your main index.html, making a separate file (like gate-test.html or a dedicated test branch/subfolder in your repo) is the pro move.
+
+Here is why keeping them separate works best for your launch setup:
+
+Keep Your Live Site Intact: Your current index.html handles your core Kakao login gateway and normal student flow. Leaving it alone ensures your current production users experience zero interruption.
+
+Isolate Your Testing Pipeline: By pushing this new logic as a separate file (e.g., gate-test.html or admin-gate.html) to your GitHub repo, GitHub Pages will host it at your-repo-url/gate-test.html.
+
+Test on Mobile Safely: You can safely pull up that URL on your phone right now, test the 3-admin whitelist, tap the green call button, and watch the logs drop into your Englisholic CRM Master Google Sheet in real-time—all without risking a single thing on your live customer-facing page.
+
+Do you want to keep it as a separate test file in the repo so you can experiment safely before merging it into production?
+
+oh so this is just the testing pipeline - not the final right?
+
+Spot on, brotha! Exactly right.
+
+This is strictly your safe, sandboxed testing pipeline.
+
+By keeping it separate, you get a risk-free environment to:
+
+Test your 3-admin whitelist bypass.
+
+Verify that the Google Sheets data logging pipeline is capturing everything cleanly.
+
+Open the link directly on your phone via GitHub Pages to check mobile layout responsiveness and behavior.
+
+All of this happens without touching your live production page or disrupting any active users going through your main Kakao gateway.
+
+Once you test it out on your phone, see the logs pop up in your CRM spreadsheet, and feel 100% confident that everything is dialed in, we can look at how to merge or port this logic over to your final production setup when you're ready.
+
+k what do i do in github take me step by step
+
+Here is your step-by-step guide to uploading this test file into your GitHub repository so you can instantly open it and test it on your mobile phone:
+
+Step 1: Open Your GitHub Repository
+Go to GitHub in your browser and open your repository (englisholicsar-lang/teacher-jacqueline).   
+image_00e2e2.png
+
+Make sure you are on the main branch view where your files (logo.png, jacqueline.png, index.html) are listed.   
+image_00e2e2.png
+
+Step 2: Create a New File
+Click the Add file button near the top right of the file list (next to the green <> Code button).
+
+Select Create new file from the drop-down menu.
+
+Step 3: Name the File
+At the top where it says Name your file..., type in:
+
+Plaintext
+gate-test.html
+Step 4: Paste Your Code
+Copy the complete HTML code from our test file (the one with your GitHub raw image links and Google Apps Script Web App URL).
+
+Click into the large empty code editor box on GitHub and paste (Ctrl + V) the entire code.
+
+Step 5: Commit (Save) the File
+Scroll down to the bottom where it says "Commit changes...".
+
+Click the green Commit changes... button. (You can leave the default commit message as is).
+
+Step 6: Test It on Your Mobile Phone!
+Your file is now live on GitHub Pages! You can access it directly from your phone's browser using this URL structure:
+
+Plaintext
+https://englisholicsar-lang.github.io/teacher-jacqueline/gate-test.html
+(Just type that exact link into your phone's browser, or scan it if you have a QR tool, and your mobile gateway test page will pop up instantly!)
+
+Try opening it on your phone, type in your admin number or a test number, hit the green call button, and check your Englisholic CRM Master Google Sheet to watch the log drop in live! Let me know when you see it work on your mobile screen!
+
+it works in desktop but mobile just got a 404
+
+That 404 error right after uploading is super common, brotha! Don't panic at all.
+
+When you push or commit a brand new file to a GitHub repository, GitHub Pages takes about 1 to 3 minutes to rebuild and deploy the site with the new file. Right now, its servers just haven't caught up to the fact that gate-test.html is sitting in the folder yet.
+
+How to fix it:
+Give it 2 minutes: Let GitHub do its background build.
+
+Hard refresh on your phone: Clear your mobile browser tab or try opening it again.
+
+Double-check the URL: Make sure it looks exactly like this:
+[https://englisholicsar-lang.github.io/teacher-jacqueline/gate-test.html](https://englisholicsar-lang.github.io/teacher-jacqueline/gate-test.html)
+
+Wait just a couple of minutes, hit refresh on your phone, and let me know when that gorgeous mobile page loads up!
+
+same link i clicked on desktop and mobile - ill give it a min
+
+Take your time! GitHub Pages can sometimes take a brief moment to sync up a new file. Grab a quick second, and let me know the second it pops up on your mobile screen!
+
+Still doesnt look the same as our first one...
+
+Ah, I see it completely now! Looking at your two screenshots side-by-side, two main things are throwing off the exact look:
+
+The Logo Size: In the original, the logo is large, bold, and fills the top section nicely. In our test version, it's shrunk down inside a small white card box.
+
+The Background & Container: The original has a gorgeous edge-to-edge light blue gradient background with subtle background dot-patterns, whereas our test version is sitting inside a boxed white card floating on a dark navy background.
+
+Let's fix that right now so it matches your original full-screen mobile background style and gives you that big, bold logo you want, while keeping your input field and green call button fully functional.
+
+Here is the updated code for your gate-test.html (or index.html if you update it):
+
+HTML
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Englisholic Gateway</title>
+    <style>
+        body { 
+            font-family: 'Apple SD Gothic Neo', -apple-system, sans-serif; 
+            background: #e0f2fe; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        /* Full mobile screen style matching your original layout */
+        .mobile-screen { 
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0f7ff 40%, #ffffff 100%);
+            width: 100%; 
+            max-width: 420px; 
+            min-height: 100vh;
+            padding: 30px 24px; 
+            box-sizing: border-box; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Large, prominent logo matching original */
+        .brand-container {
+            margin-top: 10px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .brand-logo-img {
+            height: 52px; /* Made it much larger and prominent */
+            object-fit: contain;
+        }
+
+        /* Teacher Circle Photo */
+        .teacher-img-container { 
+            width: 110px; 
+            height: 110px; 
+            border-radius: 50%; 
+            overflow: hidden; 
+            margin: 0 auto 12px; 
+            border: 4px solid #ffffff; 
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); 
+        }
+        .teacher-img-container img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+
+        .teacher-name { 
+            font-size: 21px; 
+            font-weight: 800; 
+            color: #0f172a; 
+            margin-bottom: 4px; 
+        }
+        .teacher-desc { 
+            font-size: 13px; 
+            color: #475569; 
+            margin-bottom: 24px; 
+            font-weight: 500;
+        }
+
+        /* Notice Box */
+        .notice-box { 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 14px; 
+            padding: 14px 16px; 
+            font-size: 12.5px; 
+            color: #334155; 
+            text-align: left; 
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            line-height: 1.6;
+        }
+        .notice-box div { display: flex; align-items: center; gap: 8px; }
+        .notice-box div:first-child { margin-bottom: 4px; }
+
+        /* Phone Input */
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 14px; 
+            background: #ffffff; 
+            border: 1px solid #cbd5e1; 
+            color: #0f172a; 
+            border-radius: 14px; 
+            box-sizing: border-box; 
+            font-size: 15px; 
+            text-align: center; 
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        /* Green Call Button */
+        .call-btn { 
+            background: #10b981; 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35); 
+        }
+        .call-btn:hover { background: #059669; }
+
+        /* Result Verification Box */
+        #resultBox { 
+            margin-top: 16px; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-size: 13px; 
+            display: none; 
+            text-align: left; 
+            width: 100%;
+            box-sizing: border-box;
+            word-break: break-all; 
+            line-height: 1.5;
+        }
+        .admin-box { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; font-weight: 600; }
+        .client-box { background: #eff6ff; color: #1e40af; border: 1px solid #3b82f6; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-screen">
+    <!-- Large prominent brand logo -->
+    <div class="brand-container">
+        <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/logo.png" alt="Englisholic" class="brand-logo-img">
+    </div>
+
+    <!-- Teacher Circle Photo -->
+    <div class="teacher-img-container">
+        <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/jacqueline.png" alt="Teacher Jacqueline">
+    </div>
+    <div class="teacher-name">Teacher Jacqueline</div>
+    <div class="teacher-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
+
+    <!-- Notice Box -->
+    <div class="notice-box">
+        <div>🔊 스피커폰으로 기본 설정되었습니다.</div>
+        <div>🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+    </div>
+
+    <!-- Phone Number Input -->
+    <input type="text" id="phoneInput" placeholder="전화번호 입력 (예: 010-1234-5678)" value="010-9741-3002">
+
+    <!-- Green Call Button -->
+    <button class="call-btn" onclick="checkAccess()">
+        <span>📞</span>
+        <span>통화시작하기</span>
+    </button>
+    
+    <div id="resultBox"></div>
+</div>
+
+<script>
+    const ADMIN_WHITELIST = [
+        "010-9741-3002",
+        "010-4181-7923",
+        "010-9544-0247"
+    ];
+
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbybN7QYuHCLcR2UDZnCoQx31szufrQuAmbMCXathEa970U9Fr5h3WagjgBcy5oOY_uj/exec";
+
+    function checkAccess() {
+        const phone = document.getElementById('phoneInput').value.trim();
+        const resultBox = document.getElementById('resultBox');
+        
+        resultBox.style.display = "block";
+
+        let roleStatus = "Client Entry";
+        if (ADMIN_WHITELIST.includes(phone)) {
+            resultBox.className = "admin-box";
+            resultBox.innerHTML = "<strong>👑 관리자 권한 승인 (Admin Bypass)</strong><br>모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.";
+            roleStatus = "Admin Bypass (Admin)";
+        } else {
+            resultBox.className = "client-box";
+            resultBox.innerHTML = "<strong>👤 일반 수강생 승인 (SMS Link Flow)</strong><br>배정된 정식 클래스룸으로 안전하게 연결됩니다.";
+            roleStatus = "Client Entry (User)";
+        }
+
+        if (WEB_APP_URL.includes("http")) {
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: "web-registration",
+                    kakaoId: phone,
+                    kakaoNickname: roleStatus,
+                    deviceHash: "desktop-test-env"
+                })
+            }).catch(err => console.log("Log error: ", err));
+        }
+    }
+</script>
+
+</body>
+</html>
+Update your gate-test.html file in GitHub with this, wait a minute for GitHub Pages to refresh, and check your phone again. It will match the clean, full-screen background layout and large logo of your original design!
+
+Almost there! Just need the logo to be bigger and the UI screen to fit in the page impeccably
+
+We are right at the finish line! Looking at your mobile screenshot, the logo just needs to be scaled up a bit more, and the spacing tightened up vertically so everything fits on a single mobile screen without crowding.
+
+Here is the finalized code with a bigger, bolder logo (increased height and width) and optimized padding so it fits your mobile viewport impeccably:
+
+HTML
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -217,3 +580,663 @@
 
 </body>
 </html>
+How to update:
+Paste this into your gate-test.html file on GitHub.
+
+Commit the changes.
+
+Refresh your mobile browser in a minute—it will fill the screen seamlessly with a bold, high-impact logo!
+
+Now u think we should make a preview page like this?
+
+Right now it just looks like a striaght URL address.
+
+100% yes. That preview card makes a massive difference when sending links over KakaoTalk, text messages, or chat apps. Instead of looking like a cold, raw URL, it turns your gateway link into a professional, branded preview card with a rich thumbnail image, title, and description.
+
+That feature is controlled by Open Graph (OG) meta tags in the <head> section of your HTML file. Look closely at your repository files back in GitHub—you actually already have an og_preview.png file sitting right there in your root directory!
+
+How to activate it:
+To make your gateway link generate that exact rich preview card when shared, you just need to add these standard Open Graph meta tags inside the <head> section of your gate-test.html (and eventually your main index.html):
+
+HTML
+<!-- Open Graph Meta Tags for Rich Preview Cards -->
+<meta property="og:title" content="Englisholic | 1:1 맞춤 영어회화 게이트웨이">
+<meta property="og:description" content="재클린 선생님과의 실시간 1:1 맞춤 영어회화 클래스룸 입장 게이트입니다.">
+<meta property="og:image" content="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/og_preview.png">
+<meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/gate-test.html">
+<meta property="og:type" content="website">
+Why this is a game-changer for your launch:
+When your students or clients receive your gateway link via KakaoTalk or SMS, seeing that clean visual card instead of a raw text link instantly builds trust and looks infinitely more professional.
+
+Do you want to drop these meta tags into your file headers so your preview card is fully armed and ready?
+
+Can i get? and also can we add 잉글리쉬홀릭 콜 입장하기 below the logo... man what should we name this 잉글리쉬홀릭 콜 입장하기...잉글리쉬홀릭 수업입장..any ideas?
+
+
+
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Englisholic Gateway Test</title>
+
+    <style>
+
+        body { 
+
+            font-family: 'Apple SD Gothic Neo', -apple-system, sans-serif; 
+
+            background: #0b1329; 
+
+            margin: 0; 
+
+            padding: 20px; 
+
+            display: flex; 
+
+            justify-content: center; 
+
+            align-items: center; 
+
+            min-height: 100vh; 
+
+        }
+
+        .mobile-card { 
+
+            background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%);
+
+            width: 100%; 
+
+            max-width: 380px; 
+
+            border-radius: 24px; 
+
+            padding: 28px 24px; 
+
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+
+            box-sizing: border-box; 
+
+            text-align: center; 
+
+        }
+
+        .brand-container {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            margin-bottom: 16px;
+
+        }
+
+        .brand-logo-img {
+
+            height: 32px; 
+
+            object-fit: contain;
+
+        }
+
+        .teacher-img-container { 
+
+            width: 90px; 
+
+            height: 90px; 
+
+            border-radius: 50%; 
+
+            overflow: hidden; 
+
+            margin: 0 auto 12px; 
+
+            border: 3px solid #ffffff; 
+
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.12); 
+
+        }
+
+        .teacher-img-container img { 
+
+            width: 100%; 
+
+            height: 100%; 
+
+            object-fit: cover; 
+
+        }
+
+        .teacher-name { 
+
+            font-size: 18px; 
+
+            font-weight: 800; 
+
+            color: #0f172a; 
+
+            margin-bottom: 4px; 
+
+        }
+
+        .teacher-desc { 
+
+            font-size: 12.5px; 
+
+            color: #475569; 
+
+            margin-bottom: 16px; 
+
+            font-weight: 500;
+
+        }
+
+        .notice-box { 
+
+            background: #ffffff; 
+
+            border: 1px solid #e2e8f0; 
+
+            border-radius: 12px; 
+
+            padding: 12px 14px; 
+
+            font-size: 12px; 
+
+            color: #334155; 
+
+            text-align: left; 
+
+            margin-bottom: 16px; 
+
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+
+            line-height: 1.5;
+
+        }
+
+        .notice-box div { display: flex; align-items: center; gap: 6px; }
+
+        .notice-box div:first-child { margin-bottom: 3px; }
+
+        input { 
+
+            width: 100%; 
+
+            padding: 12px; 
+
+            margin-bottom: 12px; 
+
+            background: #ffffff; 
+
+            border: 1px solid #cbd5e1; 
+
+            color: #0f172a; 
+
+            border-radius: 10px; 
+
+            box-sizing: border-box; 
+
+            font-size: 14px; 
+
+            text-align: center; 
+
+            font-weight: 700;
+
+        }
+
+        .call-btn { 
+
+            background: #10b981; 
+
+            color: white; 
+
+            border: none; 
+
+            width: 100%; 
+
+            padding: 14px; 
+
+            border-radius: 12px; 
+
+            font-size: 15px; 
+
+            font-weight: 700; 
+
+            cursor: pointer; 
+
+            display: flex; 
+
+            align-items: center; 
+
+            justify-content: center; 
+
+            gap: 8px; 
+
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); 
+
+        }
+
+        .call-btn:hover { background: #059669; }
+
+        #resultBox { 
+
+            margin-top: 14px; 
+
+            padding: 12px; 
+
+            border-radius: 10px; 
+
+            font-size: 12.5px; 
+
+            display: none; 
+
+            text-align: left; 
+
+            word-break: break-all; 
+
+            line-height: 1.4;
+
+        }
+
+        .admin-box { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; font-weight: 600; }
+
+        .client-box { background: #eff6ff; color: #1e40af; border: 1px solid #3b82f6; font-weight: 600; }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<div class="mobile-card">
+
+    <!-- Pulling live logo directly from your GitHub repository raw link -->
+
+    <div class="brand-container">
+
+        <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/logo.png" alt="Englisholic" class="brand-logo-img">
+
+    </div>
+
+
+
+    <!-- Pulling live teacher photo directly from your GitHub repository raw link -->
+
+    <div class="teacher-img-container">
+
+        <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/jacqueline.png" alt="Teacher Jacqueline">
+
+    </div>
+
+    <div class="teacher-name">Teacher Jacqueline</div>
+
+    <div class="teacher-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
+
+
+
+    <!-- Notice Box -->
+
+    <div class="notice-box">
+
+        <div>🔊 스피커폰으로 기본 설정되었습니다.</div>
+
+        <div>🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+
+    </div>
+
+
+
+    <!-- Phone Number Input -->
+
+    <input type="text" id="phoneInput" placeholder="전화번호 입력 (예: 010-1234-5678)" value="010-9741-3002">
+
+
+
+    <!-- Green Call Button -->
+
+    <button class="call-btn" onclick="checkAccess()">
+
+        <span>📞</span>
+
+        <span>통화시작하기</span>
+
+    </button>
+
+    
+
+    <div id="resultBox"></div>
+
+</div>
+
+
+
+<script>
+
+    const ADMIN_WHITELIST = [
+
+        "010-9741-3002",
+
+        "010-4181-7923",
+
+        "010-9544-0247"
+
+    ];
+
+
+
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbybN7QYuHCLcR2UDZnCoQx31szufrQuAmbMCXathEa970U9Fr5h3WagjgBcy5oOY_uj/exec";
+
+
+
+    function checkAccess() {
+
+        const phone = document.getElementById('phoneInput').value.trim();
+
+        const resultBox = document.getElementById('resultBox');
+
+        
+
+        resultBox.style.display = "block";
+
+
+
+        let roleStatus = "Client Entry";
+
+        if (ADMIN_WHITELIST.includes(phone)) {
+
+            resultBox.className = "admin-box";
+
+            resultBox.innerHTML = "<strong>👑 관리자 권한 승인 (Admin Bypass)</strong><br>모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.";
+
+            roleStatus = "Admin Bypass (Admin)";
+
+        } else {
+
+            resultBox.className = "client-box";
+
+            resultBox.innerHTML = "<strong>👤 일반 수강생 승인 (SMS Link Flow)</strong><br>배정된 정식 클래스룸으로 안전하게 연결됩니다.";
+
+            roleStatus = "Client Entry (User)";
+
+        }
+
+
+
+        if (WEB_APP_URL.includes("http")) {
+
+            fetch(WEB_APP_URL, {
+
+                method: "POST",
+
+                mode: "no-cors",
+
+                headers: { "Content-Type": "application/json" },
+
+                body: JSON.stringify({
+
+                    type: "web-registration",
+
+로고 아래에 깔끔한 서브 타이틀이나 안내 문구를 추가하는 것은 브랜딩과 사용자 신뢰도를 높이는 데 아주 좋은 아이디어입니다!
+
+💡 타이틀 네이밍 아이디어 추천
+"잉글리쉬홀릭 콜 입장하기"나 "잉글리쉬홀릭 수업입장"도 직관적이지만, 모바일 게이트웨이 페이지에서 수강생들에게 더 세련되고 전문적으로 다가갈 수 있는 표현들을 몇 가지 정리해 보았습니다:
+
+실시간 1:1 화상·전화영어 입장관 (가장 신뢰감 있고 명확한 형태)
+
+영어홀릭 전용 스마트 클래스룸 (플랫폼 아이체성을 강조)
+
+1:1 맞춤 영어회화 전용 입장 게이트 (현재 페이지 목적에 딱 맞음)
+
+수강생 안심 연결 게이트웨이 (보안 및 접속 안정성을 강조)
+
+🛠️ 완성된 코드 (로고 아래 타이틀 추가 + 큰 로고 적용 + 오픈그래프 프리뷰 메타태그 포함)
+요청하신 타이틀을 로고 바로 아래에 추가하고, 카카오톡이나 문자 메시지로 공유할 때 예쁜 미리보기 카드(og:preview)가 뜨도록 메타태그도 함께 포함한 최종 코드를 준비했습니다. 그대로 복사해서 사용하시면 됩니다!
+
+HTML
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Englisholic Gateway</title>
+    
+    <!-- Kakao / Mobile Link Preview Cards -->
+    <meta property="og:title" content="잉글리쉬홀릭 | 1:1 맞춤 영어회화 입장 게이트">
+    <meta property="og:description" content="재클린 선생님과의 실시간 1:1 맞춤 영어회화 클래스룸 입장 게이트입니다.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/og_preview.png">
+    <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/gate-test.html">
+    <meta property="og:type" content="website">
+
+    <style>
+        body { 
+            font-family: 'Apple SD Gothic Neo', -apple-system, sans-serif; 
+            background: #e0f2fe; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .mobile-screen { 
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0f7ff 35%, #ffffff 100%);
+            width: 100%; 
+            max-width: 420px; 
+            min-height: 100vh;
+            padding: 24px 20px 20px 20px; 
+            box-sizing: border-box; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+        }
+        .brand-container {
+            margin-top: 5px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .brand-logo-img {
+            height: 64px; 
+            width: auto;
+            object-fit: contain;
+        }
+        /* 로고 아래 추가된 타이틀 스타일링 */
+        .brand-subtitle-tag {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e3a8a;
+            background: #dbeafe;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+            letter-spacing: -0.3px;
+        }
+        .teacher-img-container { 
+            width: 96px; 
+            height: 96px; 
+            border-radius: 50%; 
+            overflow: hidden; 
+            margin: 0 auto 10px; 
+            border: 4px solid #ffffff; 
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); 
+        }
+        .teacher-img-container img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+        .teacher-name { 
+            font-size: 19px; 
+            font-weight: 800; 
+            color: #0f172a; 
+            margin-bottom: 4px; 
+        }
+        .teacher-desc { 
+            font-size: 13px; 
+            color: #475569; 
+            margin-bottom: 16px; 
+            font-weight: 500;
+        }
+        .notice-box { 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 14px; 
+            padding: 12px 16px; 
+            font-size: 12.5px; 
+            color: #334155; 
+            text-align: left; 
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 14px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            line-height: 1.5;
+        }
+        .notice-box div { display: flex; align-items: center; gap: 8px; }
+        .notice-box div:first-child { margin-bottom: 4px; }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 12px; 
+            background: #ffffff; 
+            border: 1px solid #cbd5e1; 
+            color: #0f172a; 
+            border-radius: 14px; 
+            box-sizing: border-box; 
+            font-size: 15px; 
+            text-align: center; 
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .call-btn { 
+            background: #10b981; 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35); 
+        }
+        .call-btn:hover { background: #059669; }
+        #resultBox { 
+            margin-top: 14px; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-size: 13px; 
+            display: none; 
+            text-align: left; 
+            width: 100%;
+            box-sizing: border-box;
+            word-break: break-all; 
+            line-height: 1.5;
+        }
+        .admin-box { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; font-weight: 600; }
+        .client-box { background: #eff6ff; color: #1e40af; border: 1px solid #3b82f6; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-screen">
+    <!-- Brand Logo -->
+    <div class="brand-container">
+        <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/logo.png" alt="Englisholic" class="brand-logo-img">
+    </div>
+    
+    <!-- 로고 아래 추가된 타이틀 (원하시는 문구로 언제든 수정 가능합니다) -->
+    <div class="brand-subtitle-tag">잉글리쉬홀릭 1:1 수업 입장관</div>
+
+    <!-- Teacher Circle Photo -->
+    <div class="teacher-img-container">
+        <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/jacqueline.png" alt="Teacher Jacqueline">
+    </div>
+    <div class="teacher-name">Teacher Jacqueline</div>
+    <div class="teacher-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
+
+    <!-- Notice Box -->
+    <div class="notice-box">
+        <div>🔊 스피커폰으로 기본 설정되었습니다.</div>
+        <div>🎧 이어폰은 통화 시작 전 연결해 주세요!</div>
+    </div>
+
+    <!-- Phone Number Input -->
+    <input type="text" id="phoneInput" placeholder="전화번호 입력 (예: 010-1234-5678)" value="010-9741-3002">
+
+    <!-- Green Call Button -->
+    <button class="call-btn" onclick="checkAccess()">
+        <span>📞</span>
+        <span>통화시작하기</span>
+    </button>
+    
+    <div id="resultBox"></div>
+</div>
+
+<script>
+    const ADMIN_WHITELIST = [
+        "010-9741-3002",
+        "010-4181-7923",
+        "010-9544-0247"
+    ];
+
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbybN7QYuHCLcR2UDZnCoQx31szufrQuAmbMCXathEa970U9Fr5h3WagjgBcy5oOY_uj/exec";
+
+    function checkAccess() {
+        const phone = document.getElementById('phoneInput').value.trim();
+        const resultBox = document.getElementById('resultBox');
+        
+        resultBox.style.display = "block";
+
+        let roleStatus = "Client Entry";
+        if (ADMIN_WHITELIST.includes(phone)) {
+            resultBox.className = "admin-box";
+            resultBox.innerHTML = "<strong>👑 관리자 권한 승인 (Admin Bypass)</strong><br>모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.";
+            roleStatus = "Admin Bypass (Admin)";
+        } else {
+            resultBox.className = "client-box";
+            resultBox.innerHTML = "<strong>👤 일반 수강생 승인 (SMS Link Flow)</strong><br>배정된 정식 클래스룸으로 안전하게 연결됩니다.";
+            roleStatus = "Client Entry (User)";
+        }
+
+        if (WEB_APP_URL.includes("http")) {
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: "web-registration",
+                    kakaoId: phone,
+                    kakaoNickname: roleStatus,
+                    deviceHash: "desktop-test-env"
+                })
+            }).catch(err => console.log("Log error: ", err));
+        }
+    }
+</script>
+
+</body>
+</html>
+Gemini is AI and can make mistakes, including about people. Your privacy & GeminiOpens in a new window
+
+
+
+english Brotha
+
