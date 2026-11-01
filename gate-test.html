@@ -15,38 +15,39 @@
             align-items: center; 
             min-height: 100vh; 
         }
-        /* Full mobile screen style matching your original layout */
+        /* Optimized full-screen mobile container */
         .mobile-screen { 
-            background: linear-gradient(180deg, #e0f2fe 0%, #f0f7ff 40%, #ffffff 100%);
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0f7ff 35%, #ffffff 100%);
             width: 100%; 
             max-width: 420px; 
             min-height: 100vh;
-            padding: 30px 24px; 
+            padding: 24px 20px 20px 20px; 
             box-sizing: border-box; 
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: space-evenly;
         }
 
-        /* Large, prominent logo matching original */
+        /* Larger, prominent logo */
         .brand-container {
-            margin-top: 10px;
-            margin-bottom: 18px;
+            margin-top: 5px;
+            margin-bottom: 10px;
             text-align: center;
         }
         .brand-logo-img {
-            height: 52px; /* Made it much larger and prominent */
+            height: 72px; /* Significantly increased size */
+            width: auto;
             object-fit: contain;
         }
 
         /* Teacher Circle Photo */
         .teacher-img-container { 
-            width: 110px; 
-            height: 110px; 
+            width: 100px; 
+            height: 100px; 
             border-radius: 50%; 
             overflow: hidden; 
-            margin: 0 auto 12px; 
+            margin: 0 auto 10px; 
             border: 4px solid #ffffff; 
             box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); 
         }
@@ -57,7 +58,7 @@
         }
 
         .teacher-name { 
-            font-size: 21px; 
+            font-size: 20px; 
             font-weight: 800; 
             color: #0f172a; 
             margin-bottom: 4px; 
@@ -65,7 +66,7 @@
         .teacher-desc { 
             font-size: 13px; 
             color: #475569; 
-            margin-bottom: 24px; 
+            margin-bottom: 16px; 
             font-weight: 500;
         }
 
@@ -74,15 +75,15 @@
             background: #ffffff; 
             border: 1px solid #e2e8f0; 
             border-radius: 14px; 
-            padding: 14px 16px; 
+            padding: 12px 16px; 
             font-size: 12.5px; 
             color: #334155; 
             text-align: left; 
             width: 100%;
             box-sizing: border-box;
-            margin-bottom: 20px; 
+            margin-bottom: 14px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .notice-box div { display: flex; align-items: center; gap: 8px; }
         .notice-box div:first-child { margin-bottom: 4px; }
@@ -91,7 +92,7 @@
         input { 
             width: 100%; 
             padding: 14px; 
-            margin-bottom: 14px; 
+            margin-bottom: 12px; 
             background: #ffffff; 
             border: 1px solid #cbd5e1; 
             color: #0f172a; 
@@ -124,7 +125,7 @@
 
         /* Result Verification Box */
         #resultBox { 
-            margin-top: 16px; 
+            margin-top: 14px; 
             padding: 14px; 
             border-radius: 12px; 
             font-size: 13px; 
@@ -142,7 +143,7 @@
 <body>
 
 <div class="mobile-screen">
-    <!-- Large prominent brand logo -->
+    <!-- Enlarged Brand Logo -->
     <div class="brand-container">
         <img src="https://raw.githubusercontent.com/englisholicsar-lang/teacher-jacqueline/main/logo.png" alt="Englisholic" class="brand-logo-img">
     </div>
