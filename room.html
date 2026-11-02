@@ -297,7 +297,6 @@
         let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
         let vapiInstance = null;
-        window.activeMicStream = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
@@ -349,7 +348,7 @@
                 });
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
 
             const remoteAudio = document.getElementById("remote-audio");
@@ -363,16 +362,7 @@
                 btn.setAttribute("disabled", "true");
                 btn.innerHTML = `<span>통화 연결 중...</span>`;
 
-                try {
-                    const globalMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    window.activeMicStream = globalMicStream;
-
-                    startVapiCall();
-                } catch (err) {
-                    console.error("Mic permission error:", err);
-                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정을 확인해 주세요.");
-                    resetToIdleButton();
-                }
+                startVapiCall();
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
@@ -451,7 +441,7 @@
                         if (callState === 'IDLE') {
                             onCallConnectedSuccessfully();
                         }
-                    }, 2500);
+                    }, 2000);
 
                 } catch (err) {
                     console.error("Vapi start execution error:", err);
@@ -497,10 +487,6 @@
 
         function endCallUI() {
             stopTimer();
-            if (window.activeMicStream) {
-                window.activeMicStream.getTracks().forEach(track => track.stop());
-                window.activeMicStream = null;
-            }
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
                 try { vapiInstance.stop(); } catch(e) {}
             }
