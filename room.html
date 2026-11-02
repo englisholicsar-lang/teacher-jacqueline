@@ -9,7 +9,7 @@
     <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
     <meta property="og:type" content="website">
 
-    <!-- Vapi Web SDK Async Loader (From Working Trial Template) -->
+    <!-- Vapi Web SDK Async Loader -->
     <script>
       var vapiInstance = null;
       (function (d, t) {
@@ -99,7 +99,7 @@
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
             border-radius: 14px;
-            padding: 12px 16px;
+            padding: 10px 14px;
             font-size: 12px;
             color: #166534;
             text-align: left;
@@ -144,12 +144,12 @@
         </div>
 
         <div class="bottom-group">
-            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 10px; padding: 15px 10px;">
-                <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
-                    <span style="font-size: 18px;">🔊</span> 스피커폰으로 기본 설정됩니다.
+            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 8px; padding: 12px 10px;">
+                <div style="font-size: 13.5px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
+                    <span style="font-size: 16px;">🔊</span> 스피커폰으로 기본 설정됩니다.
                 </div>
-                <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
-                    <span style="font-size: 18px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!
+                <div style="font-size: 13.5px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
+                    <span style="font-size: 16px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!
                 </div>
             </div>
 
@@ -263,6 +263,24 @@
                 secondsElapsed++;
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
                 
+                if (secondsElapsed === 300) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 570) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 585) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN. DO NOT ANSWER ANY MORE QUESTIONS.]" }});
+                    }
+                }
+
                 if (secondsElapsed >= 600) {  
                     endCallUI();
                 }
@@ -311,10 +329,22 @@
                 }
 
                 if (vapiInstance && typeof vapiInstance.start === 'function') {
+                    const now = new Date();
+                    const guamTime = new Intl.DateTimeFormat('en-US', { 
+                        timeZone: 'Pacific/Guam', 
+                        hour: 'numeric', 
+                        minute: '2-digit' 
+                    }).format(now);
+
                     vapiInstance.start(activeAssistantId, {
                         variableValues: {
                             student_name: sessionStudentName,
                             coaching_notes: sessionCoachingNotes
+                        },
+                        metadata: {
+                            student_name: sessionStudentName,
+                            coaching_notes: sessionCoachingNotes,
+                            liveGuamTime: guamTime
                         }
                     });
                 }
