@@ -9,7 +9,7 @@
     <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
     <meta property="og:type" content="website">
 
-    <!-- Vapi Web SDK Async Loader -->
+    <!-- Vapi Web SDK Async Loader (From Working Trial Template) -->
     <script>
       var vapiInstance = null;
       (function (d, t) {
@@ -24,14 +24,11 @@
 
     <style>
         :root {
-            --bg-base: #f0f4f8;
-            --primary-navy: #0f172a;
-            --sub-text: #64748b;
-            --box-bg: #ffffff;
-            --box-border: #dbeafe;
-            --btn-green: #059669;
-            --btn-green-hover: #047857;
-            --disabled-bg: #cbd5e1;
+            --bg-base: #f0f6ff;
+            --primary-navy: #0e2a47;
+            --sub-text: #4a637d;
+            --box-bg: #eaf3fe;
+            --box-border: #d4e5f9;
         }
 
         * {
@@ -45,80 +42,40 @@
             font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             min-height: 100vh;
             background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(circle at 95% 5%, rgba(37, 99, 235, 0.12) 0%, transparent 45%),
-                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            background-attachment: fixed;
             position: relative;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 8px 20px 24px 20px;
+            padding: 0px 20px 20px 20px;
             color: var(--primary-navy);
         }
 
-        body::before {
-            content: "";
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 55px;
-            height: 75px;
-            background-image: radial-gradient(#94a3b8 1.5px, transparent 1.5px);
-            background-size: 10px 10px;
-            opacity: 0.5;
-            z-index: 0;
-        }
+        .bg-wave-top, .bg-wave-bottom { position: absolute; width: 100%; max-width: 500px; height: auto; z-index: 0; pointer-events: none; opacity: 0.8; }
+        .bg-wave-top { top: 0; right: 0; }
+        .bg-wave-bottom { bottom: 0; left: 0; }
 
-        .container { 
-            position: relative; 
-            z-index: 1; 
-            width: 100%; 
-            max-width: 420px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center; 
-        }
+        .dot-pattern-left { position: absolute; top: 220px; left: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
+        .dot-pattern-right { position: absolute; top: 80px; right: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
 
-        .upper-group { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            width: 100%; 
-            margin-top: 4px; 
-        }
+        .container { position: relative; z-index: 1; width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .upper-group { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 6px; }
+        .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .logo-img { height: 75px; width: auto; object-fit: contain; }
+        .avatar-container { position: relative; width: 115px; height: 115px; margin-bottom: 8px; }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); }
+        .title { font-size: 22px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
+        .subtitle { font-size: 13.5px; font-weight: 600; color: #4a637d; }
 
-        .logo-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin: 4px 0 10px 0; 
-        }
+        .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 12px; }
+        .timer-display { font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
-        .logo-img { 
-            width: 155px; 
-            height: auto; 
-            object-fit: contain; 
-        }
-
-        .avatar-container { 
-            position: relative; 
-            width: 86px; 
-            height: 86px; 
-            margin: 0 auto 10px auto; 
-        }
-
-        .avatar-img { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 3px solid #ffffff; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
-        }
+        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
+        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
+        
+        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
+        .action-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
 
         .shield-badge {
             position: absolute;
@@ -127,109 +84,14 @@
             background: #2563eb;
             color: white;
             border-radius: 50%;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 13px;
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-
-        .title { 
-            font-size: 22px; 
-            font-weight: 700; 
-            color: var(--primary-navy); 
-            margin-bottom: 4px; 
-            text-align: center; 
-        }
-
-        .subtitle { 
-            font-size: 14px; 
-            color: var(--sub-text); 
-            margin-bottom: 12px; 
-            text-align: center; 
-            line-height: 1.4; 
-        }
-
-        .timer-wrapper { 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            margin-bottom: 16px; 
-        }
-
-        .timer-display { 
-            font-size: 16px; 
-            font-weight: 800; 
-            color: var(--primary-navy); 
-            background-color: #ffffff; 
-            padding: 8px 18px; 
-            border-radius: 20px; 
-            border: 2px solid #d4e5f9; 
-            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
-        }
-
-        .bottom-group { 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-        }
-
-        .info-box { 
-            width: 100%; 
-            background: var(--box-bg); 
-            border: 1px solid var(--box-border); 
-            border-radius: 16px; 
-            padding: 14px 18px; 
-            display: flex; 
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02); 
-            text-align: center;
-        }
-        
-        .action-btn { 
-            width: 100%; 
-            background-color: var(--btn-green); 
-            color: #ffffff; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 14px; 
-            font-size: 16px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            transition: background-color 0.2s, transform 0.1s;
-            box-sizing: border-box;
-            margin-bottom: 16px; 
-        }
-
-        .action-btn:hover:not(:disabled) { 
-            background-color: var(--btn-green-hover); 
-        }
-
-        .action-btn:active:not(:disabled) { 
-            transform: scale(0.98); 
-        }
-
-        .action-btn:disabled { 
-            background-color: var(--disabled-bg); 
-            color: #64748b; 
-            box-shadow: none; 
-            cursor: not-allowed; 
         }
 
         .admin-box {
@@ -243,18 +105,24 @@
             text-align: left;
             line-height: 1.4;
             box-sizing: border-box;
-            display: none; 
+            margin-bottom: 12px;
+            display: none;
         }
 
-        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { 
-            display: none !important; 
-            visibility: hidden !important; 
-            opacity: 0 !important; 
-            pointer-events: none !important; 
-        }
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
 <body>
+
+    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/>
+    </svg>
+
+    <div class="dot-pattern-left"></div>
+    <div class="dot-pattern-right"></div>
 
     <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
 
@@ -268,7 +136,7 @@
                 <div id="shieldBadge" class="shield-badge">🛡️</div>
             </div>
             <h1 id="mainTitle" class="title">Teacher Jacqueline</h1>
-            <p id="subDesc" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+            <p id="call-status" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
             
             <div id="timer-wrapper" class="timer-wrapper" style="display: none;">
                 <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
@@ -276,21 +144,23 @@
         </div>
 
         <div class="bottom-group">
-            <div id="notice-box" class="info-box">
-                <div style="font-size: 13px; font-weight: 700; color: #334155; line-height: 1.5;">
-                    🔊 스피커폰으로 기본 설정됩니다.<br>
-                    🎧 이어폰은 통화 시작 전 연결해 주세요!
+            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 10px; padding: 15px 10px;">
+                <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
+                    <span style="font-size: 18px;">🔊</span> 스피커폰으로 기본 설정됩니다.
+                </div>
+                <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
+                    <span style="font-size: 18px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!
                 </div>
             </div>
-
-            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled>
-                <span>인증 상태 확인 중...</span>
-            </button>
 
             <div id="adminBox" class="admin-box">
                 👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>
                 모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.
             </div>
+
+            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled>
+                <span id="btn-text-content">인증 상태 확인 중...</span>
+            </button>
         </div>
     </div>
 
@@ -314,7 +184,7 @@
             const btn = document.getElementById("action-btn");
 
             if (!token) {
-                document.getElementById("subDesc").innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요.";
+                document.getElementById("call-status").innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요.";
                 btn.innerText = "입장 불가";
                 document.getElementById("shieldBadge").style.display = "none";
                 return;
@@ -328,7 +198,7 @@
                         document.getElementById("shieldBadge").style.display = "none";
 
                         document.getElementById("mainTitle").innerText = `Teacher ${data.teacher}`;
-                        document.getElementById("subDesc").innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
+                        document.getElementById("call-status").innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
                         
                         sessionStudentName = data.studentName;
                         sessionCoachingNotes = data.coachingNotes || "";
@@ -341,17 +211,17 @@
                         }
 
                         btn.removeAttribute("disabled");
-                        btn.innerHTML = `<span>📞 통화시작하기</span>`;
+                        document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
                     } else {
                         document.getElementById("shieldBadge").style.display = "none";
-                        document.getElementById("subDesc").innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다.";
+                        document.getElementById("call-status").innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다.";
                         btn.innerText = "종료된 세션";
                         btn.disabled = true;
                     }
                 })
                 .catch(err => {
                     document.getElementById("shieldBadge").style.display = "none";
-                    document.getElementById("subDesc").innerText = "서버 통신 오류가 발생했습니다.";
+                    document.getElementById("call-status").innerText = "서버 통신 오류가 발생했습니다.";
                     btn.innerText = "연결 오류";
                     btn.disabled = true;
                 });
@@ -369,7 +239,7 @@
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
-                btn.innerHTML = `<span>통화 연결 중...</span>`;
+                document.getElementById("btn-text-content").innerText = "통화 연결 중...";
 
                 startVapiCall();
 
@@ -450,27 +320,27 @@
                 }
                 
                 callState = 'ACTIVE';
-                document.getElementById("subDesc").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+                document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
                 
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
-                        <span style="text-align: left; font-size: 14px; font-weight: 700; color: var(--primary-navy); line-height: 1.4;">
+                        <span style="text-align: left; font-size: 14px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
                             마이크 권한을 허용해 주세요.
                         </span>
                     </div>
                 `;
 
                 const btn = document.getElementById("action-btn");
-                btn.style.backgroundColor = "#dc2626";
-                btn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.3)";
+                btn.style.backgroundColor = "#e05252";
+                btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
                 btn.removeAttribute("disabled"); 
-                btn.innerHTML = `<span>통화 종료하기</span>`;
+                document.getElementById("btn-text-content").innerText = "통화 종료하기";
             } else {
                 alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
                 const btn = document.getElementById("action-btn");
                 btn.removeAttribute("disabled");
-                btn.innerHTML = `<span>📞 통화시작하기</span>`;
+                document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
             }
         }
 
@@ -480,20 +350,20 @@
                 try { vapiInstance.stop(); } catch(e) {}
             }
             callState = 'ENDED';
-            document.getElementById("subDesc").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             
             document.getElementById("notice-box").innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
-                    <div style="font-size: 13.5px; font-weight: 700; color: var(--primary-navy);">🚀 세션에 참여해 주셔서 감사합니다!</div>
+                    <div style="font-size: 13.5px; font-weight: 700; color: #0e2a47;">🚀 세션에 참여해 주셔서 감사합니다!</div>
                 </div>
             `;
             
             const btn = document.getElementById("action-btn");
-            btn.style.backgroundColor = "#059669";
-            btn.style.boxShadow = "0 4px 14px rgba(5, 150, 105, 0.25)";
+            btn.style.backgroundColor = "#10b981";
+            btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
             btn.removeAttribute("disabled");
             btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
-            btn.innerHTML = `<span>고객센터 문의하기</span>`;
+            document.getElementById("btn-text-content").innerText = "고객센터 문의하기";
         }
     </script>
 </body>
