@@ -8,63 +8,58 @@
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
     <style>
         :root {
+            /* Exact soft blue background gradient vibe matching Image 2 */
             --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --btn-green: #059669;
             --btn-green-hover: #047857;
-            --disabled-bg: #e2e8f0;
+            --disabled-bg: #cbd5e1;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
+            background-image: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
             color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
         }
 
         .container {
             width: 100%;
-            max-width: 440px;
-            padding: 16px;
+            max-width: 420px;
+            padding: 16px 20px 32px 20px;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            padding: 32px 24px;
-            text-align: center;
-            position: relative;
-        }
-
-        /* Large clean logo header */
+        /* Clean Logo Header moved slightly higher */
         .logo-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 24px;
+            margin: 12px 0 16px 0;
         }
 
         .logo-img {
-            width: 180px;
+            width: 170px;
             height: auto;
             object-fit: contain;
         }
 
         .profile-img-container {
             position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 16px auto;
+            width: 92px;
+            height: 92px;
+            margin: 0 auto 12px auto;
         }
 
         .profile-img {
@@ -84,46 +79,53 @@
             background: #2563eb;
             color: white;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 12px;
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            margin: 0 0 6px 0;
+            margin: 0 0 4px 0;
             color: var(--text-main);
+            text-align: center;
         }
 
         .sub-desc {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.4;
         }
 
+        /* Wider Audio Notice Box fitting text cleanly in fewer rows */
         .audio-notice {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 14px 16px;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 14px 18px;
             font-size: 13px;
             color: #334155;
             margin-bottom: 16px;
             text-align: center;
             line-height: 1.5;
+            box-sizing: border-box;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
-        /* Green Call Button Layout */
+        /* Green Call Button matching Image 2's exact button geometry */
         .action-btn {
             width: 100%;
             padding: 16px;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
             color: #ffffff;
             background-color: var(--btn-green);
@@ -134,8 +136,9 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
             transition: background-color 0.2s, transform 0.1s;
+            box-sizing: border-box;
             margin-bottom: 16px;
         }
 
@@ -149,13 +152,14 @@
 
         .action-btn:disabled {
             background-color: var(--disabled-bg);
-            color: #94a3b8;
+            color: #64748b;
             cursor: not-allowed;
             box-shadow: none;
         }
 
         /* Admin / Status Bypass Box */
         .admin-box {
+            width: 100%;
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
             border-radius: 14px;
@@ -164,6 +168,7 @@
             color: #166534;
             text-align: left;
             line-height: 1.4;
+            box-sizing: border-box;
         }
 
         /* Completely banish any injected Vapi floating widgets or buttons */
@@ -183,33 +188,31 @@
 <body>
 
     <div class="container">
-        <div class="card">
-            <!-- Large Clean Logo Header -->
-            <div class="logo-container">
-                <img src="logo.png" alt="Englisholic" class="logo-img">
-            </div>
-            
-            <div class="profile-img-container">
-                <img id="teacherImg" src="jacqueline.png" alt="Teacher" class="profile-img">
-                <div id="shieldBadge" class="shield-badge" title="인증됨">🛡️</div>
-            </div>
+        <!-- Clean Logo Header -->
+        <div class="logo-container">
+            <img src="logo.png" alt="Englisholic" class="logo-img">
+        </div>
+        
+        <div class="profile-img-container">
+            <img id="teacherImg" src="jacqueline.png" alt="Teacher" class="profile-img">
+            <div id="shieldBadge" class="shield-badge" title="인증됨">🛡️</div>
+        </div>
 
-            <h1 id="mainTitle">Teacher Jacqueline</h1>
-            <div id="subDesc" class="sub-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
+        <h1 id="mainTitle">Teacher Jacqueline</h1>
+        <div id="subDesc" class="sub-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
 
-            <div class="audio-notice">
-                🔊 스피커폰으로 기본 설정됩니다.<br>
-                🎧 이어폰은 통화 시작 전 연결해 주세요!
-            </div>
+        <div class="audio-notice">
+            🔊 스피커폰으로 기본 설정됩니다.<br>
+            🎧 이어폰은 통화 시작 전 연결해 주세요!
+        </div>
 
-            <button id="callBtn" class="action-btn" disabled>
-                <span>인증 상태 확인 중...</span>
-            </button>
+        <button id="callBtn" class="action-btn" disabled>
+            <span>인증 상태 확인 중...</span>
+        </button>
 
-            <div id="adminBox" class="admin-box" style="display: none;">
-                👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>
-                모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.
-            </div>
+        <div id="adminBox" class="admin-box" style="display: none;">
+            👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>
+            모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.
         </div>
     </div>
 
