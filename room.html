@@ -405,62 +405,59 @@
         }
 
         function startVapiCall() {
-            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
-            if (sdk) {
+            const VapiConstructor = window.Vapi || (window.vapiSDK && window.vapiSDK.Vapi);
+            
+            if (VapiConstructor) {
                 try {
-                    // Properly initialize and start using the Vapi SDK run configuration
-                    vapiInstance = sdk.run({
-                        apiKey: VAPI_KEY,
-                        assistant: activeAssistantId,
-                        config: {
-                            variableValues: {
-                                student_name: sessionStudentName,
-                                coaching_notes: sessionCoachingNotes
+                    // Use the official constructor pattern
+                    vapiInstance = new VapiConstructor(VAPI_KEY);
+
+                    vapiInstance.on('call-start', () => {
+                        onCallConnectedSuccessfully();
+                    });
+
+                    vapiInstance.on('speech-start', () => { 
+                        if (!timerInterval) startTimer(); 
+                    });
+
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) {
+                                remoteAudio.muted = false;
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.volume = 1.0;
+                                remoteAudio.play().then(() => {
+                                    console.log("Teacher audio stream active");
+                                }).catch(e => {
+                                    console.log("Audio play unlock retry", e);
+                                    document.body.click();
+                                });
                             }
                         }
                     });
 
-                    if (vapiInstance && typeof vapiInstance.on === 'function') {
-                        vapiInstance.on('call-start', () => {
-                            onCallConnectedSuccessfully();
-                        });
+                    vapiInstance.on('call-end', () => {
+                        endCallUI();
+                    });
 
-                        vapiInstance.on('speech-start', () => { 
-                            if (!timerInterval) startTimer(); 
-                        });
+                    vapiInstance.on('error', (e) => {
+                        console.error("Vapi error event:", e);
+                        alert("통화 연결 중 오류가 발생했습니다.");
+                        resetToIdleButton();
+                    });
 
-                        vapiInstance.on('track', (track) => {
-                            if (track.kind === 'audio') {
-                                const remoteAudio = document.getElementById("remote-audio");
-                                if (remoteAudio) {
-                                    remoteAudio.muted = false;
-                                    remoteAudio.srcObject = new MediaStream([track]);
-                                    remoteAudio.volume = 1.0;
-                                    remoteAudio.play().then(() => {
-                                        console.log("Teacher audio track active");
-                                    }).catch(e => {
-                                        console.log("Audio play unlock retry", e);
-                                        document.body.click();
-                                    });
-                                }
-                            }
-                        });
-
-                        vapiInstance.on('call-end', () => {
-                            endCallUI();
-                        });
-                    }
-
-                    // Fallback timer to bridge UI smoothly if event hooks take a moment
-                    setTimeout(() => {
-                        if (callState === 'IDLE') {
-                            onCallConnectedSuccessfully();
+                    // Start the call with the assistant ID and custom variables
+                    vapiInstance.start(activeAssistantId, {
+                        variableValues: {
+                            student_name: sessionStudentName,
+                            coaching_notes: sessionCoachingNotes
                         }
-                    }, 1500);
+                    });
 
                 } catch (err) {
-                    console.error("Vapi start error:", err);
-                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요.");
+                    console.error("Vapi instantiation error:", err);
+                    alert("통화 연결 중 오류가 발생했습니다.");
                     resetToIdleButton();
                 }
 
