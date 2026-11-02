@@ -185,7 +185,6 @@
             display: none; 
         }
 
-        /* ONLY hide the default floating trigger button, leaving the call modal iframe fully functional */
         #vapi-support-button {
             display: none !important;
             visibility: hidden !important;
@@ -235,7 +234,9 @@
         const adminBox = document.getElementById('adminBox');
 
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
-        let studentDataGlobal = null;
+        let studentNameGlobal = "Student";
+        let coachingNotesGlobal = "";
+        let vapiReady = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (!token) {
@@ -245,12 +246,14 @@
                 return;
             }
 
+            // Fetch token status from Google Apps Script
             fetch(`${GAS_URL}?token=${token}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.allowed) {
                         shieldBadge.style.display = "none";
-                        studentDataGlobal = data;
+                        studentNameGlobal = data.studentName;
+                        coachingNotesGlobal = data.coachingNotes;
 
                         mainTitle.innerText = `Teacher ${data.teacher}`;
                         subDesc.innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
@@ -261,24 +264,10 @@
 
                         callBtn.innerHTML = `📞 통화시작하기`;
                         callBtn.disabled = false;
+                        vapiReady = true;
 
                         if (token.includes('test')) {
                             adminBox.style.display = "block";
-                        }
-
-                        // Initialize Vapi SDK
-                        const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
-                        if (window.vapiSDK) {
-                            window.vapiSDK.run({
-                                apiKey: publicKey,
-                                assistant: activeAssistantId,
-                                config: {
-                                    variableValues: {
-                                        student_name: data.studentName,
-                                        coaching_notes: data.coachingNotes
-                                    }
-                                }
-                            });
                         }
                     } else {
                         shieldBadge.style.display = "none";
@@ -289,39 +278,44 @@
                 })
                 .catch(err => {
                     shieldBadge.style.display = "none";
-                    subDesc.innerText = "서버 통신 오류가 발생했습니다.";
+                    subDesc.innerText = "서버 통신 오류가 연결을 방해했습니다.";
                     callBtn.innerText = "연결 오류";
                     callBtn.disabled = true;
                 });
         });
 
-        // Click handler to open Vapi call modal
+        // Direct Vapi SDK trigger on button click
         callBtn.addEventListener('click', () => {
-            if (callBtn.disabled) return;
+            if (!vapiReady || callBtn.disabled) return;
+            
             callBtn.innerText = "통화 연결 중...";
             callBtn.disabled = true;
 
+            const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+
             try {
-                if (window.vapiSDK && typeof window.vapiSDK.open === 'function') {
-                    window.vapiSDK.open();
-                } else {
-                    // Fallback re-trigger
-                    const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+                // Use standard Vapi SDK method to start call directly
+                if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                     window.vapiSDK.run({
                         apiKey: publicKey,
                         assistant: activeAssistantId,
                         config: {
                             variableValues: {
-                                student_name: studentDataGlobal ? studentDataGlobal.studentName : "Student",
-                                coaching_notes: studentDataGlobal ? studentDataGlobal.coachingNotes : ""
+                                student_name: studentNameGlobal,
+                                coaching_notes: coachingNotesGlobal
                             }
                         }
                     });
+                } else {
+                    alert("Vapi SDK가 로드되지 않았습니다. 페이지를 새로고침해 주세요.");
+                    callBtn.innerText = "📞 통화시작하기";
+                    callBtn.disabled = false;
                 }
             } catch (e) {
                 console.error(e);
                 callBtn.innerText = "연결 실패 (다시 시도)";
                 callBtn.disabled = false;
+                vapiReady = true;
             }
         });
     </script>
