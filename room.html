@@ -19,7 +19,6 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            /* Top-right wave gradient curve matching Image 3 */
             background-image: 
                 radial-gradient(circle at 95% 5%, rgba(37, 99, 235, 0.12) 0%, transparent 45%),
                 linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -35,7 +34,6 @@
             overflow-x: hidden;
         }
 
-        /* Subtle top-right dot grid accent matching Image 3 */
         body::before {
             content: "";
             position: absolute;
@@ -187,17 +185,10 @@
             display: none; 
         }
 
-        /* Completely banish any injected Vapi floating widgets */
-        iframe[src*="vapi"], 
-        div[id*="vapi-support-button"], 
-        div[class*="vapi-"], 
-        button[class*="vapi-"],
-        aside[aria-label*="vapi"],
+        /* ONLY hide the default floating trigger button, leaving the call modal iframe fully functional */
         #vapi-support-button {
             display: none !important;
             visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
         }
     </style>
 </head>
@@ -243,7 +234,6 @@
         const shieldBadge = document.getElementById('shieldBadge');
         const adminBox = document.getElementById('adminBox');
 
-        let vapiInstance = null;
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
         let studentDataGlobal = null;
 
@@ -276,10 +266,10 @@
                             adminBox.style.display = "block";
                         }
 
-                        // Initialize Vapi SDK properly
+                        // Initialize Vapi SDK
                         const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
                         if (window.vapiSDK) {
-                            vapiInstance = window.vapiSDK.run({
+                            window.vapiSDK.run({
                                 apiKey: publicKey,
                                 assistant: activeAssistantId,
                                 config: {
@@ -305,7 +295,7 @@
                 });
         });
 
-        // Robust click handler to prevent hanging on "연결 중..."
+        // Click handler to open Vapi call modal
         callBtn.addEventListener('click', () => {
             if (callBtn.disabled) return;
             callBtn.innerText = "통화 연결 중...";
@@ -314,10 +304,8 @@
             try {
                 if (window.vapiSDK && typeof window.vapiSDK.open === 'function') {
                     window.vapiSDK.open();
-                } else if (vapiInstance && typeof vapiInstance.open === 'function') {
-                    vapiInstance.open();
                 } else {
-                    // Fallback re-initialization if SDK instance is dormant
+                    // Fallback re-trigger
                     const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
                     window.vapiSDK.run({
                         apiKey: publicKey,
