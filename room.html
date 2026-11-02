@@ -64,10 +64,10 @@
         .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 8px; }
         .timer-display { font-size: 17px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 6px 16px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
-        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 14px; position: relative; }
+        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 14px; }
         .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
         
-        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 14px 18px; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; margin-bottom: 10px; position: relative; z-index: 1; }
+        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 14px 18px; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; margin-bottom: 10px; }
         .action-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
 
         .shield-badge {
@@ -99,24 +99,10 @@
             line-height: 1.3;
             box-sizing: border-box;
             display: none; 
-            z-index: 1;
-            position: relative;
         }
 
-        /* Overlay Vapi's native trigger button directly over your custom button transparently */
-        .vapi-btn, vapi-btn, #vapi-support-button {
-            position: absolute !important;
-            bottom: 10px !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 52px !important;
-            opacity: 0 !important;
-            z-index: 9999 !important;
-            cursor: pointer !important;
-        }
-        iframe[title*="vapi"], iframe[src*="vapi"] { 
-            display: none !important; 
-        }
+        /* Hide default vapi widget elements */
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
 <body>
@@ -272,9 +258,16 @@
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
-                document.getElementById("btn-text-content").innerText = "통화 연결 중...";
+                document.getElementById("btn-text-content").innerText = "마이크 권한 요청 중...";
 
                 try {
+                    // 1. Explicitly prompt user for microphone access
+                    const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    window.activeMicStream = micStream;
+
+                    document.getElementById("btn-text-content").innerText = "통화 연결 중...";
+
+                    // 2. Initialize Vapi Client instance and start call
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY,
@@ -282,16 +275,37 @@
                             config: {}
                         });
 
-                        if (vapiInstance && typeof vapiInstance.on === 'function') {
-                            vapiInstance.on('call-start', () => {
-                                startTimer();
-                            });
-                            vapiInstance.on('call-end', () => {
-                                endCallUI();
-                            });
+                        if (vapiInstance) {
+                            if (typeof vapiInstance.start === 'function') {
+                                vapiInstance.start(activeAssistantId);
+                            }
+
+                            if (typeof vapiInstance.on === 'function') {
+                                vapiInstance.on('call-start', () => {
+                                    startTimer();
+                                });
+
+                                // Capture inbound WebRTC audio track and assign to audio element
+                                vapiInstance.on('track', (track) => {
+                                    if (track.kind === 'audio') {
+                                        const remoteAudio = document.getElementById("remote-audio");
+                                        if (remoteAudio) {
+                                            remoteAudio.muted = false;
+                                            remoteAudio.srcObject = new MediaStream([track]);
+                                            remoteAudio.volume = 1.0;
+                                            remoteAudio.play().catch(e => console.log("Stream play error:", e));
+                                        }
+                                    }
+                                });
+
+                                vapiInstance.on('call-end', () => {
+                                    endCallUI();
+                                });
+                            }
                         }
                     }
 
+                    // 3. Transition UI to Active Call State
                     startTimer();
                     callState = 'ACTIVE';
                     document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
@@ -311,8 +325,8 @@
                     document.getElementById("btn-text-content").innerText = "통화 종료하기";
 
                 } catch (err) {
-                    console.error("Call start error:", err);
-                    alert("통화 연결 중 오류가 발생했습니다.");
+                    console.error("Microphone permission denied:", err);
+                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정에서 마이크를 허용해 주세요.");
                     btn.removeAttribute("disabled");
                     document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
                 }
@@ -367,6 +381,10 @@
 
         function endCallUI() {
             stopTimer();
+            if (window.activeMicStream) {
+                window.activeMicStream.getTracks().forEach(track => track.stop());
+                window.activeMicStream = null;
+            }
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
                 try { vapiInstance.stop(); } catch(e) {}
             }
