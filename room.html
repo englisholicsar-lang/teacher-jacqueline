@@ -101,7 +101,6 @@
             display: none; 
         }
 
-        /* Hide default vapi widget elements */
         iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
@@ -117,7 +116,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
+    <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -159,7 +158,7 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
-        const VAPI_KEY = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
 
         let callState = 'IDLE'; 
         let isUserAllowed = false; 
@@ -261,13 +260,11 @@
                 document.getElementById("btn-text-content").innerText = "마이크 권한 요청 중...";
 
                 try {
-                    // 1. Explicitly prompt user for microphone access
                     const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     window.activeMicStream = micStream;
 
                     document.getElementById("btn-text-content").innerText = "통화 연결 중...";
 
-                    // 2. Initialize Vapi Client instance and start call
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY,
@@ -285,15 +282,16 @@
                                     startTimer();
                                 });
 
-                                // Capture inbound WebRTC audio track and assign to audio element
-                                vapiInstance.on('track', (track) => {
+                                vapiInstance.on('track', (track, stream) => {
                                     if (track.kind === 'audio') {
                                         const remoteAudio = document.getElementById("remote-audio");
                                         if (remoteAudio) {
+                                            remoteAudio.srcObject = stream || new MediaStream([track]);
                                             remoteAudio.muted = false;
-                                            remoteAudio.srcObject = new MediaStream([track]);
                                             remoteAudio.volume = 1.0;
-                                            remoteAudio.play().catch(e => console.log("Stream play error:", e));
+                                            remoteAudio.play().then(() => {
+                                                console.log("Audio stream playing successfully.");
+                                            }).catch(e => console.log("Stream play error:", e));
                                         }
                                     }
                                 });
@@ -305,7 +303,6 @@
                         }
                     }
 
-                    // 3. Transition UI to Active Call State
                     startTimer();
                     callState = 'ACTIVE';
                     document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
