@@ -297,7 +297,7 @@
         let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
         let vapiInstance = null;
-        window.activeMicStream = null; // Fixed syntax error here
+        window.activeMicStream = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
@@ -371,8 +371,7 @@
                 } catch (err) {
                     console.error("Mic permission error:", err);
                     alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정을 확인해 주세요.");
-                    btn.removeAttribute("disabled");
-                    btn.innerHTML = `<span>📞 통화시작하기</span>`;
+                    resetToIdleButton();
                 }
 
             } else if (callState === 'ACTIVE') {
@@ -408,54 +407,53 @@
         function startVapiCall() {
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
-                vapiInstance = typeof sdk.run === 'function' 
-                    ? sdk.run({ apiKey: VAPI_KEY, assistant: activeAssistantId })
-                    : new sdk(VAPI_KEY);
-
-                if (vapiInstance && typeof vapiInstance.on === 'function') {
-                    vapiInstance.on('call-start', () => {
-                        onCallConnectedSuccessfully();
-                    });
-
-                    vapiInstance.on('speech-start', () => { 
-                        if (!timerInterval) startTimer(); 
-                    });
-
-                    vapiInstance.on('track', (track) => {
-                        if (track.kind === 'audio') {
-                            const remoteAudio = document.getElementById("remote-audio");
-                            if (remoteAudio) {
-                                remoteAudio.muted = false;
-                                remoteAudio.srcObject = new MediaStream([track]);
-                                remoteAudio.volume = 1.0;
-                                remoteAudio.play().catch(e => console.log("Stream play", e));
+                try {
+                    vapiInstance = typeof sdk.run === 'function' 
+                        ? sdk.run({ 
+                            apiKey: VAPI_KEY, 
+                            assistant: activeAssistantId,
+                            config: {
+                                variableValues: {
+                                    student_name: sessionStudentName,
+                                    coaching_notes: sessionCoachingNotes
+                                }
                             }
-                        }
-                    });
+                          })
+                        : new sdk(VAPI_KEY);
 
-                    vapiInstance.on('call-end', () => {
-                        endCallUI();
-                    });
-                }
+                    if (vapiInstance && typeof vapiInstance.start === 'function') {
+                        vapiInstance.start(activeAssistantId, {
+                            variableValues: {
+                                student_name: sessionStudentName,
+                                coaching_notes: sessionCoachingNotes
+                            }
+                        });
+                    }
 
-                if (vapiInstance && typeof vapiInstance.start === 'function') {
-                    vapiInstance.start(activeAssistantId, {
-                        variableValues: {
-                            student_name: sessionStudentName,
-                            coaching_notes: sessionCoachingNotes
-                        }
-                    });
-                } else {
+                    if (vapiInstance && typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            onCallConnectedSuccessfully();
+                        });
+                        vapiInstance.on('call-end', () => {
+                            endCallUI();
+                        });
+                    }
+
                     setTimeout(() => {
-                        onCallConnectedSuccessfully();
-                    }, 1500);
+                        if (callState === 'IDLE') {
+                            onCallConnectedSuccessfully();
+                        }
+                    }, 1200);
+
+                } catch (err) {
+                    console.error("Vapi call execution error:", err);
+                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요.");
+                    resetToIdleButton();
                 }
 
             } else {
                 alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
-                const btn = document.getElementById("action-btn");
-                btn.innerText = "📞 통화시작하기";
-                btn.disabled = false;
+                resetToIdleButton();
             }
         }
 
@@ -478,6 +476,14 @@
             btn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.3)";
             btn.removeAttribute("disabled"); 
             btn.innerHTML = `<span>통화 종료하기</span>`;
+        }
+
+        function resetToIdleButton() {
+            callState = 'IDLE';
+            const btn = document.getElementById("action-btn");
+            btn.removeAttribute("disabled");
+            btn.style.backgroundColor = "var(--btn-green)";
+            btn.innerHTML = `<span>📞 통화시작하기</span>`;
         }
 
         function endCallUI() {
