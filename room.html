@@ -166,7 +166,7 @@
         let secondsElapsed = 0;
         
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
-        let sessionStudentName = "Master Admin";
+        let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -186,7 +186,7 @@
             // MASTER ADMIN BACKDOOR BYPASS CHECK
             if (token === 'englisholic-admin-master-2026') {
                 isUserAllowed = true;
-                // The blue shield icon strictly appears ONLY on the 인증 상태 확인 중... UI page per guidelines
+                // Blue shield icon displays strictly on the 인증 상태 확인 중... UI state
                 document.getElementById("shieldBadge").style.display = "flex"; 
                 document.getElementById("call-status").innerText = "관리자 마스터 테스트 세션 준비가 완료되었습니다.";
                 document.getElementById("adminBox").style.display = "block";
@@ -269,19 +269,22 @@
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
-                document.getElementById("btn-text-content").innerText = "마이크 권한 요청 중...";
+                document.getElementById("btn-text-content").innerText = "통화 연결 중...";
 
                 try {
                     const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     window.activeMicStream = micStream;
 
-                    document.getElementById("btn-text-content").innerText = "통화 연결 중...";
-
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY,
                             assistant: activeAssistantId,
-                            config: {}
+                            config: {
+                                variableValues: {
+                                    studentName: sessionStudentName,
+                                    coachingNotes: sessionCoachingNotes
+                                }
+                            }
                         });
 
                         if (vapiInstance) {
@@ -301,9 +304,7 @@
                                             remoteAudio.srcObject = stream || new MediaStream([track]);
                                             remoteAudio.muted = false;
                                             remoteAudio.volume = 1.0;
-                                            remoteAudio.play().then(() => {
-                                                console.log("Audio stream playing successfully.");
-                                            }).catch(e => console.log("Stream play error:", e));
+                                            remoteAudio.play().catch(e => console.log("Stream play error:", e));
                                         }
                                     }
                                 });
