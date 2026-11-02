@@ -358,28 +358,21 @@
                 });
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
+
+            const remoteAudio = document.getElementById("remote-audio");
+            if (remoteAudio) {
+                remoteAudio.volume = 1.0;
+                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
+            }
 
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
-                btn.innerHTML = `<span>마이크 권한 요청 중...</span>`;
+                btn.innerHTML = `<span>통화 연결 중...</span>`;
 
-                try {
-                    // Explicitly request microphone permission first to trigger the browser prompt popup
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    // Keep stream tracks active so permission is retained, or stop them if Vapi handles its own stream acquisition
-                    stream.getTracks().forEach(track => track.stop());
-
-                    btn.innerHTML = `<span>통화 연결 중...</span>`;
-                    startVapiCall();
-                } catch (err) {
-                    console.error("Mic permission denied:", err);
-                    alert("마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 권한을 허용해 주세요.");
-                    btn.removeAttribute("disabled");
-                    btn.innerHTML = `<span>📞 통화시작하기</span>`;
-                }
+                startVapiCall();
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
