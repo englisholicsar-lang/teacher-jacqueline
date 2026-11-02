@@ -101,7 +101,8 @@
             display: none; 
         }
 
-        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
+        /* Hide default vapi widget elements but keep audio pipeline intact */
+        iframe[title*="vapi"], iframe[src*="vapi"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
 <body>
@@ -116,7 +117,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
+    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -158,7 +159,7 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
-        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+        const VAPI_KEY = "245cea17-1505-481e-9a5a-5c0755ba9e46";
 
         let callState = 'IDLE'; 
         let isUserAllowed = false; 
@@ -248,6 +249,7 @@
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
+            // Unlock audio context via user click gesture
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
                 remoteAudio.volume = 1.0;
@@ -257,14 +259,10 @@
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
-                document.getElementById("btn-text-content").innerText = "마이크 권한 요청 중...";
+                document.getElementById("btn-text-content").innerText = "통화 연결 중...";
 
                 try {
-                    const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    window.activeMicStream = micStream;
-
-                    document.getElementById("btn-text-content").innerText = "통화 연결 중...";
-
+                    // Use Vapi's official native runner method which correctly binds audio streams
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY,
@@ -277,42 +275,9 @@
                                 startTimer();
                             });
 
-                            vapiInstance.on('track', (track) => {
-                                if (track.kind === 'audio') {
-                                    const remoteAudio = document.getElementById("remote-audio");
-                                    if (remoteAudio) {
-                                        try {
-                                            const AudioContextWindow = window.AudioContext || window.webkitAudioContext;
-                                            if (AudioContextWindow) {
-                                                const audioCtx = new AudioContextWindow();
-                                                if (audioCtx.state === 'suspended') {
-                                                    audioCtx.resume();
-                                                }
-                                            }
-
-                                            remoteAudio.muted = false;
-                                            remoteAudio.srcObject = new MediaStream([track]);
-                                            remoteAudio.volume = 1.0;
-                                            
-                                            remoteAudio.play().then(() => {
-                                                console.log("Remote audio stream active.");
-                                            }).catch(error => {
-                                                console.log("Autoplay blocked:", error);
-                                            });
-                                        } catch (e) {
-                                            console.log("Audio bind error:", e);
-                                        }
-                                    }
-                                }
-                            });
-
                             vapiInstance.on('call-end', () => {
                                 endCallUI();
                             });
-                        }
-
-                        if (vapiInstance && typeof vapiInstance.start === 'function') {
-                            vapiInstance.start(activeAssistantId);
                         }
                     }
 
@@ -335,8 +300,8 @@
                     document.getElementById("btn-text-content").innerText = "통화 종료하기";
 
                 } catch (err) {
-                    console.error("Microphone permission denied:", err);
-                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정에서 마이크를 허용해 주세요.");
+                    console.error("Call start error:", err);
+                    alert("통화 연결 중 오류가 발생했습니다.");
                     btn.removeAttribute("disabled");
                     document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
                 }
@@ -391,10 +356,6 @@
 
         function endCallUI() {
             stopTimer();
-            if (window.activeMicStream) {
-                window.activeMicStream.getTracks().forEach(track => track.stop());
-                window.activeMicStream = null;
-            }
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
                 try { vapiInstance.stop(); } catch(e) {}
             }
