@@ -153,6 +153,7 @@
             box-shadow: none;
         }
 
+        /* Admin / Status Bypass Box (Only shows if admin token matches) */
         .admin-box {
             width: 100%;
             background: #f0fdf4;
@@ -164,6 +165,7 @@
             text-align: left;
             line-height: 1.4;
             box-sizing: border-box;
+            display: none; 
         }
 
         /* Completely banish any injected Vapi floating widgets or buttons */
@@ -205,7 +207,7 @@
             <span>인증 상태 확인 중...</span>
         </button>
 
-        <div id="adminBox" class="admin-box" style="display: none;">
+        <div id="adminBox" class="admin-box">
             👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>
             모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.
         </div>
@@ -250,7 +252,10 @@
                         callBtn.innerHTML = `📞 통화시작하기`;
                         callBtn.disabled = false;
 
-                        adminBox.style.display = "block";
+                        // Only show admin box if it's your designated admin/test token (e.g. contains 'test')
+                        if (token.includes('test')) {
+                            adminBox.style.display = "block";
+                        }
 
                         const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
                         if (window.vapiSDK) {
