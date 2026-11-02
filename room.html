@@ -1,290 +1,4 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>잉글리쉬홀릭 - Live Session</title>
-    
-    <meta property="og:title" content="잉글리쉬홀릭 - Live Session">
-    <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
-    <meta property="og:type" content="website">
-
-    <!-- Vapi Web SDK Loader -->
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
-
-    <style>
-        :root {
-            --bg-base: #f0f4f8;
-            --primary-navy: #0f172a;
-            --sub-text: #64748b;
-            --box-bg: #ffffff;
-            --box-border: #dbeafe;
-            --btn-green: #059669;
-            --btn-green-hover: #047857;
-            --disabled-bg: #cbd5e1;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(circle at 95% 5%, rgba(37, 99, 235, 0.12) 0%, transparent 45%),
-                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            background-attachment: fixed;
-            position: relative;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 8px 20px 24px 20px;
-            color: var(--primary-navy);
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 55px;
-            height: 75px;
-            background-image: radial-gradient(#94a3b8 1.5px, transparent 1.5px);
-            background-size: 10px 10px;
-            opacity: 0.5;
-            z-index: 0;
-        }
-
-        .container { 
-            position: relative; 
-            z-index: 1; 
-            width: 100%; 
-            max-width: 420px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center; 
-        }
-
-        .upper-group { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            width: 100%; 
-            margin-top: 4px; 
-        }
-
-        .logo-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin: 4px 0 10px 0; 
-        }
-
-        .logo-img { 
-            width: 155px; 
-            height: auto; 
-            object-fit: contain; 
-        }
-
-        .avatar-container { 
-            position: relative; 
-            width: 86px; 
-            height: 86px; 
-            margin: 0 auto 10px auto; 
-        }
-
-        .avatar-img { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 3px solid #ffffff; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
-        }
-
-        .shield-badge {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background: #2563eb;
-            color: white;
-            border-radius: 50%;
-            width: 26px;
-            height: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-
-        .title { 
-            font-size: 22px; 
-            font-weight: 700; 
-            color: var(--primary-navy); 
-            margin-bottom: 4px; 
-            text-align: center; 
-        }
-
-        .subtitle { 
-            font-size: 14px; 
-            color: var(--sub-text); 
-            margin-bottom: 12px; 
-            text-align: center; 
-            line-height: 1.4; 
-        }
-
-        .timer-wrapper { 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            margin-bottom: 16px; 
-        }
-
-        .timer-display { 
-            font-size: 16px; 
-            font-weight: 800; 
-            color: var(--primary-navy); 
-            background-color: #ffffff; 
-            padding: 8px 18px; 
-            border-radius: 20px; 
-            border: 2px solid #d4e5f9; 
-            box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
-        }
-
-        .bottom-group { 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-        }
-
-        .info-box { 
-            width: 100%; 
-            background: var(--box-bg); 
-            border: 1px solid var(--box-border); 
-            border-radius: 16px; 
-            padding: 14px 18px; 
-            display: flex; 
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02); 
-            text-align: center;
-        }
-        
-        .action-btn { 
-            width: 100%; 
-            background-color: var(--btn-green); 
-            color: #ffffff; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 14px; 
-            font-size: 16px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            transition: background-color 0.2s, transform 0.1s;
-            box-sizing: border-box;
-            margin-bottom: 16px; 
-        }
-
-        .action-btn:hover:not(:disabled) { 
-            background-color: var(--btn-green-hover); 
-        }
-
-        .action-btn:active:not(:disabled) { 
-            transform: scale(0.98); 
-        }
-
-        .action-btn:disabled { 
-            background-color: var(--disabled-bg); 
-            color: #64748b; 
-            box-shadow: none; 
-            cursor: not-allowed; 
-        }
-
-        .admin-box {
-            width: 100%;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 14px;
-            padding: 12px 16px;
-            font-size: 12px;
-            color: #166534;
-            text-align: left;
-            line-height: 1.4;
-            box-sizing: border-box;
-            display: none; 
-        }
-
-        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { 
-            display: none !important; 
-            visibility: hidden !important; 
-            opacity: 0 !important; 
-            pointer-events: none !important; 
-        }
-    </style>
-</head>
-<body>
-
-    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
-
-    <div id="main-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper">
-                <img src="logo.png" alt="Englisholic Logo" class="logo-img">
-            </div>
-            <div class="avatar-container">
-                <img id="teacherImg" class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-                <div id="shieldBadge" class="shield-badge">🛡️</div>
-            </div>
-            <h1 id="mainTitle" class="title">Teacher Jacqueline</h1>
-            <p id="subDesc" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
-            
-            <div id="timer-wrapper" class="timer-wrapper" style="display: none;">
-                <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
-            </div>
-        </div>
-
-        <div class="bottom-group">
-            <div id="notice-box" class="info-box">
-                <div style="font-size: 13px; font-weight: 700; color: #334155; line-height: 1.5;">
-                    🔊 스피커폰으로 기본 설정됩니다.<br>
-                    🎧 이어폰은 통화 시작 전 연결해 주세요!
-                </div>
-            </div>
-
-            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled>
-                <span>인증 상태 확인 중...</span>
-            </button>
-
-            <div id="adminBox" class="admin-box">
-                👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>
-                모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
         const VAPI_KEY = "245cea17-1505-481e-9a5a-5c0755ba9e46";
 
@@ -395,64 +109,58 @@
         }
 
         function startVapiCall() {
-            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+            const sdk = window.vapiSDK || window.vapi;
             
             if (sdk && typeof sdk.run === 'function') {
-                try {
-                    vapiInstance = sdk.run({ 
-                        apiKey: VAPI_KEY, 
-                        assistant: activeAssistantId,
-                        config: {
-                            variableValues: {
-                                student_name: sessionStudentName,
-                                coaching_notes: sessionCoachingNotes
+                vapiInstance = sdk.run({ 
+                    apiKey: VAPI_KEY, 
+                    assistant: activeAssistantId,
+                    config: {
+                        variableValues: {
+                            student_name: sessionStudentName,
+                            coaching_notes: sessionCoachingNotes
+                        }
+                    }
+                });
+
+                if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    vapiInstance.on('call-start', () => {
+                        onCallConnectedSuccessfully();
+                    });
+
+                    vapiInstance.on('speech-start', () => { 
+                        if (!timerInterval) startTimer(); 
+                    });
+
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) {
+                                remoteAudio.muted = false;
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.volume = 1.0;
+                                remoteAudio.play().catch(e => console.log("Audio play error", e));
                             }
                         }
                     });
 
-                    if (vapiInstance && typeof vapiInstance.on === 'function') {
-                        vapiInstance.on('call-start', () => {
-                            onCallConnectedSuccessfully();
-                        });
-
-                        vapiInstance.on('speech-start', () => { 
-                            if (!timerInterval) startTimer(); 
-                        });
-
-                        vapiInstance.on('track', (track) => {
-                            if (track.kind === 'audio') {
-                                const remoteAudio = document.getElementById("remote-audio");
-                                if (remoteAudio) {
-                                    remoteAudio.muted = false;
-                                    remoteAudio.srcObject = new MediaStream([track]);
-                                    remoteAudio.volume = 1.0;
-                                    remoteAudio.play().catch(e => console.log("Audio play error", e));
-                                }
-                            }
-                        });
-
-                        vapiInstance.on('call-end', () => {
-                            endCallUI();
-                        });
-                    }
-
-                    // Seamless transition fallback timer
-                    setTimeout(() => {
-                        if (callState === 'IDLE') {
-                            onCallConnectedSuccessfully();
-                        }
-                    }, 2000);
-
-                } catch (err) {
-                    console.error("Vapi start execution error:", err);
-                    alert("통화 연결 중 오류가 발생했습니다.");
-                    resetToIdleButton();
+                    vapiInstance.on('call-end', () => {
+                        endCallUI();
+                    });
                 }
+
+                // Smooth UI transition fallback
+                setTimeout(() => {
+                    if (callState === 'IDLE') {
+                        onCallConnectedSuccessfully();
+                    }
+                }, 2000);
+
             } else {
-                // Retry if SDK loader script is still finishing up
+                // Auto-retry if SDK loader is still initializing
                 setTimeout(() => {
                     startVapiCall();
-                }, 1000);
+                }, 800);
             }
         }
 
@@ -507,5 +215,3 @@
             btn.innerHTML = `<span>고객센터 문의하기</span>`;
         }
     </script>
-</body>
-</html>
