@@ -297,7 +297,6 @@
         let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
         let vapiInstance = null;
-        window.activeMicStream = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
@@ -349,7 +348,7 @@
                 });
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
 
             const remoteAudio = document.getElementById("remote-audio");
@@ -363,16 +362,7 @@
                 btn.setAttribute("disabled", "true");
                 btn.innerHTML = `<span>통화 연결 중...</span>`;
 
-                try {
-                    const globalMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    window.activeMicStream = globalMicStream;
-
-                    startVapiCall();
-                } catch (err) {
-                    console.error("Mic permission error:", err);
-                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정을 확인해 주세요.");
-                    resetToIdleButton();
-                }
+                startVapiCall();
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
@@ -408,18 +398,36 @@
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
                 try {
+                    // Initialize Vapi instance using the proven trial format
                     vapiInstance = typeof sdk.run === 'function' 
-                        ? sdk.run({ 
-                            apiKey: VAPI_KEY, 
-                            assistant: activeAssistantId,
-                            config: {
-                                variableValues: {
-                                    student_name: sessionStudentName,
-                                    coaching_notes: sessionCoachingNotes
+                        ? sdk.run({ apiKey: VAPI_KEY, assistant: activeAssistantId })
+                        : new sdk(VAPI_KEY);
+
+                    if (vapiInstance && typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            onCallConnectedSuccessfully();
+                        });
+
+                        vapiInstance.on('speech-start', () => { 
+                            if (!timerInterval) startTimer(); 
+                        });
+
+                        vapiInstance.on('track', (track) => {
+                            if (track.kind === 'audio') {
+                                const remoteAudio = document.getElementById("remote-audio");
+                                if (remoteAudio) {
+                                    remoteAudio.muted = false;
+                                    remoteAudio.srcObject = new MediaStream([track]);
+                                    remoteAudio.volume = 1.0;
+                                    remoteAudio.play().catch(e => console.log("Stream play", e));
                                 }
                             }
-                          })
-                        : new sdk(VAPI_KEY);
+                        });
+
+                        vapiInstance.on('call-end', () => {
+                            endCallUI();
+                        });
+                    }
 
                     if (vapiInstance && typeof vapiInstance.start === 'function') {
                         vapiInstance.start(activeAssistantId, {
@@ -430,23 +438,15 @@
                         });
                     }
 
-                    if (vapiInstance && typeof vapiInstance.on === 'function') {
-                        vapiInstance.on('call-start', () => {
-                            onCallConnectedSuccessfully();
-                        });
-                        vapiInstance.on('call-end', () => {
-                            endCallUI();
-                        });
-                    }
-
+                    // Fallback timer to ensure the UI switches over smoothly if the event listener delays
                     setTimeout(() => {
                         if (callState === 'IDLE') {
                             onCallConnectedSuccessfully();
                         }
-                    }, 1200);
+                    }, 2000);
 
                 } catch (err) {
-                    console.error("Vapi call execution error:", err);
+                    console.error("Vapi start error:", err);
                     alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요.");
                     resetToIdleButton();
                 }
@@ -488,10 +488,6 @@
 
         function endCallUI() {
             stopTimer();
-            if (window.activeMicStream) {
-                window.activeMicStream.getTracks().forEach(track => track.stop());
-                window.activeMicStream = null;
-            }
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
                 try { vapiInstance.stop(); } catch(e) {}
             }
