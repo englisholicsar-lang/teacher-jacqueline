@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>잉글리쉬홀릭 - Live Session</title>
-    <!-- Vapi Web SDK -->
+    <!-- Vapi Web SDK Script Tag -->
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
     <style>
         :root {
@@ -239,7 +239,7 @@
                 return;
             }
 
-            // Fetch token verification from GAS backend
+            // Fetch token data from GAS backend
             fetch(`${GAS_URL}?token=${token}`)
                 .then(response => response.json())
                 .then(data => {
@@ -260,7 +260,7 @@
                             adminBox.style.display = "block";
                         }
 
-                        // Initialize Vapi SDK binding correctly to our button
+                        // Let Vapi attach directly to our button element using Vapi's native configuration
                         const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
                         if (window.vapiSDK) {
                             vapiInstance = window.vapiSDK.run({
@@ -272,31 +272,21 @@
                                         coaching_notes: data.coachingNotes
                                     }
                                 },
+                                // Target our custom button directly so Vapi handles the click/state natively
                                 button: {
-                                    position: "bottom-right",
-                                    offset: "40px",
-                                    width: "30px",
-                                    height: "30px",
+                                    elementId: "callBtn",
+                                    mode: "normal",
                                     idle: {
-                                        color: "rgb(93, 254, 202)",
-                                        type: "pill",
-                                        title: "Call",
-                                        subtitle: "Aida",
-                                        icon: "https://unpkg.com/lucide-static@0.321.0/icons/phone.svg"
+                                        title: "📞 통화시작하기",
+                                        color: "#059669"
                                     },
                                     loading: {
-                                        color: "rgb(93, 254, 202)",
-                                        type: "pill",
-                                        title: "Connecting...",
-                                        subtitle: "Please wait",
-                                        icon: "https://unpkg.com/lucide-static@0.321.0/icons/loader-2.svg"
+                                        title: "통화 연결 중...",
+                                        color: "#64748b"
                                     },
                                     active: {
-                                        color: "rgb(255, 0, 0)",
-                                        type: "pill",
-                                        title: "Disconnect",
-                                        subtitle: "Active",
-                                        icon: "https://unpkg.com/lucide-static@0.321.0/icons/phone-off.svg"
+                                        title: "통화 종료",
+                                        color: "#dc2626"
                                     }
                                 }
                             });
@@ -313,30 +303,7 @@
                     subDesc.innerText = "서버 통신 오류가 발생했습니다.";
                     callBtn.innerText = "연결 오류";
                     callBtn.disabled = true;
-                });
-        });
-
-        // Bridge our custom green button click directly to Vapi's control flow
-        callBtn.addEventListener('click', () => {
-            if (callBtn.disabled) return;
-            callBtn.innerText = "통화 연결 중...";
-            callBtn.disabled = true;
-
-            try {
-                // If Vapi injected a button element, programmatically click it to trigger the native modal flow
-                const vapiWidgetBtn = document.querySelector('#vapi-support-button') || document.querySelector('[class*="vapi"] button');
-                if (vapiWidgetBtn) {
-                    vapiWidgetBtn.click();
-                } else if (window.vapiSDK && typeof window.vapiSDK.open === 'function') {
-                    window.vapiSDK.open();
-                } else {
-                    window.location.reload();
-                }
-            } catch (e) {
-                console.error(e);
-                callBtn.innerText = "연결 실패 (새로고침)";
-                callBtn.disabled = false;
-            }
+    
         });
     </script>
 </body>
