@@ -408,9 +408,17 @@
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
                 try {
-                    vapiInstance = typeof sdk.run === 'function' 
-                        ? sdk.run({ apiKey: VAPI_KEY, assistant: activeAssistantId })
-                        : new sdk(VAPI_KEY);
+                    // Properly initialize and start using the Vapi SDK run configuration
+                    vapiInstance = sdk.run({
+                        apiKey: VAPI_KEY,
+                        assistant: activeAssistantId,
+                        config: {
+                            variableValues: {
+                                student_name: sessionStudentName,
+                                coaching_notes: sessionCoachingNotes
+                            }
+                        }
+                    });
 
                     if (vapiInstance && typeof vapiInstance.on === 'function') {
                         vapiInstance.on('call-start', () => {
@@ -429,7 +437,7 @@
                                     remoteAudio.srcObject = new MediaStream([track]);
                                     remoteAudio.volume = 1.0;
                                     remoteAudio.play().then(() => {
-                                        console.log("Remote audio stream active");
+                                        console.log("Teacher audio track active");
                                     }).catch(e => {
                                         console.log("Audio play unlock retry", e);
                                         document.body.click();
@@ -443,20 +451,12 @@
                         });
                     }
 
-                    if (vapiInstance && typeof vapiInstance.start === 'function') {
-                        vapiInstance.start(activeAssistantId, {
-                            variableValues: {
-                                student_name: sessionStudentName,
-                                coaching_notes: sessionCoachingNotes
-                            }
-                        });
-                    }
-
+                    // Fallback timer to bridge UI smoothly if event hooks take a moment
                     setTimeout(() => {
                         if (callState === 'IDLE') {
                             onCallConnectedSuccessfully();
                         }
-                    }, 2000);
+                    }, 1500);
 
                 } catch (err) {
                     console.error("Vapi start error:", err);
