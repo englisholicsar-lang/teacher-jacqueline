@@ -186,7 +186,9 @@
             // MASTER ADMIN BACKDOOR BYPASS CHECK
             if (token === 'englisholic-admin-master-2026') {
                 isUserAllowed = true;
-                // Blue shield icon displays strictly on the 인증 상태 확인 중... UI state
+                sessionStudentName = "Drew (Master Admin)";
+                sessionCoachingNotes = "Discussing advanced AI telephony integrations and testing seamless Vapi assistant variable injection.";
+                
                 document.getElementById("shieldBadge").style.display = "flex"; 
                 document.getElementById("call-status").innerText = "관리자 마스터 테스트 세션 준비가 완료되었습니다.";
                 document.getElementById("adminBox").style.display = "block";
@@ -272,6 +274,7 @@
                 document.getElementById("btn-text-content").innerText = "통화 연결 중...";
 
                 try {
+                    // Single clean microphone permission request in sync with call launch
                     const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     window.activeMicStream = micStream;
 
@@ -281,8 +284,8 @@
                             assistant: activeAssistantId,
                             config: {
                                 variableValues: {
-                                    studentName: sessionStudentName,
-                                    coachingNotes: sessionCoachingNotes
+                                    student_name: sessionStudentName,
+                                    coaching_notes: sessionCoachingNotes
                                 }
                             }
                         });
