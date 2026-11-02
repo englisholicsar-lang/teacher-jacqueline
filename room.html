@@ -297,6 +297,7 @@
         let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
         let vapiInstance = null;
+        window.activeMicStream = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
@@ -348,7 +349,7 @@
                 });
         });
 
-        function handleMainAction() {
+        async function handleMainAction() {
             if (!isUserAllowed) return;
 
             const remoteAudio = document.getElementById("remote-audio");
@@ -362,7 +363,16 @@
                 btn.setAttribute("disabled", "true");
                 btn.innerHTML = `<span>통화 연결 중...</span>`;
 
-                startVapiCall();
+                try {
+                    const globalMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    window.activeMicStream = globalMicStream;
+
+                    startVapiCall();
+                } catch (err) {
+                    console.error("Mic permission error:", err);
+                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정을 확인해 주세요.");
+                    resetToIdleButton();
+                }
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
@@ -398,7 +408,6 @@
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
                 try {
-                    // Initialize Vapi instance using the proven trial format
                     vapiInstance = typeof sdk.run === 'function' 
                         ? sdk.run({ apiKey: VAPI_KEY, assistant: activeAssistantId })
                         : new sdk(VAPI_KEY);
@@ -419,7 +428,12 @@
                                     remoteAudio.muted = false;
                                     remoteAudio.srcObject = new MediaStream([track]);
                                     remoteAudio.volume = 1.0;
-                                    remoteAudio.play().catch(e => console.log("Stream play", e));
+                                    remoteAudio.play().then(() => {
+                                        console.log("Remote audio stream active");
+                                    }).catch(e => {
+                                        console.log("Audio play unlock retry", e);
+                                        document.body.click();
+                                    });
                                 }
                             }
                         });
@@ -438,7 +452,6 @@
                         });
                     }
 
-                    // Fallback timer to ensure the UI switches over smoothly if the event listener delays
                     setTimeout(() => {
                         if (callState === 'IDLE') {
                             onCallConnectedSuccessfully();
@@ -488,6 +501,10 @@
 
         function endCallUI() {
             stopTimer();
+            if (window.activeMicStream) {
+                window.activeMicStream.getTracks().forEach(track => track.stop());
+                window.activeMicStream = null;
+            }
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
                 try { vapiInstance.stop(); } catch(e) {}
             }
