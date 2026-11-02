@@ -10,7 +10,17 @@
     <meta property="og:type" content="website">
 
     <!-- Vapi Web SDK Loader -->
-    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <script>
+      var vapiInstance = null;
+      (function (d, t) {
+        var g = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+        g.defer = true;
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+      })(document, "script");
+    </script>
 
     <style>
         :root {
@@ -296,7 +306,6 @@
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
         let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
-        let vapiInstance = null;
         window.activeMicStream = null;
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -405,65 +414,77 @@
         }
 
         function startVapiCall() {
-            const VapiConstructor = window.Vapi || (window.vapiSDK && window.vapiSDK.Vapi);
+            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             
-            if (VapiConstructor) {
+            if (sdk) {
                 try {
-                    // Use the official constructor pattern
-                    vapiInstance = new VapiConstructor(VAPI_KEY);
-
-                    vapiInstance.on('call-start', () => {
-                        onCallConnectedSuccessfully();
-                    });
-
-                    vapiInstance.on('speech-start', () => { 
-                        if (!timerInterval) startTimer(); 
-                    });
-
-                    vapiInstance.on('track', (track) => {
-                        if (track.kind === 'audio') {
-                            const remoteAudio = document.getElementById("remote-audio");
-                            if (remoteAudio) {
-                                remoteAudio.muted = false;
-                                remoteAudio.srcObject = new MediaStream([track]);
-                                remoteAudio.volume = 1.0;
-                                remoteAudio.play().then(() => {
-                                    console.log("Teacher audio stream active");
-                                }).catch(e => {
-                                    console.log("Audio play unlock retry", e);
-                                    document.body.click();
-                                });
+                    // Use the exact standard SDK run initialization proven for script-tag setups
+                    vapiInstance = typeof sdk.run === 'function'
+                        ? sdk.run({ 
+                            apiKey: VAPI_KEY, 
+                            assistant: activeAssistantId,
+                            config: {
+                                variableValues: {
+                                    student_name: sessionStudentName,
+                                    coaching_notes: sessionCoachingNotes
+                                }
                             }
+                          })
+                        : new sdk(VAPI_KEY);
+
+                    if (vapiInstance && typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            onCallConnectedSuccessfully();
+                        });
+
+                        vapiInstance.on('speech-start', () => { 
+                            if (!timerInterval) startTimer(); 
+                        });
+
+                        vapiInstance.on('track', (track) => {
+                            if (track.kind === 'audio') {
+                                const remoteAudio = document.getElementById("remote-audio");
+                                if (remoteAudio) {
+                                    remoteAudio.muted = false;
+                                    remoteAudio.srcObject = new MediaStream([track]);
+                                    remoteAudio.volume = 1.0;
+                                    remoteAudio.play().catch(e => console.log("Audio play error", e));
+                                }
+                            }
+                        });
+
+                        vapiInstance.on('call-end', () => {
+                            endCallUI();
+                        });
+                    }
+
+                    if (vapiInstance && typeof vapiInstance.start === 'function') {
+                        vapiInstance.start(activeAssistantId, {
+                            variableValues: {
+                                student_name: sessionStudentName,
+                                coaching_notes: sessionCoachingNotes
+                            }
+                        });
+                    }
+
+                    // Direct connection transition fallback to ensure smooth entry
+                    setTimeout(() => {
+                        if (callState === 'IDLE') {
+                            onCallConnectedSuccessfully();
                         }
-                    });
-
-                    vapiInstance.on('call-end', () => {
-                        endCallUI();
-                    });
-
-                    vapiInstance.on('error', (e) => {
-                        console.error("Vapi error event:", e);
-                        alert("통화 연결 중 오류가 발생했습니다.");
-                        resetToIdleButton();
-                    });
-
-                    // Start the call with the assistant ID and custom variables
-                    vapiInstance.start(activeAssistantId, {
-                        variableValues: {
-                            student_name: sessionStudentName,
-                            coaching_notes: sessionCoachingNotes
-                        }
-                    });
+                    }, 2000);
 
                 } catch (err) {
-                    console.error("Vapi instantiation error:", err);
-                    alert("통화 연결 중 오류가 발생했습니다.");
+                    console.error("Vapi start error:", err);
+                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요.");
                     resetToIdleButton();
                 }
 
             } else {
-                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
-                resetToIdleButton();
+                // If SDK isn't ready yet, give it a 1-second auto-retry instead of failing
+                setTimeout(() => {
+                    startVapiCall();
+                }, 1000);
             }
         }
 
