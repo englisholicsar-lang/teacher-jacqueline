@@ -183,17 +183,10 @@
                 return;
             }
 
+            // Always fetch dynamically from GAS (even for admin master token) so Column F is the true source
+            let fetchUrl = `${GAS_URL}?token=${token}`;
             if (token === 'englisholic-admin-master-2026') {
-                isUserAllowed = true;
-                sessionStudentName = "Drew";
-                sessionCoachingNotes = "재등록일 1일 남음 수업을 특별히 재미있게";
-                
-                document.getElementById("shieldBadge").style.display = "flex"; 
-                document.getElementById("call-status").innerText = "관리자 마스터 테스트 세션 준비가 완료되었습니다.";
-                document.getElementById("adminBox").style.display = "block";
-                btn.removeAttribute("disabled");
-                document.getElementById("btn-text-content").innerText = "📞 관리자 테스트 통화 시작";
-                return;
+                fetchUrl = `${GAS_URL}?key=englisholic-admin-master-2026`;
             }
 
             let fallbackTriggered = false;
@@ -201,9 +194,9 @@
                 if (!isUserAllowed) {
                     fallbackTriggered = true;
                     isUserAllowed = true;
-                    document.getElementById("shieldBadge").style.display = "none";
+                    document.getElementById("shieldBadge").style.display = token === 'englisholic-admin-master-2026' ? "flex" : "none";
                     document.getElementById("call-status").innerText = `${urlStudent || sessionStudentName} 회원님, 수업 준비가 완료되었습니다.`;
-                    if (token.includes('test')) {
+                    if (token.includes('test') || token === 'englisholic-admin-master-2026') {
                         document.getElementById("adminBox").style.display = "block";
                     }
                     btn.removeAttribute("disabled");
@@ -211,7 +204,7 @@
                 }
             }, 3500);
 
-            fetch(`${GAS_URL}?token=${token}`)
+            fetch(fetchUrl)
                 .then(res => res.json())
                 .then(data => {
                     if (fallbackTriggered) return;
@@ -219,6 +212,8 @@
 
                     if (data.allowed) {
                         isUserAllowed = true;
+                        
+                        // Blue shield appears strictly on the 인증 상태 확인 중... UI check phase/loading, then hides when ready
                         document.getElementById("shieldBadge").style.display = "none";
 
                         document.getElementById("mainTitle").innerText = `Teacher ${data.teacher || 'Jacqueline'}`;
@@ -230,7 +225,7 @@
                             activeAssistantId = data.assistantId;
                         }
 
-                        if (token.includes('test')) {
+                        if (token.includes('test') || token === 'englisholic-admin-master-2026') {
                             document.getElementById("adminBox").style.display = "block";
                         }
 
@@ -250,7 +245,7 @@
                     isUserAllowed = true;
                     document.getElementById("shieldBadge").style.display = "none";
                     document.getElementById("call-status").innerText = "수업 준비가 완료되었습니다.";
-                    if (token.includes('test')) {
+                    if (token.includes('test') || token === 'englisholic-admin-master-2026') {
                         document.getElementById("adminBox").style.display = "block";
                     }
                     btn.removeAttribute("disabled");
@@ -294,11 +289,9 @@
 
                             if (typeof vapiInstance.on === 'function') {
                                 vapiInstance.on('call-start', () => {
-                                    // Timer starts strictly when the live call actually begins
                                     startTimer();
                                     callState = 'ACTIVE';
                                     
-                                    // Inject coaching notes directly into the live assistant memory context
                                     if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") {
                                         if (vapiInstance && typeof vapiInstance.send === 'function') {
                                             vapiInstance.send({
