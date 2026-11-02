@@ -9,18 +9,11 @@
     <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
     <meta property="og:type" content="website">
 
-    <!-- Vapi Web SDK Async Loader -->
+    <!-- Vapi Web SDK Loader (Direct Global Runner) -->
     <script>
       var vapiInstance = null;
-      (function (d, t) {
-        var g = d.createElement(t),
-            s = d.getElementsByTagName(t)[0];
-        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-        g.defer = true;
-        g.async = true;
-        s.parentNode.insertBefore(g, s);
-      })(document, "script");
     </script>
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
     <style>
         :root {
@@ -48,7 +41,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 0px 20px 20px 20px;
+            padding: 0px 20px 16px 20px;
             color: var(--primary-navy);
         }
 
@@ -60,21 +53,21 @@
         .dot-pattern-right { position: absolute; top: 80px; right: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
 
         .container { position: relative; z-index: 1; width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .upper-group { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 6px; }
-        .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-        .logo-img { height: 75px; width: auto; object-fit: contain; }
-        .avatar-container { position: relative; width: 115px; height: 115px; margin-bottom: 8px; }
+        .upper-group { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 4px; }
+        .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+        .logo-img { height: 65px; width: auto; object-fit: contain; }
+        .avatar-container { position: relative; width: 100px; height: 100px; margin-bottom: 6px; }
         .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); }
-        .title { font-size: 22px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
-        .subtitle { font-size: 13.5px; font-weight: 600; color: #4a637d; }
+        .title { font-size: 21px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
+        .subtitle { font-size: 13px; font-weight: 600; color: #4a637d; }
 
-        .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 12px; }
-        .timer-display { font-size: 18px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 8px 18px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
+        .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 8px; }
+        .timer-display { font-size: 17px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 6px 16px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
 
-        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
-        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
+        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 14px; }
+        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
         
-        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
+        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 14px 18px; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; margin-bottom: 10px; }
         .action-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
 
         .shield-badge {
@@ -84,12 +77,12 @@
             background: #2563eb;
             color: white;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 12px;
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
@@ -98,15 +91,14 @@
             width: 100%;
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
-            border-radius: 14px;
-            padding: 10px 14px;
-            font-size: 12px;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 11.5px;
             color: #166534;
             text-align: left;
-            line-height: 1.4;
+            line-height: 1.3;
             box-sizing: border-box;
-            margin-bottom: 12px;
-            display: none;
+            display: none; 
         }
 
         iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
@@ -144,23 +136,24 @@
         </div>
 
         <div class="bottom-group">
-            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 8px; padding: 12px 10px;">
-                <div style="font-size: 13.5px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
-                    <span style="font-size: 16px;">🔊</span> 스피커폰으로 기본 설정됩니다.
+            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 6px; padding: 10px 10px;">
+                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
+                    <span style="font-size: 15px;">🔊</span> 스피커폰으로 기본 설정됩니다.
                 </div>
-                <div style="font-size: 13.5px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
-                    <span style="font-size: 16px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!
+                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
+                    <span style="font-size: 15px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!
                 </div>
             </div>
+
+            <!-- Action Button is now above the Admin Box -->
+            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled>
+                <span id="btn-text-content">인증 상태 확인 중...</span>
+            </button>
 
             <div id="adminBox" class="admin-box">
                 👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>
                 모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.
             </div>
-
-            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled>
-                <span id="btn-text-content">인증 상태 확인 중...</span>
-            </button>
         </div>
     </div>
 
@@ -292,11 +285,12 @@
         }
 
         function startVapiCall() {
-            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
-            if (sdk) {
-                vapiInstance = typeof sdk.run === 'function' 
-                    ? sdk.run({ apiKey: VAPI_KEY, assistant: activeAssistantId })
-                    : new sdk(VAPI_KEY);
+            if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                vapiInstance = window.vapiSDK.run({
+                    apiKey: VAPI_KEY,
+                    assistant: activeAssistantId,
+                    config: {}
+                });
 
                 if (vapiInstance && typeof vapiInstance.on === 'function') {
                     vapiInstance.on('call-start', () => {
@@ -328,44 +322,30 @@
                     });
                 }
 
-                if (vapiInstance && typeof vapiInstance.start === 'function') {
-                    const now = new Date();
-                    const guamTime = new Intl.DateTimeFormat('en-US', { 
-                        timeZone: 'Pacific/Guam', 
-                        hour: 'numeric', 
-                        minute: '2-digit' 
-                    }).format(now);
+                // Fallback UI transition timer if call-start event takes a moment
+                setTimeout(() => {
+                    if (callState === 'IDLE') {
+                        startTimer();
+                        callState = 'ACTIVE';
+                        document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+                        
+                        document.getElementById("notice-box").innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                                <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                                <span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
+                                    마이크 권한을 허용해 주세요.
+                                </span>
+                            </div>
+                        `;
 
-                    vapiInstance.start(activeAssistantId, {
-                        variableValues: {
-                            student_name: sessionStudentName,
-                            coaching_notes: sessionCoachingNotes
-                        },
-                        metadata: {
-                            student_name: sessionStudentName,
-                            coaching_notes: sessionCoachingNotes,
-                            liveGuamTime: guamTime
-                        }
-                    });
-                }
-                
-                callState = 'ACTIVE';
-                document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
-                
-                document.getElementById("notice-box").innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
-                        <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
-                        <span style="text-align: left; font-size: 14px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
-                            마이크 권한을 허용해 주세요.
-                        </span>
-                    </div>
-                `;
+                        const btn = document.getElementById("action-btn");
+                        btn.style.backgroundColor = "#e05252";
+                        btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                        btn.removeAttribute("disabled"); 
+                        document.getElementById("btn-text-content").innerText = "통화 종료하기";
+                    }
+                }, 1500);
 
-                const btn = document.getElementById("action-btn");
-                btn.style.backgroundColor = "#e05252";
-                btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                btn.removeAttribute("disabled"); 
-                document.getElementById("btn-text-content").innerText = "통화 종료하기";
             } else {
                 alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
                 const btn = document.getElementById("action-btn");
