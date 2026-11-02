@@ -9,8 +9,8 @@
     <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
     <meta property="og:type" content="website">
 
-    <!-- Direct Vapi Web Core Bundle -->
-    <script src="https://unpkg.com/@vapi-ai/web@latest/dist/index.js"></script>
+    <!-- Vapi Web SDK Loader -->
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
         :root {
@@ -235,9 +235,18 @@
             box-sizing: border-box;
             display: none; 
         }
+
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { 
+            display: none !important; 
+            visibility: hidden !important; 
+            opacity: 0 !important; 
+            pointer-events: none !important; 
+        }
     </style>
 </head>
 <body>
+
+    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -287,7 +296,7 @@
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
         let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
-        let vapi = null;
+        let vapiInstance = null;
         window.activeMicStream = null;
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -323,12 +332,6 @@
                             document.getElementById("adminBox").style.display = "block";
                         }
 
-                        // Initialize direct Vapi client core
-                        if (window.Vapi) {
-                            vapi = new window.Vapi(VAPI_KEY);
-                            setupVapiListeners();
-                        }
-
                         btn.removeAttribute("disabled");
                         btn.innerHTML = `<span>📞 통화시작하기</span>`;
                     } else {
@@ -346,31 +349,14 @@
                 });
         });
 
-        function setupVapiListeners() {
-            if (!vapi) return;
-
-            vapi.on("call-start", () => {
-                console.log("Vapi call started successfully");
-                onCallConnectedSuccessfully();
-            });
-
-            vapi.on("speech-start", () => {
-                if (!timerInterval) startTimer();
-            });
-
-            vapi.on("call-end", () => {
-                endCallUI();
-            });
-
-            vapi.on("error", (e) => {
-                console.error("Vapi error:", e);
-                alert("통화 연결 중 오류가 발생했습니다.");
-                resetToIdleButton();
-            });
-        }
-
         async function handleMainAction() {
             if (!isUserAllowed) return;
+
+            const remoteAudio = document.getElementById("remote-audio");
+            if (remoteAudio) {
+                remoteAudio.volume = 1.0;
+                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
+            }
 
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
@@ -378,30 +364,13 @@
                 btn.innerHTML = `<span>통화 연결 중...</span>`;
 
                 try {
-                    // Activate microphone stream to lock hardware indicator
                     const globalMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     window.activeMicStream = globalMicStream;
 
-                    if (!vapi && window.Vapi) {
-                        vapi = new window.Vapi(VAPI_KEY);
-                        setupVapiListeners();
-                    }
-
-                    if (vapi) {
-                        // Start call using direct core method
-                        await vapi.start(activeAssistantId, {
-                            variableValues: {
-                                student_name: sessionStudentName,
-                                coaching_notes: sessionCoachingNotes
-                            }
-                        });
-                    } else {
-                        throw new Error("Vapi core SDK not loaded");
-                    }
-
+                    startVapiCall();
                 } catch (err) {
-                    console.error("Call start failure:", err);
-                    alert("마이크 권한 또는 통화 연결에 실패했습니다.");
+                    console.error("Mic permission error:", err);
+                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정을 확인해 주세요.");
                     resetToIdleButton();
                 }
 
@@ -433,6 +402,68 @@
 
         function stopTimer() {
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function startVapiCall() {
+            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+            
+            if (sdk && typeof sdk.run === 'function') {
+                try {
+                    vapiInstance = sdk.run({ 
+                        apiKey: VAPI_KEY, 
+                        assistant: activeAssistantId,
+                        config: {
+                            variableValues: {
+                                student_name: sessionStudentName,
+                                coaching_notes: sessionCoachingNotes
+                            }
+                        }
+                    });
+
+                    if (vapiInstance && typeof vapiInstance.on === 'function') {
+                        vapiInstance.on('call-start', () => {
+                            onCallConnectedSuccessfully();
+                        });
+
+                        vapiInstance.on('speech-start', () => { 
+                            if (!timerInterval) startTimer(); 
+                        });
+
+                        vapiInstance.on('track', (track) => {
+                            if (track.kind === 'audio') {
+                                const remoteAudio = document.getElementById("remote-audio");
+                                if (remoteAudio) {
+                                    remoteAudio.muted = false;
+                                    remoteAudio.srcObject = new MediaStream([track]);
+                                    remoteAudio.volume = 1.0;
+                                    remoteAudio.play().catch(e => console.log("Audio play error", e));
+                                }
+                            }
+                        });
+
+                        vapiInstance.on('call-end', () => {
+                            endCallUI();
+                        });
+                    }
+
+                    // Seamless transition fallback timer
+                    setTimeout(() => {
+                        if (callState === 'IDLE') {
+                            onCallConnectedSuccessfully();
+                        }
+                    }, 2500);
+
+                } catch (err) {
+                    console.error("Vapi start execution error:", err);
+                    alert("통화 연결 중 오류가 발생했습니다.");
+                    resetToIdleButton();
+                }
+            } else {
+                // Retry if SDK loader script is still finishing up
+                setTimeout(() => {
+                    startVapiCall();
+                }, 1000);
+            }
         }
 
         function onCallConnectedSuccessfully() {
@@ -470,8 +501,8 @@
                 window.activeMicStream.getTracks().forEach(track => track.stop());
                 window.activeMicStream = null;
             }
-            if (vapi && typeof vapi.stop === 'function') {
-                try { vapi.stop(); } catch(e) {}
+            if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                try { vapiInstance.stop(); } catch(e) {}
             }
             callState = 'ENDED';
             document.getElementById("subDesc").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
