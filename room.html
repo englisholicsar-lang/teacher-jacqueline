@@ -317,4 +317,102 @@
 
                     startTimer();
                     callState = 'ACTIVE';
-                    document.getElementById("call
+                    document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+                    
+                    document.getElementById("notice-box").innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                            <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                            <span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
+                                선생님께 인사해 보세요! (예: Hello!)
+                            </span>
+                        </div>
+                    `;
+
+                    btn.style.backgroundColor = "#e05252";
+                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                    btn.removeAttribute("disabled"); 
+                    document.getElementById("btn-text-content").innerText = "통화 종료하기";
+
+                } catch (err) {
+                    console.error("Microphone permission denied:", err);
+                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정에서 마이크를 허용해 주세요.");
+                    btn.removeAttribute("disabled");
+                    document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+                }
+
+            } else if (callState === 'ACTIVE') {
+                endCallUI();
+            }
+        }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            document.getElementById("timer-wrapper").style.display = "flex";
+
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed === 300) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 570) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 585) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN. DO NOT ANSWER ANY MORE QUESTIONS.]" }});
+                    }
+                }
+
+                if (secondsElapsed >= 600) {  
+                    endCallUI();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function endCallUI() {
+            stopTimer();
+            if (window.activeMicStream) {
+                window.activeMicStream.getTracks().forEach(track => track.stop());
+                window.activeMicStream = null;
+            }
+            if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                try { vapiInstance.stop(); } catch(e) {}
+            }
+            callState = 'ENDED';
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            
+            document.getElementById("notice-box").innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
+                    <div style="font-size: 13.5px; font-weight: 700; color: #0e2a47;">🚀 세션에 참여해 주셔서 감사합니다!</div>
+                </div>
+            `;
+            
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#10b981";
+            btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
+            btn.removeAttribute("disabled");
+            btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
+            document.getElementById("btn-text-content").innerText = "고객센터 문의하기";
+        }
+    </script>
+</body>
+</html>
