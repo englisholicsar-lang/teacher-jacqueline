@@ -9,7 +9,7 @@
     <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
     <meta property="og:type" content="website">
 
-    <!-- Vapi Web SDK Async Loader (From Working Trial Template) -->
+    <!-- Vapi Web SDK Async Loader -->
     <script>
       var vapiInstance = null;
       (function (d, t) {
@@ -295,4 +295,206 @@
     </div>
 
     <script>
-        const GAS_URL = "
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
+        const VAPI_KEY = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+
+        let callState = 'IDLE'; 
+        let isUserAllowed = false; 
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        
+        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
+        let sessionStudentName = "Student";
+        let sessionCoachingNotes = "";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById("action-btn");
+
+            if (!token) {
+                document.getElementById("subDesc").innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요.";
+                btn.innerText = "입장 불가";
+                document.getElementById("shieldBadge").style.display = "none";
+                return;
+            }
+
+            fetch(`${GAS_URL}?token=${token}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.allowed) {
+                        isUserAllowed = true;
+                        document.getElementById("shieldBadge").style.display = "none";
+
+                        document.getElementById("mainTitle").innerText = `Teacher ${data.teacher}`;
+                        document.getElementById("subDesc").innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
+                        
+                        sessionStudentName = data.studentName;
+                        sessionCoachingNotes = data.coachingNotes || "";
+                        if (data.assistantId) {
+                            activeAssistantId = data.assistantId;
+                        }
+
+                        if (token.includes('test')) {
+                            document.getElementById("adminBox").style.display = "block";
+                        }
+
+                        btn.removeAttribute("disabled");
+                        btn.innerHTML = `<span>📞 통화시작하기</span>`;
+                    } else {
+                        document.getElementById("shieldBadge").style.display = "none";
+                        document.getElementById("subDesc").innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다.";
+                        btn.innerText = "종료된 세션";
+                        btn.disabled = true;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById("shieldBadge").style.display = "none";
+                    document.getElementById("subDesc").innerText = "서버 통신 오류가 발생했습니다.";
+                    btn.innerText = "연결 오류";
+                    btn.disabled = true;
+                });
+        });
+
+        function handleMainAction() {
+            if (!isUserAllowed) return;
+
+            const remoteAudio = document.getElementById("remote-audio");
+            if (remoteAudio) {
+                remoteAudio.volume = 1.0;
+                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
+            }
+
+            if (callState === 'IDLE') {
+                const btn = document.getElementById("action-btn");
+                btn.setAttribute("disabled", "true");
+                btn.innerHTML = `<span>통화 연결 중...</span>`;
+
+                startVapiCall();
+
+            } else if (callState === 'ACTIVE') {
+                endCallUI();
+            }
+        }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            document.getElementById("timer-wrapper").style.display = "flex";
+
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed >= 600) {  
+                    endCallUI();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function startVapiCall() {
+            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
+            if (sdk) {
+                vapiInstance = typeof sdk.run === 'function' 
+                    ? sdk.run({ apiKey: VAPI_KEY, assistant: activeAssistantId })
+                    : new sdk(VAPI_KEY);
+
+                if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    vapiInstance.on('call-start', () => {
+                        startTimer();
+                        const remoteAudio = document.getElementById("remote-audio");
+                        if (remoteAudio) { 
+                            remoteAudio.muted = false;
+                            remoteAudio.volume = 1.0;
+                            remoteAudio.play().catch(e => console.log("Audio play", e)); 
+                        }
+                    });
+
+                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) {
+                                remoteAudio.muted = false;
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.volume = 1.0;
+                                remoteAudio.play().catch(e => console.log("Stream play", e));
+                            }
+                        }
+                    });
+
+                    vapiInstance.on('call-end', () => {
+                        endCallUI();
+                    });
+                }
+
+                if (vapiInstance && typeof vapiInstance.start === 'function') {
+                    vapiInstance.start(activeAssistantId, {
+                        variableValues: {
+                            student_name: sessionStudentName,
+                            coaching_notes: sessionCoachingNotes
+                        }
+                    });
+                }
+                
+                callState = 'ACTIVE';
+                document.getElementById("subDesc").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+                
+                document.getElementById("notice-box").innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                        <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                        <span style="text-align: left; font-size: 14px; font-weight: 700; color: var(--primary-navy); line-height: 1.4;">
+                            마이크 권한을 허용해 주세요.
+                        </span>
+                    </div>
+                `;
+
+                const btn = document.getElementById("action-btn");
+                btn.style.backgroundColor = "#dc2626";
+                btn.style.boxShadow = "0 4px 14px rgba(220, 38, 38, 0.3)";
+                btn.removeAttribute("disabled"); 
+                btn.innerHTML = `<span>통화 종료하기</span>`;
+            } else {
+                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+                const btn = document.getElementById("action-btn");
+                btn.removeAttribute("disabled");
+                btn.innerHTML = `<span>📞 통화시작하기</span>`;
+            }
+        }
+
+        function endCallUI() {
+            stopTimer();
+            if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                try { vapiInstance.stop(); } catch(e) {}
+            }
+            callState = 'ENDED';
+            document.getElementById("subDesc").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            
+            document.getElementById("notice-box").innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
+                    <div style="font-size: 13.5px; font-weight: 700; color: var(--primary-navy);">🚀 세션에 참여해 주셔서 감사합니다!</div>
+                </div>
+            `;
+            
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#059669";
+            btn.style.boxShadow = "0 4px 14px rgba(5, 150, 105, 0.25)";
+            btn.removeAttribute("disabled");
+            btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
+            btn.innerHTML = `<span>고객센터 문의하기</span>`;
+        }
+    </script>
+</body>
+</html>
