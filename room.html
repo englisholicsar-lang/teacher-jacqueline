@@ -183,7 +183,6 @@
                 return;
             }
 
-            // Always fetch dynamically from GAS (even for admin master token) so Column F is the true source
             let fetchUrl = `${GAS_URL}?token=${token}`;
             if (token === 'englisholic-admin-master-2026') {
                 fetchUrl = `${GAS_URL}?key=englisholic-admin-master-2026`;
@@ -213,7 +212,6 @@
                     if (data.allowed) {
                         isUserAllowed = true;
                         
-                        // Blue shield appears strictly on the 인증 상태 확인 중... UI check phase/loading, then hides when ready
                         document.getElementById("shieldBadge").style.display = "none";
 
                         document.getElementById("mainTitle").innerText = `Teacher ${data.teacher || 'Jacqueline'}`;
