@@ -116,7 +116,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <audio id="remote-audio" autoplay playsinline style="display: none;"></audio>
+    <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
         <div class="upper-group">
@@ -281,10 +281,27 @@
                                 if (track.kind === 'audio') {
                                     const remoteAudio = document.getElementById("remote-audio");
                                     if (remoteAudio) {
-                                        remoteAudio.muted = false;
-                                        remoteAudio.srcObject = new MediaStream([track]);
-                                        remoteAudio.volume = 1.0;
-                                        remoteAudio.play().catch(e => console.log("Stream play error:", e));
+                                        try {
+                                            const AudioContextWindow = window.AudioContext || window.webkitAudioContext;
+                                            if (AudioContextWindow) {
+                                                const audioCtx = new AudioContextWindow();
+                                                if (audioCtx.state === 'suspended') {
+                                                    audioCtx.resume();
+                                                }
+                                            }
+
+                                            remoteAudio.muted = false;
+                                            remoteAudio.srcObject = new MediaStream([track]);
+                                            remoteAudio.volume = 1.0;
+                                            
+                                            remoteAudio.play().then(() => {
+                                                console.log("Remote audio stream active.");
+                                            }).catch(error => {
+                                                console.log("Autoplay blocked:", error);
+                                            });
+                                        } catch (e) {
+                                            console.log("Audio bind error:", e);
+                                        }
                                     }
                                 }
                             });
