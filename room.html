@@ -19,10 +19,9 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            /* Adding the signature wave gradients and decorative background details from Image 2 */
+            /* Top-right wave gradient curve matching Image 3 */
             background-image: 
-                radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 10% 90%, rgba(37, 99, 235, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 95% 5%, rgba(37, 99, 235, 0.12) 0%, transparent 45%),
                 linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             background-attachment: fixed;
             color: var(--text-main);
@@ -36,30 +35,17 @@
             overflow-x: hidden;
         }
 
-        /* Optional decorative dot grids matching Image 2 */
+        /* Subtle top-right dot grid accent matching Image 3 */
         body::before {
             content: "";
             position: absolute;
-            top: 20px;
+            top: 15px;
             right: 15px;
-            width: 60px;
-            height: 80px;
-            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            width: 55px;
+            height: 75px;
+            background-image: radial-gradient(#94a3b8 1.5px, transparent 1.5px);
             background-size: 10px 10px;
-            opacity: 0.6;
-            z-index: -1;
-        }
-
-        body::after {
-            content: "";
-            position: absolute;
-            top: 350px;
-            left: 15px;
-            width: 60px;
-            height: 80px;
-            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-            background-size: 10px 10px;
-            opacity: 0.6;
+            opacity: 0.5;
             z-index: -1;
         }
 
@@ -104,7 +90,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
-        /* Blue shield badge strictly on verification loading state */
         .shield-badge {
             position: absolute;
             bottom: 0;
@@ -188,7 +173,6 @@
             box-shadow: none;
         }
 
-        /* Admin / Status Bypass Box (Only shows if test token matches) */
         .admin-box {
             width: 100%;
             background: #f0fdf4;
@@ -203,7 +187,7 @@
             display: none; 
         }
 
-        /* Completely banish any injected Vapi floating widgets or buttons */
+        /* Completely banish any injected Vapi floating widgets */
         iframe[src*="vapi"], 
         div[id*="vapi-support-button"], 
         div[class*="vapi-"], 
@@ -220,7 +204,6 @@
 <body>
 
     <div class="container">
-        <!-- Clean Logo Header -->
         <div class="logo-container">
             <img src="logo.png" alt="Englisholic" class="logo-img">
         </div>
@@ -260,8 +243,9 @@
         const shieldBadge = document.getElementById('shieldBadge');
         const adminBox = document.getElementById('adminBox');
 
-        let vapiSDKInstance = null;
+        let vapiInstance = null;
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
+        let studentDataGlobal = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (!token) {
@@ -276,6 +260,7 @@
                 .then(data => {
                     if (data.allowed) {
                         shieldBadge.style.display = "none";
+                        studentDataGlobal = data;
 
                         mainTitle.innerText = `Teacher ${data.teacher}`;
                         subDesc.innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
@@ -291,9 +276,10 @@
                             adminBox.style.display = "block";
                         }
 
+                        // Initialize Vapi SDK properly
                         const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
                         if (window.vapiSDK) {
-                            vapiSDKInstance = window.vapiSDK.run({
+                            vapiInstance = window.vapiSDK.run({
                                 apiKey: publicKey,
                                 assistant: activeAssistantId,
                                 config: {
@@ -319,13 +305,35 @@
                 });
         });
 
+        // Robust click handler to prevent hanging on "연결 중..."
         callBtn.addEventListener('click', () => {
             if (callBtn.disabled) return;
-            callBtn.innerText = "연결 중...";
+            callBtn.innerText = "통화 연결 중...";
             callBtn.disabled = true;
 
-            if (window.vapiSDK && typeof window.vapiSDK.open === 'function') {
-                window.vapiSDK.open();
+            try {
+                if (window.vapiSDK && typeof window.vapiSDK.open === 'function') {
+                    window.vapiSDK.open();
+                } else if (vapiInstance && typeof vapiInstance.open === 'function') {
+                    vapiInstance.open();
+                } else {
+                    // Fallback re-initialization if SDK instance is dormant
+                    const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+                    window.vapiSDK.run({
+                        apiKey: publicKey,
+                        assistant: activeAssistantId,
+                        config: {
+                            variableValues: {
+                                student_name: studentDataGlobal ? studentDataGlobal.studentName : "Student",
+                                coaching_notes: studentDataGlobal ? studentDataGlobal.coachingNotes : ""
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+                callBtn.innerText = "연결 실패 (다시 시도)";
+                callBtn.disabled = false;
             }
         });
     </script>
