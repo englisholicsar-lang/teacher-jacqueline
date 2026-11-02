@@ -184,11 +184,6 @@
             box-sizing: border-box;
             display: none; 
         }
-
-        #vapi-support-button {
-            display: none !important;
-            visibility: hidden !important;
-        }
     </style>
 </head>
 <body>
@@ -234,9 +229,7 @@
         const adminBox = document.getElementById('adminBox');
 
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
-        let studentNameGlobal = "Student";
-        let coachingNotesGlobal = "";
-        let vapiReady = false;
+        let vapiInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (!token) {
@@ -246,14 +239,12 @@
                 return;
             }
 
-            // Fetch token status from Google Apps Script
+            // Fetch token verification from GAS backend
             fetch(`${GAS_URL}?token=${token}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.allowed) {
                         shieldBadge.style.display = "none";
-                        studentNameGlobal = data.studentName;
-                        coachingNotesGlobal = data.coachingNotes;
 
                         mainTitle.innerText = `Teacher ${data.teacher}`;
                         subDesc.innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
@@ -264,10 +255,51 @@
 
                         callBtn.innerHTML = `📞 통화시작하기`;
                         callBtn.disabled = false;
-                        vapiReady = true;
 
                         if (token.includes('test')) {
                             adminBox.style.display = "block";
+                        }
+
+                        // Initialize Vapi SDK binding correctly to our button
+                        const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+                        if (window.vapiSDK) {
+                            vapiInstance = window.vapiSDK.run({
+                                apiKey: publicKey,
+                                assistant: activeAssistantId,
+                                config: {
+                                    variableValues: {
+                                        student_name: data.studentName,
+                                        coaching_notes: data.coachingNotes
+                                    }
+                                },
+                                button: {
+                                    position: "bottom-right",
+                                    offset: "40px",
+                                    width: "30px",
+                                    height: "30px",
+                                    idle: {
+                                        color: "rgb(93, 254, 202)",
+                                        type: "pill",
+                                        title: "Call",
+                                        subtitle: "Aida",
+                                        icon: "https://unpkg.com/lucide-static@0.321.0/icons/phone.svg"
+                                    },
+                                    loading: {
+                                        color: "rgb(93, 254, 202)",
+                                        type: "pill",
+                                        title: "Connecting...",
+                                        subtitle: "Please wait",
+                                        icon: "https://unpkg.com/lucide-static@0.321.0/icons/loader-2.svg"
+                                    },
+                                    active: {
+                                        color: "rgb(255, 0, 0)",
+                                        type: "pill",
+                                        title: "Disconnect",
+                                        subtitle: "Active",
+                                        icon: "https://unpkg.com/lucide-static@0.321.0/icons/phone-off.svg"
+                                    }
+                                }
+                            });
                         }
                     } else {
                         shieldBadge.style.display = "none";
@@ -278,44 +310,32 @@
                 })
                 .catch(err => {
                     shieldBadge.style.display = "none";
-                    subDesc.innerText = "서버 통신 오류가 연결을 방해했습니다.";
+                    subDesc.innerText = "서버 통신 오류가 발생했습니다.";
                     callBtn.innerText = "연결 오류";
                     callBtn.disabled = true;
                 });
         });
 
-        // Direct Vapi SDK trigger on button click
+        // Bridge our custom green button click directly to Vapi's control flow
         callBtn.addEventListener('click', () => {
-            if (!vapiReady || callBtn.disabled) return;
-            
+            if (callBtn.disabled) return;
             callBtn.innerText = "통화 연결 중...";
             callBtn.disabled = true;
 
-            const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
-
             try {
-                // Use standard Vapi SDK method to start call directly
-                if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
-                    window.vapiSDK.run({
-                        apiKey: publicKey,
-                        assistant: activeAssistantId,
-                        config: {
-                            variableValues: {
-                                student_name: studentNameGlobal,
-                                coaching_notes: coachingNotesGlobal
-                            }
-                        }
-                    });
+                // If Vapi injected a button element, programmatically click it to trigger the native modal flow
+                const vapiWidgetBtn = document.querySelector('#vapi-support-button') || document.querySelector('[class*="vapi"] button');
+                if (vapiWidgetBtn) {
+                    vapiWidgetBtn.click();
+                } else if (window.vapiSDK && typeof window.vapiSDK.open === 'function') {
+                    window.vapiSDK.open();
                 } else {
-                    alert("Vapi SDK가 로드되지 않았습니다. 페이지를 새로고침해 주세요.");
-                    callBtn.innerText = "📞 통화시작하기";
-                    callBtn.disabled = false;
+                    window.location.reload();
                 }
             } catch (e) {
                 console.error(e);
-                callBtn.innerText = "연결 실패 (다시 시도)";
+                callBtn.innerText = "연결 실패 (새로고침)";
                 callBtn.disabled = false;
-                vapiReady = true;
             }
         });
     </script>
