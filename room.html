@@ -1,41 +1,310 @@
-if (token.includes('test')) {
-            adminBox.style.display = "block";
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>잉글리쉬홀릭 - Live Session</title>
+    <!-- Vapi Web SDK Script Tag -->
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --btn-green: #059669;
+            --btn-green-hover: #047857;
+            --disabled-bg: #cbd5e1;
         }
 
-        const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
-        if (window.vapiSDK) {
-            vapiInstance = window.vapiSDK.run({
-                apiKey: publicKey,
-                assistant: activeAssistantId,
-                config: {
-                    variableValues: {
-                        student_name: data.studentName,
-                        coaching_notes: data.coachingNotes
-                    }
-                },
-                button: {
-                    elementId: "callBtn",
-                    mode: "normal",
-                    idle: {
-                        title: "📞 통화시작하기",
-                        color: "#059669"
-                    },
-                    loading: {
-                        title: "통화 연결 중...",
-                        color: "#64748b"
-                    },
-                    active: {
-                        title: "통화 종료",
-                        color: "#dc2626"
-                    }
-                }
-            });
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 95% 5%, rgba(37, 99, 235, 0.12) 0%, transparent 45%),
+                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-    })
-    .catch(err => {
-        shieldBadge.style.display = "none";
-        subDesc.innerText = "서버 통신 오류가 발생했습니다.";
-        callBtn.innerText = "연결 오류";
-        callBtn.disabled = true;
-    });
-});
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 55px;
+            height: 75px;
+            background-image: radial-gradient(#94a3b8 1.5px, transparent 1.5px);
+            background-size: 10px 10px;
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 8px 20px 24px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px 0 10px 0;
+        }
+
+        .logo-img {
+            width: 155px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .profile-img-container {
+            position: relative;
+            width: 86px;
+            height: 86px;
+            margin: 0 auto 10px auto;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .shield-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .sub-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .audio-notice {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #334155;
+            margin-bottom: 16px;
+            text-align: center;
+            line-height: 1.5;
+            box-sizing: border-box;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            background-color: var(--btn-green);
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+            transition: background-color 0.2s, transform 0.1s;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            background-color: var(--btn-green-hover);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .action-btn:disabled {
+            background-color: var(--disabled-bg);
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .admin-box {
+            width: 100%;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: #166534;
+            text-align: left;
+            line-height: 1.4;
+            box-sizing: border-box;
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Englisholic" class="logo-img">
+        </div>
+        
+        <div class="profile-img-container">
+            <img id="teacherImg" src="jacqueline.png" alt="Teacher" class="profile-img">
+            <div id="shieldBadge" class="shield-badge" title="인증됨">🛡️</div>
+        </div>
+
+        <h1 id="mainTitle">Teacher Jacqueline</h1>
+        <div id="subDesc" class="sub-desc">재클린 선생님과의 1:1 맞춤 영어회화</div>
+
+        <div class="audio-notice">
+            🔊 스피커폰으로 기본 설정됩니다.<br>
+            🎧 이어폰은 통화 시작 전 연결해 주세요!
+        </div>
+
+        <button id="callBtn" class="action-btn" disabled>
+            <span>인증 상태 확인 중...</span>
+        </button>
+
+        <div id="adminBox" class="admin-box">
+            👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>
+            모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        const mainTitle = document.getElementById('mainTitle');
+        const subDesc = document.getElementById('subDesc');
+        const callBtn = document.getElementById('callBtn');
+        const shieldBadge = document.getElementById('shieldBadge');
+        const adminBox = document.getElementById('adminBox');
+
+        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
+        let vapiInstance = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                subDesc.innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요.";
+                callBtn.innerText = "입장 불가";
+                shieldBadge.style.display = "none";
+                return;
+            }
+
+            // Fetch token data from GAS backend
+            fetch(`${GAS_URL}?token=${token}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.allowed) {
+                        shieldBadge.style.display = "none";
+
+                        mainTitle.innerText = `Teacher ${data.teacher}`;
+                        subDesc.innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
+                        
+                        if (data.assistantId) {
+                            activeAssistantId = data.assistantId;
+                        }
+
+                        callBtn.innerHTML = `📞 통화시작하기`;
+                        callBtn.disabled = false;
+
+                        if (token.includes('test')) {
+                            adminBox.style.display = "block";
+                        }
+
+                        // Let Vapi attach directly to our button element using Vapi's native configuration
+                        const publicKey = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+                        if (window.vapiSDK) {
+                            vapiInstance = window.vapiSDK.run({
+                                apiKey: publicKey,
+                                assistant: activeAssistantId,
+                                config: {
+                                    variableValues: {
+                                        student_name: data.studentName,
+                                        coaching_notes: data.coachingNotes
+                                    }
+                                },
+                                // Target our custom button directly so Vapi handles the click/state natively
+                                button: {
+                                    elementId: "callBtn",
+                                    mode: "normal",
+                                    idle: {
+                                        title: "📞 통화시작하기",
+                                        color: "#059669"
+                                    },
+                                    loading: {
+                                        title: "통화 연결 중...",
+                                        color: "#64748b"
+                                    },
+                                    active: {
+                                        title: "통화 종료",
+                                        color: "#dc2626"
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        shieldBadge.style.display = "none";
+                        subDesc.innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다.";
+                        callBtn.innerText = "종료된 세션";
+                        callBtn.disabled = true;
+                    }
+                })
+                .catch(err => {
+                    shieldBadge.style.display = "none";
+                    subDesc.innerText = "서버 통신 오류가 발생했습니다.";
+                    callBtn.innerText = "연결 오류";
+                    callBtn.disabled = true;
+                });
+        });
+    </script>
+</body>
+</html>
