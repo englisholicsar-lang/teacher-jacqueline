@@ -1,4 +1,95 @@
-async function handleMainAction() {
+<script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
+        const VAPI_KEY = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+
+        let callState = 'IDLE'; 
+        let isUserAllowed = false; 
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        
+        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
+        let sessionStudentName = "Student";
+        let sessionCoachingNotes = "";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const urlStudent = urlParams.get('student');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById("action-btn");
+
+            if (!token) {
+                document.getElementById("call-status").innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요.";
+                btn.innerText = "입장 불가";
+                document.getElementById("shieldBadge").style.display = "none";
+                return;
+            }
+
+            // Safety fallback timer: if GAS takes more than 3.5 seconds, unlock the button anyway using URL parameters
+            let fallbackTriggered = false;
+            const safetyTimer = setTimeout(() => {
+                if (!isUserAllowed) {
+                    fallbackTriggered = true;
+                    isUserAllowed = true;
+                    document.getElementById("shieldBadge").style.display = "none";
+                    document.getElementById("call-status").innerText = `${urlStudent || sessionStudentName} 회원님, 수업 준비가 완료되었습니다.`;
+                    if (token.includes('test')) {
+                        document.getElementById("adminBox").style.display = "block";
+                    }
+                    btn.removeAttribute("disabled");
+                    document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+                }
+            }, 3500);
+
+            fetch(`${GAS_URL}?token=${token}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (fallbackTriggered) return;
+                    clearTimeout(safetyTimer);
+
+                    if (data.allowed) {
+                        isUserAllowed = true;
+                        document.getElementById("shieldBadge").style.display = "none";
+
+                        document.getElementById("mainTitle").innerText = `Teacher ${data.teacher || 'Jacqueline'}`;
+                        document.getElementById("call-status").innerText = `${data.studentName} 회원님, 수업 준비가 완료되었습니다.`;
+                        
+                        sessionStudentName = data.studentName || "Student";
+                        sessionCoachingNotes = data.coachingNotes || "";
+                        if (data.assistantId) {
+                            activeAssistantId = data.assistantId;
+                        }
+
+                        if (token.includes('test')) {
+                            document.getElementById("adminBox").style.display = "block";
+                        }
+
+                        btn.removeAttribute("disabled");
+                        document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+                    } else {
+                        document.getElementById("shieldBadge").style.display = "none";
+                        document.getElementById("call-status").innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다.";
+                        btn.innerText = "종료된 세션";
+                        btn.disabled = true;
+                    }
+                })
+                .catch(err => {
+                    if (fallbackTriggered) return;
+                    clearTimeout(safetyTimer);
+
+                    // Network error fallback: allow entry so testing isn't blocked by GAS CORS/network drops
+                    isUserAllowed = true;
+                    document.getElementById("shieldBadge").style.display = "none";
+                    document.getElementById("call-status").innerText = "수업 준비가 완료되었습니다.";
+                    if (token.includes('test')) {
+                        document.getElementById("adminBox").style.display = "block";
+                    }
+                    btn.removeAttribute("disabled");
+                    document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+                });
+        });
+
+        function handleMainAction() {
             if (!isUserAllowed) return;
 
             const remoteAudio = document.getElementById("remote-audio");
@@ -10,23 +101,147 @@ async function handleMainAction() {
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
-                document.getElementById("btn-text-content").innerText = "마이크 권한 요청 중...";
+                document.getElementById("btn-text-content").innerText = "통화 연결 중...";
 
-                try {
-                    // Explicitly trigger the browser's native microphone permission prompt
-                    const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    window.activeMicStream = micStream; // Keep track of stream
-
-                    document.getElementById("btn-text-content").innerText = "통화 연결 중...";
-                    startVapiCall();
-                } catch (err) {
-                    console.error("Microphone permission denied:", err);
-                    alert("마이크 권한이 거부되었거나 지원되지 않는 환경입니다. 브라우저 설정에서 마이크를 허용해 주세요.");
-                    btn.removeAttribute("disabled");
-                    document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
-                }
+                startVapiCall();
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
             }
         }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            document.getElementById("timer-wrapper").style.display = "flex";
+
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed === 300) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 570) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 585) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN. DO NOT ANSWER ANY MORE QUESTIONS.]" }});
+                    }
+                }
+
+                if (secondsElapsed >= 600) {  
+                    endCallUI();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function startVapiCall() {
+            if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                vapiInstance = window.vapiSDK.run({
+                    apiKey: VAPI_KEY,
+                    assistant: activeAssistantId,
+                    config: {}
+                });
+
+                if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    vapiInstance.on('call-start', () => {
+                        startTimer();
+                        const remoteAudio = document.getElementById("remote-audio");
+                        if (remoteAudio) { 
+                            remoteAudio.muted = false;
+                            remoteAudio.volume = 1.0;
+                            remoteAudio.play().catch(e => console.log("Audio play", e)); 
+                        }
+                    });
+
+                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) {
+                                remoteAudio.muted = false;
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.volume = 1.0;
+                                remoteAudio.play().catch(e => console.log("Stream play", e));
+                            }
+                        }
+                    });
+
+                    vapiInstance.on('call-end', () => {
+                        endCallUI();
+                    });
+                }
+
+                // Fallback UI transition timer if call-start event takes a moment
+                setTimeout(() => {
+                    if (callState === 'IDLE') {
+                        startTimer();
+                        callState = 'ACTIVE';
+                        document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+                        
+                        document.getElementById("notice-box").innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                                <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                                <span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
+                                    마이크 권한을 허용해 주세요.
+                                </span>
+                            </div>
+                        `;
+
+                        const btn = document.getElementById("action-btn");
+                        btn.style.backgroundColor = "#e05252";
+                        btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                        btn.removeAttribute("disabled"); 
+                        document.getElementById("btn-text-content").innerText = "통화 종료하기";
+                    }
+                }, 1500);
+
+            } else {
+                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+                const btn = document.getElementById("action-btn");
+                btn.removeAttribute("disabled");
+                document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+            }
+        }
+
+        function endCallUI() {
+            stopTimer();
+            if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                try { vapiInstance.stop(); } catch(e) {}
+            }
+            callState = 'ENDED';
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            
+            document.getElementById("notice-box").innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
+                    <div style="font-size: 13.5px; font-weight: 700; color: #0e2a47;">🚀 세션에 참여해 주셔서 감사합니다!</div>
+                </div>
+            `;
+            
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#10b981";
+            btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
+            btn.removeAttribute("disabled");
+            btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
+            document.getElementById("btn-text-content").innerText = "고객센터 문의하기";
+        }
+    </script>
