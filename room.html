@@ -211,8 +211,8 @@
                 secondsElapsed++; 
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
                 if (secondsElapsed === 300 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
-                if (secondsElapsed === 570 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION.]" }});
-                if (secondsElapsed === 585 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. EXECUTE end_tutoring_session.]" }});
+                if (secondsElapsed === 570 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 9:30 elapsed. Please begin your natural wrap-up. Do not hang up, just say your warm goodbyes and let the student respond.]" }});
+                if (secondsElapsed === 585 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 15 seconds remaining. Wait for the student's final goodbye.]" }});
                 if (secondsElapsed >= 600) endCallUI();
             }, 1000);
         }
