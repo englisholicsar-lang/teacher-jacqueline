@@ -10,17 +10,7 @@
     <meta property="og:type" content="website">
 
     <!-- Vapi Web SDK Loader -->
-    <script>
-      var vapiInstance = null;
-      (function (d, t) {
-        var g = d.createElement(t),
-            s = d.getElementsByTagName(t)[0];
-        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
-        g.defer = true;
-        g.async = true;
-        s.parentNode.insertBefore(g, s);
-      })(document, "script");
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
 
     <style>
         :root {
@@ -246,7 +236,8 @@
             display: none; 
         }
 
-        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { 
+        /* Completely hide default Vapi floating elements */
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn, #vapi-support-button { 
             display: none !important; 
             visibility: hidden !important; 
             opacity: 0 !important; 
@@ -294,16 +285,30 @@
         </div>
     </div>
 
+    <!-- Vapi Widget Configuration Script -->
+    <script>
+      var vapiInstance = null;
+      window.addEventListener("load", function () {
+          if (window.vapiSDK) {
+              vapiInstance = window.vapiSDK.run({
+                  apiKey: VAPI_KEY_VAL,
+                  assistant: ACTIVE_ASSISTANT_ID_VAL,
+                  config: {}
+              });
+          }
+      });
+    </script>
+
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
-        const VAPI_KEY = "245cea17-1505-481e-9a5a-5c0755ba9e46";
+        const VAPI_KEY_VAL = "245cea17-1505-481e-9a5a-5c0755ba9e46";
 
         let callState = 'IDLE'; 
         let isUserAllowed = false; 
         let timerInterval = null;
         let secondsElapsed = 0;
         
-        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
+        let ACTIVE_ASSISTANT_ID_VAL = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
         let sessionStudentName = "Student";
         let sessionCoachingNotes = "";
         window.activeMicStream = null;
@@ -334,7 +339,7 @@
                         sessionStudentName = data.studentName;
                         sessionCoachingNotes = data.coachingNotes || "";
                         if (data.assistantId) {
-                            activeAssistantId = data.assistantId;
+                            ACTIVE_ASSISTANT_ID_VAL = data.assistantId;
                         }
 
                         if (token.includes('test')) {
@@ -373,6 +378,7 @@
                 btn.innerHTML = `<span>통화 연결 중...</span>`;
 
                 try {
+                    // Grab microphone permission hardware stream
                     const globalMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     window.activeMicStream = globalMicStream;
 
@@ -414,77 +420,34 @@
         }
 
         function startVapiCall() {
-            const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
-            
-            if (sdk) {
-                try {
-                    // Use the exact standard SDK run initialization proven for script-tag setups
-                    vapiInstance = typeof sdk.run === 'function'
-                        ? sdk.run({ 
-                            apiKey: VAPI_KEY, 
-                            assistant: activeAssistantId,
-                            config: {
-                                variableValues: {
-                                    student_name: sessionStudentName,
-                                    coaching_notes: sessionCoachingNotes
-                                }
-                            }
-                          })
-                        : new sdk(VAPI_KEY);
-
-                    if (vapiInstance && typeof vapiInstance.on === 'function') {
-                        vapiInstance.on('call-start', () => {
-                            onCallConnectedSuccessfully();
-                        });
-
-                        vapiInstance.on('speech-start', () => { 
-                            if (!timerInterval) startTimer(); 
-                        });
-
-                        vapiInstance.on('track', (track) => {
-                            if (track.kind === 'audio') {
-                                const remoteAudio = document.getElementById("remote-audio");
-                                if (remoteAudio) {
-                                    remoteAudio.muted = false;
-                                    remoteAudio.srcObject = new MediaStream([track]);
-                                    remoteAudio.volume = 1.0;
-                                    remoteAudio.play().catch(e => console.log("Audio play error", e));
-                                }
-                            }
-                        });
-
-                        vapiInstance.on('call-end', () => {
-                            endCallUI();
-                        });
-                    }
-
-                    if (vapiInstance && typeof vapiInstance.start === 'function') {
-                        vapiInstance.start(activeAssistantId, {
+            try {
+                // If vapiInstance was created by SDK loader, start it directly with variables
+                if (window.vapiInstance && typeof window.vapiInstance.start === 'function') {
+                    window.vapiInstance.start(ACTIVE_ASSISTANT_ID_VAL, {
+                        variableValues: {
+                            student_name: sessionStudentName,
+                            coaching_notes: sessionCoachingNotes
+                        }
+                    });
+                } else if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                    vapiInstance = window.vapiSDK.run({
+                        apiKey: VAPI_KEY_VAL,
+                        assistant: ACTIVE_ASSISTANT_ID_VAL,
+                        config: {
                             variableValues: {
                                 student_name: sessionStudentName,
                                 coaching_notes: sessionCoachingNotes
                             }
-                        });
-                    }
-
-                    // Direct connection transition fallback to ensure smooth entry
-                    setTimeout(() => {
-                        if (callState === 'IDLE') {
-                            onCallConnectedSuccessfully();
                         }
-                    }, 2000);
-
-                } catch (err) {
-                    console.error("Vapi start error:", err);
-                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요.");
-                    resetToIdleButton();
+                    });
                 }
 
-            } else {
-                // If SDK isn't ready yet, give it a 1-second auto-retry instead of failing
-                setTimeout(() => {
-                    startVapiCall();
-                }, 1000);
+                onCallConnectedSuccessfully();
+
+            } catch (err) {
+                console.error("Vapi start execution error:", err);
+                alert("통화 연결 중 오류가 발생했습니다.");
+                resetToIdleButton();
             }
         }
 
@@ -523,8 +486,8 @@
                 window.activeMicStream.getTracks().forEach(track => track.stop());
                 window.activeMicStream = null;
             }
-            if (vapiInstance && typeof vapiInstance.stop === 'function') {
-                try { vapiInstance.stop(); } catch(e) {}
+            if (window.vapiInstance && typeof window.vapiInstance.stop === 'function') {
+                try { window.vapiInstance.stop(); } catch(e) {}
             }
             callState = 'ENDED';
             document.getElementById("subDesc").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
