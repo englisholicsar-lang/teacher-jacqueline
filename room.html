@@ -292,23 +292,40 @@
                                 vapiInstance.start(activeAssistantId);
                             }
 
-                            if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") {
-                                setTimeout(() => {
-                                    if (vapiInstance && typeof vapiInstance.send === 'function') {
-                                        vapiInstance.send({
-                                            type: "add-message",
-                                            message: {
-                                                role: "system",
-                                                content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student like an old friend and bring up this exact coaching note as your very first topic right after saying hello!`
-                                            }
-                                        });
-                                    }
-                                }, 1500);
-                            }
-
                             if (typeof vapiInstance.on === 'function') {
                                 vapiInstance.on('call-start', () => {
+                                    // Timer starts strictly when the live call actually begins
                                     startTimer();
+                                    callState = 'ACTIVE';
+                                    
+                                    // Inject coaching notes directly into the live assistant memory context
+                                    if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") {
+                                        if (vapiInstance && typeof vapiInstance.send === 'function') {
+                                            vapiInstance.send({
+                                                type: "add-message",
+                                                message: {
+                                                    role: "system",
+                                                    content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student like an old friend and bring up this exact coaching note as your very first topic right after saying hello!`
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+                                    
+                                    document.getElementById("notice-box").innerHTML = `
+                                        <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                                            <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                                            <span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
+                                                선생님께 인사해 보세요! (예: Hello!)
+                                            </span>
+                                        </div>
+                                    `;
+
+                                    btn.style.backgroundColor = "#e05252";
+                                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                                    btn.removeAttribute("disabled"); 
+                                    document.getElementById("btn-text-content").innerText = "통화 종료하기";
                                 });
 
                                 vapiInstance.on('track', (track, stream) => {
@@ -329,24 +346,6 @@
                             }
                         }
                     }
-
-                    startTimer();
-                    callState = 'ACTIVE';
-                    document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
-                    
-                    document.getElementById("notice-box").innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
-                            <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
-                            <span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">
-                                선생님께 인사해 보세요! (예: Hello!)
-                            </span>
-                        </div>
-                    `;
-
-                    btn.style.backgroundColor = "#e05252";
-                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
-                    btn.removeAttribute("disabled"); 
-                    document.getElementById("btn-text-content").innerText = "통화 종료하기";
 
                 } catch (err) {
                     console.error("Vapi initialization error:", err);
