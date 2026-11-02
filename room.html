@@ -19,7 +19,12 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            background-image: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            /* Adding the signature wave gradients and decorative background details from Image 2 */
+            background-image: 
+                radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 10% 90%, rgba(37, 99, 235, 0.06) 0%, transparent 40%),
+                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background-attachment: fixed;
             color: var(--text-main);
             margin: 0;
             padding: 0;
@@ -28,6 +33,34 @@
             align-items: center;
             justify-content: flex-start;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Optional decorative dot grids matching Image 2 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            right: 15px;
+            width: 60px;
+            height: 80px;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 10px 10px;
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            top: 350px;
+            left: 15px;
+            width: 60px;
+            height: 80px;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 10px 10px;
+            opacity: 0.6;
+            z-index: -1;
         }
 
         .container {
@@ -38,6 +71,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .logo-container {
@@ -153,7 +188,7 @@
             box-shadow: none;
         }
 
-        /* Admin / Status Bypass Box (Only shows if admin token matches) */
+        /* Admin / Status Bypass Box (Only shows if test token matches) */
         .admin-box {
             width: 100%;
             background: #f0fdf4;
@@ -252,7 +287,6 @@
                         callBtn.innerHTML = `📞 통화시작하기`;
                         callBtn.disabled = false;
 
-                        // Only show admin box if it's your designated admin/test token (e.g. contains 'test')
                         if (token.includes('test')) {
                             adminBox.style.display = "block";
                         }
