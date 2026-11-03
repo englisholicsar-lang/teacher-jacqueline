@@ -68,7 +68,7 @@
     </div>
     
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxGFDkjGSgl8_p4jdl6DZV6Z87y1mY5QMv1f2kH8KokerqpKnTZKSRgSQDIzUntL3t3/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxS0K8CzwdC8lr3hGGz_1NmGhX7cJSJFQeisYf-VjWBDYmVdy65wLNgQj_-oA_3GFDa/exec";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         
         let callState = 'IDLE', isUserAllowed = false, timerInterval = null, secondsElapsed = 0;
@@ -143,13 +143,12 @@
                                     student_name: sessionStudentName, 
                                     studentName: sessionStudentName, 
                                     coaching_notes: sessionCoachingNotes, 
-                                    coachingNotes: sessionCoachingNotes
+                                    coachingNotes: sessionCoachingNotes 
                                 } 
                             }
                         });
                         
                         if (vapiInstance) {
-                            // 오디오 통화 강제 시작 복구 (필수!)
                             if (typeof vapiInstance.start === 'function') {
                                 vapiInstance.start(activeAssistantId);
                             }
@@ -169,7 +168,6 @@
                                 });
                             }
                             
-                            // UI 강제 전환 백업 (2.5초 후)
                             setTimeout(() => {
                                 const actionBtn = document.getElementById("action-btn");
                                 if (callState === 'IDLE' && actionBtn.innerText.includes("연결 중")) {
@@ -192,7 +190,6 @@
             if (callState === 'ACTIVE') return;
             callState = 'ACTIVE';
             
-            // 1. 에러가 나도 무조건 실행되어야 하는 타이머와 UI 강제 변환
             try { startTimer(); } catch(e) {}
             
             try {
@@ -200,13 +197,12 @@
                 document.getElementById("notice-box").innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;"><div style="font-size: 24px; flex-shrink: 0;">🎙️</div><span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">선생님께 인사해 보세요! (예: Hello!)</span></div>`;
                 
                 const btn = document.getElementById("action-btn");
-                btn.style.backgroundColor = "#e05252"; // 강제 빨간색
+                btn.style.backgroundColor = "#e05252";
                 btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)"; 
                 btn.removeAttribute("disabled"); 
                 document.getElementById("btn-text-content").innerText = "통화 종료하기";
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
-            // 2. 외부 연동 시스템 메시지는 맨 마지막에 시도 (실패해도 화면은 멈추지 않음)
             if (sessionCoachingNotes && String(sessionCoachingNotes).trim() !== "") { 
                 try { 
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
