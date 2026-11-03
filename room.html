@@ -22,9 +22,9 @@
             </div>
         </div>
 
-        <!-- Instructor Avatar -->
+        <!-- Instructor Avatar (Restored to original custom look) -->
         <div class="relative w-24 h-24 mx-auto mb-4">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400" 
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400" 
                  alt="Teacher Jacqueline" 
                  class="w-full h-full object-cover rounded-full border-4 border-blue-50 shadow-md">
         </div>
@@ -129,7 +129,6 @@
                     endCall();
                 });
 
-                // Safety fallback timeout to guarantee active state if Vapi event doesn't fire locally
                 setTimeout(() => {
                     if (actionBtn.textContent.includes("연결 중")) {
                         activateActiveCallState();
@@ -176,7 +175,6 @@
             actionBtn.textContent = "저장 및 종료 중...";
             actionBtn.disabled = true;
 
-            // Send postback to Google Sheet to mark as '완료' and save summary
             try {
                 await fetch(GAS_URL, {
                     method: "POST",
