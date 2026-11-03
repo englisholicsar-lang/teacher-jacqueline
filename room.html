@@ -111,9 +111,10 @@
                         btn.removeAttribute("disabled"); 
                         document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
                     } else {
-                        document.getElementById("call-status").innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다."; 
+                        document.getElementById("call-status").innerText = data.message || "이미 완료되었거나 만료된 수업 링크입니다."; 
                         btn.innerText = "종료된 세션"; 
                         btn.disabled = true;
+                        isUserAllowed = false;
                     }
                 })
                 .catch(err => { 
@@ -151,6 +152,11 @@
                                     student_gender: sessionGender, 
                                     student_age: sessionAge 
                                 } 
+                            },
+                            client: {
+                                customer: {
+                                    name: sessionStudentName
+                                }
                             }
                         });
                         
