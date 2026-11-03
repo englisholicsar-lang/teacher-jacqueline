@@ -1,262 +1,248 @@
-// =========================================================================
-// ENGLISHOLIC MASTER BACKBONE (Fully Mapped & Restored)
-// =========================================================================
-
-var SHEET_ID = "12COE2Ikr0y0YwiXC6UyUKjVkwqupFfluLKDtvdjEUUs";
-
-// --- 1. HANDLE FRONTEND TOKEN REQUESTS (room.html integration) ---
-function doGet(e) {
-  try {
-    var token = (e && e.parameter && e.parameter.token) ? e.parameter.token.trim() : "";
-    var adminKey = (e && e.parameter && e.parameter.key) ? e.parameter.key.trim() : "";
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>잉글리쉬홀릭 - Live Session</title>
     
-    var ss = SpreadsheetApp.openById(SHEET_ID);
-    var sheet = ss.getSheetByName("수업 대기열 및 운영 큐");
-    var profileSheet = ss.getSheetByName("수강생 마스터 프로필");
-    
-    if (!sheet || !profileSheet) {
-      return ContentService.createTextOutput(JSON.stringify({ allowed: false, message: "Sheet not found" }))
-                           .setMimeType(ContentService.MimeType.JSON);
-    }
+    <meta property="og:title" content="잉글리쉬홀릭 - Live Session">
+    <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
+    <meta property="og:type" content="website">
 
-    var profileData = profileSheet.getDataRange().getValues();
+    <script>var vapiInstance = null;</script>
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
-    function getStudentProfile(targetName) {
-      var pDetails = "", pStrengths = "", pGender = "", pAge = "";
-      if (!targetName) return { details: "", strengths: "", gender: "", age: "" };
-      var searchName = targetName.toString().trim().toLowerCase();
-      
-      for (var p = 1; p < profileData.length; p++) {
-        var rowName = profileData[p][0] ? profileData[p][0].toString().trim().toLowerCase() : "";
-        if (rowName === searchName) {
-          pDetails = profileData[p][6] || "";   // Column G
-          pStrengths = profileData[p][7] || ""; // Column H
-          pGender = profileData[p][8] || "";    // Column I
-          pAge = profileData[p][9] || "";       // Column J
-          break;
+    <style>
+        :root { --bg-base: #f0f6ff; --primary-navy: #0e2a47; --sub-text: #4a637d; --box-bg: #eaf3fe; --box-border: #d4e5f9; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; min-height: 100vh; background-color: var(--bg-base); position: relative; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 0px 20px 16px 20px; color: var(--primary-navy); }
+        .bg-wave-top, .bg-wave-bottom { position: absolute; width: 100%; max-width: 500px; height: auto; z-index: 0; pointer-events: none; opacity: 0.8; }
+        .bg-wave-top { top: 0; right: 0; } .bg-wave-bottom { bottom: 0; left: 0; }
+        .dot-pattern-left { position: absolute; top: 220px; left: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
+        .dot-pattern-right { position: absolute; top: 80px; right: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
+        .container { position: relative; z-index: 1; width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .upper-group { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 4px; }
+        .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+        .logo-img { height: 65px; width: auto; object-fit: contain; }
+        .avatar-container { position: relative; width: 100px; height: 100px; margin-bottom: 6px; }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); }
+        .title { font-size: 21px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
+        .subtitle { font-size: 13px; font-weight: 600; color: #4a637d; }
+        .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 8px; }
+        .timer-display { font-size: 17px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 6px 16px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
+        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 14px; }
+        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
+        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 14px 18px; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; margin-bottom: 10px; }
+        .action-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
+        .shield-badge { position: absolute; bottom: 0; right: 0; background: #2563eb; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+        .admin-box { width: 100%; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 8px 12px; font-size: 11.5px; color: #166534; text-align: left; line-height: 1.3; box-sizing: border-box; display: none; }
+        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
+    </style>
+</head>
+<body>
+    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/></svg>
+    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/></svg>
+    <div class="dot-pattern-left"></div><div class="dot-pattern-right"></div>
+    <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
+    <div id="main-container" class="container">
+        <div class="upper-group">
+            <div class="logo-wrapper"><img src="logo.png" alt="Englisholic Logo" class="logo-img"></div>
+            <div class="avatar-container">
+                <img id="teacherImg" class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
+                <div id="shieldBadge" class="shield-badge">🛡️</div>
+            </div>
+            <h1 id="mainTitle" class="title">Teacher Jacqueline</h1>
+            <p id="call-status" class="subtitle">인증 상태 확인 중...</p>
+            <div id="timer-wrapper" class="timer-wrapper" style="display: none;"><div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div></div>
+        </div>
+        <div class="bottom-group">
+            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 6px; padding: 10px 10px;">
+                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;"><span style="font-size: 15px;">🔊</span> 스피커폰으로 기본 설정됩니다.</div>
+                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;"><span style="font-size: 15px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!</div>
+            </div>
+            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled><span id="btn-text-content">데이터 동기화 중...</span></button>
+            <div id="adminBox" class="admin-box">👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.</div>
+        </div>
+    </div>
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxGFDkjGSgl8_p4jdl6DZV6Z87y1mY5QMv1f2kH8KokerqpKnTZKSRgSQDIzUntL3t3/exec";
+        const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+        
+        let callState = 'IDLE', isUserAllowed = false, timerInterval = null, secondsElapsed = 0;
+        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626", sessionStudentName = "Student", sessionCoachingNotes = "", sessionDetails = "", sessionStrengths = "", sessionGender = "", sessionAge = "";
+        
+        const urlParams = new URLSearchParams(window.location.search), token = urlParams.get('token');
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById("action-btn");
+            if (!token) {
+                document.getElementById("call-status").innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요."; 
+                btn.innerText = "입장 불가"; 
+                document.getElementById("shieldBadge").style.display = "none"; 
+                return;
+            }
+            
+            document.getElementById("shieldBadge").style.display = "none";
+            let fetchUrl = `${GAS_URL}?token=${token}`;
+            if (token === 'englisholic-admin-master-2026') fetchUrl = `${GAS_URL}?key=englisholic-admin-master-2026`;
+            
+            fetch(fetchUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.allowed) {
+                        isUserAllowed = true;
+                        sessionStudentName = data.studentName || "Student"; 
+                        sessionCoachingNotes = data.coachingNotes || ""; 
+                        sessionDetails = data.details || ""; 
+                        sessionStrengths = data.strengths || ""; 
+                        sessionGender = data.gender || ""; 
+                        sessionAge = data.age || "";
+                        
+                        if (data.assistantId) activeAssistantId = data.assistantId;
+                        
+                        document.getElementById("mainTitle").innerText = `Teacher ${data.teacher || 'Jacqueline'}`;
+                        document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 수업 준비가 완료되었습니다.`;
+                        
+                        if (token === 'englisholic-admin-master-2026' || token.includes('test')) { 
+                            document.getElementById("adminBox").style.display = "block"; 
+                            document.getElementById("shieldBadge").style.display = "flex"; 
+                        }
+                        
+                        btn.removeAttribute("disabled"); 
+                        document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+                    } else {
+                        document.getElementById("call-status").innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다."; 
+                        btn.innerText = "종료된 세션"; 
+                        btn.disabled = true;
+                    }
+                })
+                .catch(err => { 
+                    document.getElementById("call-status").innerText = "서버 연결 오류. 잠시 후 다시 시도해 주세요."; 
+                    btn.innerText = "오류 발생"; 
+                });
+        });
+
+        async function handleMainAction() {
+            if (!isUserAllowed) return;
+            const remoteAudio = document.getElementById("remote-audio"); 
+            if (remoteAudio) { 
+                remoteAudio.volume = 1.0; 
+                remoteAudio.play().catch(e => console.log("Audio tap", e)); 
+            }
+            
+            if (callState === 'IDLE') {
+                const btn = document.getElementById("action-btn"); 
+                btn.setAttribute("disabled", "true"); 
+                document.getElementById("btn-text-content").innerText = "통화 연결 중...";
+                
+                try {
+                    if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                        vapiInstance = window.vapiSDK.run({
+                            apiKey: VAPI_KEY, 
+                            assistant: activeAssistantId, 
+                            config: { 
+                                variableValues: { 
+                                    student_name: sessionStudentName, 
+                                    studentName: sessionStudentName, 
+                                    coaching_notes: sessionCoachingNotes, 
+                                    coachingNotes: sessionCoachingNotes, 
+                                    personal_details: sessionDetails, 
+                                    strengths_weaknesses: sessionStrengths, 
+                                    student_gender: sessionGender, 
+                                    student_age: sessionAge 
+                                } 
+                            }
+                        });
+                        
+                        if (vapiInstance) {
+                            if (typeof vapiInstance.start === 'function') vapiInstance.start(activeAssistantId);
+                            if (typeof vapiInstance.on === 'function') {
+                                vapiInstance.on('call-start', () => {
+                                    startTimer(); 
+                                    callState = 'ACTIVE';
+                                    if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") { 
+                                        if (vapiInstance && typeof vapiInstance.send === 'function') { 
+                                            vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student like an old friend and bring up this exact coaching note as your very first topic right after saying hello!` } }); 
+                                        } 
+                                    }
+                                    document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+                                    document.getElementById("notice-box").innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;"><div style="font-size: 24px; flex-shrink: 0;">🎙️</div><span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">선생님께 인사해 보세요! (예: Hello!)</span></div>`;
+                                    btn.style.backgroundColor = "#e05252"; 
+                                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)"; 
+                                    btn.removeAttribute("disabled"); 
+                                    document.getElementById("btn-text-content").innerText = "통화 종료하기";
+                                });
+                                vapiInstance.on('track', (track, stream) => { 
+                                    if (track.kind === 'audio') { 
+                                        const remoteAudio = document.getElementById("remote-audio"); 
+                                        if (remoteAudio) { 
+                                            remoteAudio.srcObject = stream || new MediaStream([track]); 
+                                            remoteAudio.muted = false; 
+                                            remoteAudio.volume = 1.0; 
+                                            remoteAudio.play().catch(e => console.log("Stream error:", e)); 
+                                        } 
+                                    } 
+                                });
+                                vapiInstance.on('call-end', () => { endCallUI(); });
+                            }
+                        }
+                    }
+                } catch (err) { 
+                    console.error("Vapi init error:", err); 
+                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); 
+                    btn.removeAttribute("disabled"); 
+                    document.getElementById("btn-text-content").innerText = "📞 통화시작하기"; 
+                }
+            } else if (callState === 'ACTIVE') { 
+                endCallUI(); 
+            }
         }
-      }
-      return { details: pDetails, strengths: pStrengths, gender: pGender, age: pAge };
-    }
-
-    // Admin Bypass Logic
-    if (adminKey === "englisholic-admin-master-2026" || token === "englisholic-admin-master-2026") {
-      var adminName = sheet.getRange(2, 1).getValue() || "Student"; 
-      var adminTeacher = sheet.getRange(2, 4).getValue() || "Jacqueline"; 
-      var adminNotes = sheet.getRange(2, 6).getValue() || "일반적인 회화 진행 및 안부 인사"; 
-      var adminProfile = getStudentProfile(adminName);
-      var combinedAdminNotes = adminNotes + " | [BACKGROUND DETAILS]: Student is " + adminProfile.age + " years old, " + adminProfile.gender + ". Details: " + adminProfile.details + ". Strengths/Weaknesses: " + adminProfile.strengths;
-      
-      return ContentService.createTextOutput(JSON.stringify({ 
-        allowed: true, 
-        studentName: adminName, 
-        teacher: adminTeacher, 
-        assistantId: "53ed6c7f-9876-4daf-9f9f-d7181b72a626", 
-        coachingNotes: combinedAdminNotes,
-        details: adminProfile.details,
-        strengths: adminProfile.strengths,
-        gender: adminProfile.gender,
-        age: adminProfile.age
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    if (!token) {
-      return ContentService.createTextOutput(JSON.stringify({ allowed: false, message: "No token provided" }))
-                           .setMimeType(ContentService.MimeType.JSON);
-    }
-
-    var data = sheet.getDataRange().getValues();
-    var matchedRow = -1, studentName = "", assignedTeacher = "Jacqueline", status = "";
-
-    for (var i = 1; i < data.length; i++) {
-      var rowTokenStr = data[i][11] ? data[i][11].toString() : ""; 
-      if (rowTokenStr && rowTokenStr.indexOf(token) !== -1) {
-        matchedRow = i + 1; 
-        studentName = data[i][0]; 
-        assignedTeacher = data[i][3]; 
-        status = data[i][4] ? data[i][4].toString().trim() : ""; 
-        break;
-      }
-    }
-
-    if (matchedRow === -1) {
-      return ContentService.createTextOutput(JSON.stringify({ allowed: false, message: "Invalid token or session expired" }))
-                           .setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // Allow entry if status is active or for testing purposes
-    var coachingNotes = sheet.getRange(matchedRow, 6).getValue() || "일반적인 회화 진행 및 안부 인사";
-    var studentProfile = getStudentProfile(studentName);
-    
-    var combinedNotes = coachingNotes + " | [BACKGROUND DETAILS]: Student is " + studentProfile.age + " years old, " + studentProfile.gender + ". Details: " + studentProfile.details + ". Strengths/Weaknesses: " + studentProfile.strengths;
-    
-    var assistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626"; 
-    if (assignedTeacher === "Brandon") assistantId = "ad93cd2d-b299-4ec0-830f-d10a7fec4aae";
-    else if (assignedTeacher === "Claire") assistantId = "224f0d7c-ddf0-4440-a6ac-a997f9262c65";
-    else if (assignedTeacher === "Randy") assistantId = "bfef25f2-024f-4e72-a6a9-bfa27b7c18e9";
-
-    return ContentService.createTextOutput(JSON.stringify({ 
-      allowed: true, 
-      studentName: studentName, 
-      teacher: assignedTeacher, 
-      assistantId: assistantId, 
-      coachingNotes: combinedNotes,
-      details: studentProfile.details,
-      strengths: studentProfile.strengths,
-      gender: studentProfile.gender,
-      age: studentProfile.age
-    })).setMimeType(ContentService.MimeType.JSON);
-
-  } catch (err) { 
-    return ContentService.createTextOutput(JSON.stringify({ allowed: false, error: err.toString() }))
-                         .setMimeType(ContentService.MimeType.JSON); 
-  }
-}
-
-// --- 2. POST CALL WEBHOOK (Vapi end-of-call report mapping) ---
-function doPost(e) {
-  try {
-    if (!e || !e.postData || !e.postData.contents) return ContentService.createTextOutput("No data");
-    var data = JSON.parse(e.postData.contents);
-    
-    var eventType = (data.message && data.message.type) || data.type || "";
-    if (eventType !== "end-of-call-report") return ContentService.createTextOutput("Ignored");
-    
-    var messageObj = data.message || data;
-    var analysis = messageObj.analysis || {};
-    
-    var summary = analysis.summary || messageObj.summary || "";
-    var structuredData = analysis.structuredData || messageObj.structuredData || {};
-    
-    var callObj = messageObj.call || data.call || {};
-    var customerObj = callObj.customer || messageObj.customer || {};
-    var studentName = customerObj.name || structuredData.student_name || "Student";
-    
-    var callDurationSec = 0;
-    if (callObj.startedAt && callObj.endedAt) {
-      callDurationSec = (new Date(callObj.endedAt).getTime() - new Date(callObj.startedAt).getTime()) / 1000;
-    } else if (messageObj.duration) {
-      callDurationSec = messageObj.duration; 
-    } else {
-      callDurationSec = callObj.duration || 0;
-    }
-    if (isNaN(callDurationSec) || callDurationSec < 0) callDurationSec = 0;
-    
-    var m = Math.floor(callDurationSec / 60);
-    var s = Math.floor(callDurationSec % 60);
-    var durationStr = m + "m " + s + "s";
-    
-    var needsCallback = (callDurationSec < 590) ? "Yes (" + durationStr + ")" : "No (" + durationStr + ")";
-    var finalOutput = summary ? summary : "학생 응답 없음 / 조기 종료. 실제 통화 시간: " + durationStr;
-
-    var ss = SpreadsheetApp.openById(SHEET_ID);
-    var sheet = ss.getSheetByName("수업 대기열 및 운영 큐");
-    var gradeSheet = ss.getSheetByName("수업 평가 기록부");
-    var values = sheet.getDataRange().getValues();
-    var matchedTeacher = "Jacqueline";
-
-    for (var i = 1; i < values.length; i++) {
-      var sheetNameCell = values[i][0] ? values[i][0].toString().trim().toLowerCase() : "";
-      var targetSearchName = studentName.toString().trim().toLowerCase();
-      
-      if (sheetNameCell && (sheetNameCell === targetSearchName || sheetNameCell.indexOf(targetSearchName) !== -1)) {
-        var rIdx = i + 1;
-        matchedTeacher = values[i][3] || "Jacqueline"; 
-        sheet.getRange(rIdx, 5).setValue("통화 완료 / 요약 수신됨"); 
-        sheet.getRange(rIdx, 7).setValue(finalOutput);             
-        sheet.getRange(rIdx, 8).setValue(needsCallback);           
-        sheet.getRange(rIdx, 9).setValue("진행 시간: " + durationStr + " - 확인 완료.");
-        break;
-      }
-    }
-
-    if (gradeSheet) {
-      var todayDate = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
-      if (callDurationSec >= 300) { 
-        gradeSheet.appendRow([ 
-          studentName, 
-          todayDate, 
-          matchedTeacher, 
-          "완료", 
-          "", 
-          "", 
-          structuredData.todays_topic || "N/A", 
-          structuredData.textbook_page || "N/A", 
-          structuredData.listening_score || "N/A", 
-          structuredData.fluency_score || "N/A", 
-          structuredData.grammar_score || "N/A", 
-          structuredData.vocabulary_score || "N/A", 
-          structuredData.comprehension_score || "N/A", 
-          structuredData.total_score || "N/A", 
-          structuredData.teacher_comment || "N/A" 
-        ]);
-      } else {
-        gradeSheet.appendRow([ 
-          studentName, 
-          todayDate, 
-          matchedTeacher, 
-          "조기 종료", 
-          "", 
-          "", 
-          "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", 
-          "5분 미만 조기 종료 (평가 불가)" 
-        ]);
-      }
-    }
-    return ContentService.createTextOutput("Success");
-  } catch (err) { 
-    return ContentService.createTextOutput("Error: " + err.toString()); 
-  }
-}
-
-// --- 3. AUTOMATIC UNLOCK & TOKENS ---
-function 자동출입권한해제및토큰생성() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet(); 
-  var sheet = ss.getSheetByName("수업 대기열 및 운영 큐");
-  if (!sheet) return;
-  
-  var data = sheet.getDataRange().getValues(), now = new Date();
-  
-  for (var i = 1; i < data.length; i++) {
-    var studentName = data[i][0];
-    var scheduledDate = data[i][1];
-    var scheduledTime = data[i][2];
-    var status = data[i][4] ? data[i][4].toString().trim() : ""; 
-    var existingToken = data[i][11]; 
-    
-    if (!studentName || status === "완료") continue;
-    
-    if (!existingToken || existingToken.toString().trim() === "") { 
-      var rawToken = Utilities.getUuid(); 
-      existingToken = "https://englisholicsar-lang.github.io/teacher-jacqueline/room.html?token=" + rawToken; 
-      sheet.getRange(i + 1, 12).setValue(existingToken); 
-    }
-    
-    if (isTargetTimeReached_(scheduledDate, scheduledTime, now, 5)) {
-      if (status !== "입실 허용됨" && status !== "발신 완료") {
-        sheet.getRange(i + 1, 5).setValue("입실 허용됨");
-      }
-    }
-  }
-}
-
-function isTargetTimeReached_(scheduledDate, scheduledTime, now, offsetMinutes) {
-  if (!scheduledTime) return false;
-  try {
-    var targetTime = new Date(scheduledTime);
-    if (isNaN(targetTime.getTime())) {
-      var timeStr = scheduledTime.toString().trim();
-      targetTime = new Date(now.toDateString() + " " + timeStr);
-    } else {
-      targetTime.setFullYear(now.getFullYear(), now.getMonth(), now.getDate());
-    }
-    var unlockTime = new Date(targetTime.getTime() - (offsetMinutes * 60000));
-    return now.getFullYear() === unlockTime.getFullYear() &&
-           now.getMonth() === unlockTime.getMonth() &&
-           now.getDate() === unlockTime.getDate() &&
-           now.getHours() === unlockTime.getHours() && 
-           now.getMinutes() === unlockTime.getMinutes();
-  } catch(e) { 
-    return false; 
-  }
-}
+        
+        function formatTime(secs) { 
+            const m = Math.floor(secs / 60), s = secs % 60; 
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); 
+        }
+        
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval); 
+            secondsElapsed = 0; 
+            document.getElementById("timer-wrapper").style.display = "flex";
+            timerInterval = setInterval(() => {
+                secondsElapsed++; 
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                if (secondsElapsed === 300 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
+                if (secondsElapsed === 570 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 9:30 elapsed. Please begin your natural wrap-up. Do not hang up, just say your warm goodbyes and let the student respond.]" }});
+                if (secondsElapsed === 585 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 15 seconds remaining. Wait for the student's final goodbye.]" }});
+                if (secondsElapsed >= 600) endCallUI();
+            }, 1000);
+        }
+        
+        function stopTimer() { 
+            if (timerInterval) { 
+                clearInterval(timerInterval); 
+                timerInterval = null; 
+            } 
+        }
+        
+        function endCallUI() {
+            stopTimer(); 
+            if (window.activeMicStream) { 
+                window.activeMicStream.getTracks().forEach(track => track.stop()); 
+                window.activeMicStream = null; 
+            }
+            if (vapiInstance && typeof vapiInstance.stop === 'function') { 
+                try { vapiInstance.stop(); } catch(e) {} 
+            }
+            callState = 'ENDED'; 
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            document.getElementById("notice-box").innerHTML = `<div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;"><div style="font-size: 13.5px; font-weight: 700; color: #0e2a47;">🚀 세션에 참여해 주셔서 감사합니다!</div></div>`;
+            const btn = document.getElementById("action-btn"); 
+            btn.style.backgroundColor = "#10b981"; 
+            btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
+            btn.removeAttribute("disabled"); 
+            btn.onclick = function() { window.location.href = 'tel:1877-5079'; }; 
+            document.getElementById("btn-text-content").innerText = "고객센터 문의하기";
+        }
+    </script>
+</body>
+</html>
