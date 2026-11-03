@@ -5,143 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>잉글리쉬홀릭 - Live Session</title>
     
-    <meta property="og:title" content="잉글리쉬홀릭 - Live Session">
-    <meta property="og:description" content="1:1 맞춤 영어회화 라이브 세션">
-    <meta property="og:type" content="website">
-
     <script>var vapiInstance = null;</script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
     <style>
         :root { --bg-base: #f0f6ff; --primary-navy: #0e2a47; --sub-text: #4a637d; --box-bg: #eaf3fe; --box-border: #d4e5f9; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; min-height: 100vh; background-color: var(--bg-base); position: relative; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 0px 20px 16px 20px; color: var(--primary-navy); }
-        .bg-wave-top, .bg-wave-bottom { position: absolute; width: 100%; max-width: 500px; height: auto; z-index: 0; pointer-events: none; opacity: 0.8; }
-        .bg-wave-top { top: 0; right: 0; } .bg-wave-bottom { bottom: 0; left: 0; }
-        .dot-pattern-left { position: absolute; top: 220px; left: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
-        .dot-pattern-right { position: absolute; top: 80px; right: 10px; width: 45px; height: 80px; background-image: radial-gradient(#c2dcfc 2px, transparent 2px); background-size: 10px 10px; z-index: 0; }
-        .container { position: relative; z-index: 1; width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .upper-group { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 4px; }
-        .logo-wrapper { display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
-        .logo-img { height: 65px; width: auto; object-fit: contain; }
-        .avatar-container { position: relative; width: 100px; height: 100px; margin-bottom: 6px; }
-        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12), 0 0 0 6px rgba(255, 255, 255, 0.4); }
-        .title { font-size: 21px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; letter-spacing: -0.3px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; min-height: 100vh; background-color: var(--bg-base); display: flex; flex-direction: column; align-items: center; padding: 0px 20px 16px 20px; color: var(--primary-navy); }
+        .container { position: relative; z-index: 1; width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 20px; }
+        .logo-img { height: 65px; margin-bottom: 6px; }
+        .avatar-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 6px 18px rgba(12, 42, 74, 0.12); margin-bottom: 6px; }
+        .title { font-size: 21px; font-weight: 800; color: #0c2a4a; margin-bottom: 2px; }
         .subtitle { font-size: 13px; font-weight: 600; color: #4a637d; }
-        .timer-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 8px; }
-        .timer-display { font-size: 17px; font-weight: 800; color: #0e2a47; background-color: #ffffff; padding: 6px 16px; border-radius: 20px; border: 2px solid #d4e5f9; box-shadow: 0 4px 10px rgba(12, 42, 74, 0.06); display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.2; }
-        .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 14px; }
-        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
-        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 14px 18px; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; margin-bottom: 10px; }
-        .action-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
-        .shield-badge { position: absolute; bottom: 0; right: 0; background: #2563eb; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-        .admin-box { width: 100%; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 8px 12px; font-size: 11.5px; color: #166534; text-align: left; line-height: 1.3; box-sizing: border-box; display: none;  }
-        iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
+        .timer-display { font-size: 17px; font-weight: 800; background: #ffffff; padding: 6px 16px; border-radius: 20px; border: 2px solid #d4e5f9; margin-top: 8px; }
+        .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 10px; margin-top: 14px; margin-bottom: 10px; font-size: 13px; font-weight: 800; }
+        .action-btn { width: 100%; background-color: #059669; color: #ffffff; border: none; padding: 14px 18px; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35); }
+        .action-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/></svg>
-    <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/></svg>
-    <div class="dot-pattern-left"></div><div class="dot-pattern-right"></div>
     <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
     <div id="main-container" class="container">
-        <div class="upper-group">
-            <div class="logo-wrapper"><img src="logo.png" alt="Englisholic Logo" class="logo-img"></div>
-            <div class="avatar-container">
-                <img id="teacherImg" class="avatar-img" src="jacqueline.png" alt="Teacher Jacqueline">
-                <div id="shieldBadge" class="shield-badge">🛡️</div>
-            </div>
-            <h1 id="mainTitle" class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">인증 상태 확인 중...</p>
-            <div id="timer-wrapper" class="timer-wrapper" style="display: none;"><div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div></div>
+        <img src="logo.png" alt="Englisholic Logo" class="logo-img">
+        <img id="teacherImg" class="avatar-img" src="jacqueline.png" alt="Teacher">
+        <h1 id="mainTitle" class="title">Teacher Jacqueline</h1>
+        <p id="call-status" class="subtitle">인증 상태 확인 중...</p>
+        <div id="timer-wrapper" style="display: none;"><div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div></div>
+        
+        <div class="info-box">
+            🔊 스피커폰으로 기본 설정됩니다.<br>🎧 이어폰은 통화 시작 전 연결해 주세요!
         </div>
-        <div class="bottom-group">
-            <div id="notice-box" class="info-box" style="flex-direction: column; gap: 6px; padding: 10px 10px;">
-                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;"><span style="font-size: 15px;">🔊</span> 스피커폰으로 기본 설정됩니다.</div>
-                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;"><span style="font-size: 15px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!</div>
-            </div>
-            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled><span id="btn-text-content">데이터 동기화 중...</span></button>
-            <div id="adminBox" class="admin-box">👑 <strong>관리자 권한 승인 (Admin Bypass)</strong><br>모든 클래스 백엔드 및 테스트 로그 조회 권한이 활성화되었습니다.</div>
-        </div>
+        <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled><span id="btn-text-content">데이터 동기화 중...</span></button>
     </div>
+
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyulJrE2iIOIoc9hfqjMGJT67EnuL18pWfV7N-Fy4gixd-NGCE_5B_wGqkESWmRkLc/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxGFDkjGSgl8_p4jdl6DZV6Z87y1mY5QMv1f2kH8KokerqpKnTZKSRgSQDIzUntL3t3/exec";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
+        
         let callState = 'IDLE', isUserAllowed = false, timerInterval = null, secondsElapsed = 0;
-        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626", sessionStudentName = "Student", sessionCoachingNotes = "", sessionDetails = "", sessionStrengths = "", sessionGender = "", sessionAge = "";
+        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626", sessionStudentName = "Student", sessionCoachingNotes = "";
+        
         const urlParams = new URLSearchParams(window.location.search), token = urlParams.get('token');
+        
         window.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById("action-btn");
             if (!token) {
-                document.getElementById("call-status").innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요."; btn.innerText = "입장 불가"; document.getElementById("shieldBadge").style.display = "none"; return;
+                document.getElementById("call-status").innerText = "유효하지 않은 링크입니다."; 
+                btn.innerText = "입장 불가"; 
+                return;
             }
-            document.getElementById("shieldBadge").style.display = "none";
-            let fetchUrl = `${GAS_URL}?token=${token}`;
-            if (token === 'englisholic-admin-master-2026') fetchUrl = `${GAS_URL}?key=englisholic-admin-master-2026`;
+            
+            let fetchUrl = token === 'englisholic-admin-master-2026' ? `${GAS_URL}?key=${token}` : `${GAS_URL}?token=${token}`;
+            
             fetch(fetchUrl)
                 .then(res => res.json())
                 .then(data => {
                     if (data.allowed) {
                         isUserAllowed = true;
-                        sessionStudentName = data.studentName || "Student"; sessionCoachingNotes = data.coachingNotes || ""; sessionDetails = data.details || ""; sessionStrengths = data.strengths || ""; sessionGender = data.gender || ""; sessionAge = data.age || "";
+                        sessionStudentName = data.studentName || "Student"; 
+                        sessionCoachingNotes = data.coachingNotes || ""; 
                         if (data.assistantId) activeAssistantId = data.assistantId;
+                        
                         document.getElementById("mainTitle").innerText = `Teacher ${data.teacher || 'Jacqueline'}`;
                         document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 수업 준비가 완료되었습니다.`;
-                        if (token === 'englisholic-admin-master-2026' || token.includes('test')) { document.getElementById("adminBox").style.display = "block"; document.getElementById("shieldBadge").style.display = "flex"; }
-                        btn.removeAttribute("disabled"); document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+                        btn.removeAttribute("disabled"); 
+                        document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
                     } else {
-                        document.getElementById("call-status").innerText = data.message || "만료되었거나 이미 종료된 수업 링크입니다."; btn.innerText = "종료된 세션"; btn.disabled = true;
+                        document.getElementById("call-status").innerText = data.message || "종료된 수업 링크입니다."; 
+                        btn.disabled = true;
                     }
                 })
-                .catch(err => { document.getElementById("call-status").innerText = "서버 연결 오류. 잠시 후 다시 시도해 주세요."; btn.innerText = "오류 발생"; });
+                .catch(err => { 
+                    document.getElementById("call-status").innerText = "서버 연결 오류."; 
+                });
         });
+
         async function handleMainAction() {
             if (!isUserAllowed) return;
-            const remoteAudio = document.getElementById("remote-audio"); if (remoteAudio) { remoteAudio.volume = 1.0; remoteAudio.play().catch(e => console.log("Audio tap", e)); }
+            const btn = document.getElementById("action-btn");
+            
             if (callState === 'IDLE') {
-                const btn = document.getElementById("action-btn"); btn.setAttribute("disabled", "true"); document.getElementById("btn-text-content").innerText = "통화 연결 중...";
+                btn.setAttribute("disabled", "true"); 
+                document.getElementById("btn-text-content").innerText = "통화 연결 중...";
+                
                 try {
-                    if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
-                        vapiInstance = window.vapiSDK.run({
-                            apiKey: VAPI_KEY, assistant: activeAssistantId, config: { variableValues: { student_name: sessionStudentName, studentName: sessionStudentName, coaching_notes: sessionCoachingNotes, coachingNotes: sessionCoachingNotes, personal_details: sessionDetails, strengths_weaknesses: sessionStrengths, student_gender: sessionGender, student_age: sessionAge } }
-                        });
-                        if (vapiInstance) {
-                            if (typeof vapiInstance.start === 'function') vapiInstance.start(activeAssistantId);
-                            if (typeof vapiInstance.on === 'function') {
-                                vapiInstance.on('call-start', () => {
-                                    startTimer(); callState = 'ACTIVE';
-                                    if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") { if (vapiInstance && typeof vapiInstance.send === 'function') { vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student like an old friend and bring up this exact coaching note as your very first topic right after saying hello!` } }); } }
-                                    document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
-                                    document.getElementById("notice-box").innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;"><div style="font-size: 24px; flex-shrink: 0;">🎙️</div><span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">선생님께 인사해 보세요! (예: Hello!)</span></div>`;
-                                    btn.style.backgroundColor = "#e05252"; btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)"; btn.removeAttribute("disabled"); document.getElementById("btn-text-content").innerText = "통화 종료하기";
-                                });
-                                vapiInstance.on('track', (track, stream) => { if (track.kind === 'audio') { const remoteAudio = document.getElementById("remote-audio"); if (remoteAudio) { remoteAudio.srcObject = stream || new MediaStream([track]); remoteAudio.muted = false; remoteAudio.volume = 1.0; remoteAudio.play().catch(e => console.log("Stream error:", e)); } } });
-                                vapiInstance.on('call-end', () => { endCallUI(); });
-                            }
+                    vapiInstance = window.vapiSDK.run({
+                        apiKey: VAPI_KEY, 
+                        assistant: activeAssistantId, 
+                        config: { 
+                            variableValues: { 
+                                student_name: sessionStudentName, 
+                                coaching_notes: sessionCoachingNotes
+                            } 
                         }
+                    });
+                    
+                    if (vapiInstance) {
+                        // THE DIAGNOSTIC CATCHER - THIS WILL POP UP THE EXACT ERROR
+                        vapiInstance.on('error', (e) => {
+                            console.error("Vapi Error:", e);
+                            alert("VAPI 시스템 에러: " + (e.message || JSON.stringify(e)));
+                            btn.removeAttribute("disabled");
+                            document.getElementById("btn-text-content").innerText = "📞 통화시작하기";
+                        });
+
+                        vapiInstance.on('call-start', () => {
+                            startTimer(); 
+                            callState = 'ACTIVE';
+                            if (sessionCoachingNotes) { 
+                                vapiInstance.send({ type: "add-message", message: { role: "system", content: `Today's Custom Coaching Notes: "${sessionCoachingNotes}".` } }); 
+                            }
+                            document.getElementById("call-status").innerText = "통화가 연결되었습니다.";
+                            btn.style.backgroundColor = "#e05252"; 
+                            btn.removeAttribute("disabled"); 
+                            document.getElementById("btn-text-content").innerText = "통화 종료하기";
+                        });
+                        
+                        vapiInstance.on('call-end', () => { endCallUI(); });
                     }
-                } catch (err) { console.error("Vapi init error:", err); alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); btn.removeAttribute("disabled"); document.getElementById("btn-text-content").innerText = "📞 통화시작하기"; }
-            } else if (callState === 'ACTIVE') { endCallUI(); }
+                } catch (err) { 
+                    alert("코드 실행 오류: " + err.message); 
+                    btn.removeAttribute("disabled"); 
+                    document.getElementById("btn-text-content").innerText = "📞 통화시작하기"; 
+                }
+            } else if (callState === 'ACTIVE') { 
+                endCallUI(); 
+            }
         }
-        function formatTime(secs) { const m = Math.floor(secs / 60), s = secs % 60; return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); }
+        
+        function formatTime(secs) { 
+            const m = Math.floor(secs / 60), s = secs % 60; 
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); 
+        }
+        
         function startTimer() {
-            if (timerInterval) clearInterval(timerInterval); secondsElapsed = 0; document.getElementById("timer-wrapper").style.display = "flex";
+            document.getElementById("timer-wrapper").style.display = "flex";
             timerInterval = setInterval(() => {
-                secondsElapsed++; document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
-                if (secondsElapsed === 300 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
-                if (secondsElapsed === 570 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION.]" }});
-                if (secondsElapsed === 585 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. EXECUTE end_tutoring_session.]" }});
+                secondsElapsed++; 
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed === 570 && vapiInstance) vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 9:30 elapsed. Do not hang up, just say goodbye.]" }});
                 if (secondsElapsed >= 600) endCallUI();
             }, 1000);
         }
-        function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+        
         function endCallUI() {
-            stopTimer(); if (window.activeMicStream) { window.activeMicStream.getTracks().forEach(track => track.stop()); window.activeMicStream = null; }
-            if (vapiInstance && typeof vapiInstance.stop === 'function') { try { vapiInstance.stop(); } catch(e) {} }
-            callState = 'ENDED'; document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
-            document.getElementById("notice-box").innerHTML = `<div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;"><div style="font-size: 13.5px; font-weight: 700; color: #0e2a47;">🚀 세션에 참여해 주셔서 감사합니다!</div></div>`;
-            const btn = document.getElementById("action-btn"); btn.style.backgroundColor = "#10b981"; btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
-            btn.removeAttribute("disabled"); btn.onclick = function() { window.location.href = 'tel:1877-5079'; }; document.getElementById("btn-text-content").innerText = "고객센터 문의하기";
+            clearInterval(timerInterval); 
+            if (vapiInstance) { try { vapiInstance.stop(); } catch(e) {} }
+            callState = 'ENDED'; 
+            document.getElementById("call-status").innerText = "수고하셨습니다!";
+            const btn = document.getElementById("action-btn"); 
+            btn.style.backgroundColor = "#10b981"; 
+            btn.removeAttribute("disabled"); 
+            document.getElementById("btn-text-content").innerText = "종료됨";
         }
     </script>
 </body>
