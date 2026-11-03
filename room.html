@@ -138,17 +138,21 @@
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY, 
                             assistant: activeAssistantId, 
-                            config: {} // Ensure config is clean so it doesn't conflict
+                            config: {} 
                         });
                         
                         if (vapiInstance) {
                             if (typeof vapiInstance.start === 'function') {
-                                // Explicitly force the variables into the start connection payload
+                                // METADATA INJECTED HERE
                                 vapiInstance.start(activeAssistantId, { 
                                     variableValues: { 
                                         student_name: sessionStudentName, 
                                         coaching_notes: sessionCoachingNotes 
-                                    } 
+                                    },
+                                    metadata: {
+                                        studentName: sessionStudentName,
+                                        token: token
+                                    }
                                 });
                             }
 
