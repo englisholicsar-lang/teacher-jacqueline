@@ -69,10 +69,7 @@
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         
         let callState = 'IDLE', isUserAllowed = false, timerInterval = null, secondsElapsed = 0;
-        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626";
-        
-        // Reinstated all session variables to prevent Vapi initialization crashes
-        let sessionStudentName = "Student", sessionCoachingNotes = "", sessionDetails = "", sessionStrengths = "", sessionGender = "", sessionAge = "";
+        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626", sessionStudentName = "Student", sessionCoachingNotes = "", sessionDetails = "", sessionStrengths = "", sessionGender = "", sessionAge = "";
         
         const urlParams = new URLSearchParams(window.location.search), token = urlParams.get('token');
         
@@ -94,10 +91,12 @@
                 .then(data => {
                     if (data.allowed) {
                         isUserAllowed = true;
-                        
-                        // Map incoming backend data securely
                         sessionStudentName = data.studentName || "Student"; 
                         sessionCoachingNotes = data.coachingNotes || ""; 
+                        sessionDetails = data.details || ""; 
+                        sessionStrengths = data.strengths || ""; 
+                        sessionGender = data.gender || ""; 
+                        sessionAge = data.age || "";
                         
                         if (data.assistantId) activeAssistantId = data.assistantId;
                         
@@ -142,16 +141,15 @@
                             apiKey: VAPI_KEY, 
                             assistant: activeAssistantId, 
                             config: { 
-                                // Restored full variable block to guarantee safe Vapi initialization
                                 variableValues: { 
                                     student_name: sessionStudentName, 
                                     studentName: sessionStudentName, 
-                                    coaching_notes: sessionCoachingNotes,
-                                    coachingNotes: sessionCoachingNotes,
-                                    personal_details: sessionDetails,
-                                    strengths_weaknesses: sessionStrengths,
-                                    student_gender: sessionGender,
-                                    student_age: sessionAge
+                                    coaching_notes: sessionCoachingNotes, 
+                                    coachingNotes: sessionCoachingNotes, 
+                                    personal_details: sessionDetails, 
+                                    strengths_weaknesses: sessionStrengths, 
+                                    student_gender: sessionGender, 
+                                    student_age: sessionAge 
                                 } 
                             }
                         });
@@ -162,7 +160,11 @@
                                 vapiInstance.on('call-start', () => {
                                     startTimer(); 
                                     callState = 'ACTIVE';
-                                    
+                                    if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") { 
+                                        if (vapiInstance && typeof vapiInstance.send === 'function') { 
+                                            vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student like an old friend and bring up this exact coaching note as your very first topic right after saying hello!` } }); 
+                                        } 
+                                    }
                                     document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
                                     document.getElementById("notice-box").innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;"><div style="font-size: 24px; flex-shrink: 0;">🎙️</div><span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">선생님께 인사해 보세요! (예: Hello!)</span></div>`;
                                     btn.style.backgroundColor = "#e05252"; 
@@ -208,13 +210,9 @@
             timerInterval = setInterval(() => {
                 secondsElapsed++; 
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
-                
-                // System Alerts sent directly to the AI
                 if (secondsElapsed === 300 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
                 if (secondsElapsed === 570 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 9:30 elapsed. Please begin your natural wrap-up. Do not hang up, just say your warm goodbyes and let the student respond.]" }});
                 if (secondsElapsed === 585 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 15 seconds remaining. Wait for the student's final goodbye.]" }});
-                
-                // Forced disconnect exactly at 10:00
                 if (secondsElapsed >= 600) endCallUI();
             }, 1000);
         }
