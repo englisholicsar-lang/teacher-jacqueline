@@ -160,11 +160,14 @@
                                 vapiInstance.on('call-start', () => {
                                     startTimer(); 
                                     callState = 'ACTIVE';
+                                    
+                                    // FIX 1: Send only clean coaching notes as the system injection
                                     if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") { 
                                         if (vapiInstance && typeof vapiInstance.send === 'function') { 
-                                            vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student like an old friend and bring up this exact coaching note as your very first topic right after saying hello!` } }); 
+                                            vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student and naturally incorporate this specific coaching note.` } }); 
                                         } 
                                     }
+                                    
                                     document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
                                     document.getElementById("notice-box").innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;"><div style="font-size: 24px; flex-shrink: 0;">🎙️</div><span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">선생님께 인사해 보세요! (예: Hello!)</span></div>`;
                                     btn.style.backgroundColor = "#e05252"; 
@@ -233,6 +236,21 @@
             if (vapiInstance && typeof vapiInstance.stop === 'function') { 
                 try { vapiInstance.stop(); } catch(e) {} 
             }
+
+            // FIX 3: Frontend Webhook Fallback POST request sent directly to GAS
+            try {
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'frontend-completion',
+                        studentName: sessionStudentName,
+                        duration: secondsElapsed
+                    })
+                }).catch(e => console.log("Fallback payload skipped", e));
+            } catch(e) {}
+
             callState = 'ENDED'; 
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             document.getElementById("notice-box").innerHTML = `<div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;"><div style="font-size: 13.5px; font-weight: 700; color: #0e2a47;">🚀 세션에 참여해 주셔서 감사합니다!</div></div>`;
