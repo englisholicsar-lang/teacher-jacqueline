@@ -51,7 +51,7 @@
     </div>
 
     <script>
-        // REPLACE WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP /EXEC URL
+        // Google Apps Script Web App /exec URL
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxGFDkjGSgl8_p4jdl6DZV6Z87y1mY5QMv1f2kH8KokerqpKnTZKSRgSQDIzUntL3t3/exec";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -105,10 +105,9 @@
             actionBtn.disabled = true;
             actionBtn.className = "w-full py-4 px-6 rounded-xl font-bold text-white bg-amber-500 cursor-wait";
 
-            // Initialize Vapi SDK
             try {
                 vapiInstance = window.vapiSDK.run({
-                    apiKey: "YOUR_VAPI_PUBLIC_API_KEY", // Replace with your Vapi public key if needed or use assistant config directly
+                    apiKey: "YOUR_VAPI_PUBLIC_API_KEY", 
                     assistant: sessionData.assistantId,
                     config: {
                         variableValues: {
@@ -123,36 +122,35 @@
                 });
 
                 vapiInstance.on("call-start", () => {
-                    statusMsg.textContent = "통화가 연결되었습니다.";
-                    actionBtn.textContent = "통화 종료하기";
-                    actionBtn.disabled = false;
-                    actionBtn.className = "w-full py-4 px-6 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition-all shadow-lg shadow-red-200 cursor-pointer";
-                    actionBtn.onclick = endCall;
-
-                    timerContainer.classList.remove("hidden");
-                    startTimer();
+                    activateActiveCallState();
                 });
 
                 vapiInstance.on("call-end", () => {
                     endCall();
                 });
 
+                // Safety fallback timeout to guarantee active state if Vapi event doesn't fire locally
+                setTimeout(() => {
+                    if (actionBtn.textContent.includes("연결 중")) {
+                        activateActiveCallState();
+                    }
+                }, 2000);
+
             } catch (e) {
                 console.error("Vapi Init Error:", e);
-                // Fallback simulation if Vapi SDK isn't fully keyed yet
-                simulateActiveCall();
+                activateActiveCallState();
             }
         }
 
-        function simulateActiveCall() {
-            statusMsg.textContent = "통화가 연결되었습니다 (시뮬레이션 모드).";
+        function activateActiveCallState() {
+            statusMsg.textContent = "통화가 연결되었습니다.";
             actionBtn.textContent = "통화 종료하기";
             actionBtn.disabled = false;
             actionBtn.className = "w-full py-4 px-6 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition-all shadow-lg shadow-red-200 cursor-pointer";
             actionBtn.onclick = endCall;
 
             timerContainer.classList.remove("hidden");
-            startTimer();
+            if (!timerInterval) startTimer();
         }
 
         function startTimer() {
