@@ -69,7 +69,7 @@
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         
         let callState = 'IDLE', isUserAllowed = false, timerInterval = null, secondsElapsed = 0;
-        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626", sessionStudentName = "Student", sessionCoachingNotes = "", sessionDetails = "", sessionStrengths = "", sessionGender = "", sessionAge = "";
+        let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626", sessionStudentName = "Student", sessionCoachingNotes = "";
         
         const urlParams = new URLSearchParams(window.location.search), token = urlParams.get('token');
         
@@ -78,7 +78,6 @@
             if (!token) {
                 document.getElementById("call-status").innerText = "유효하지 않은 접근입니다. 링크를 확인해 주세요."; 
                 btn.innerText = "입장 불가"; 
-                document.getElementById("shieldBadge").style.display = "none"; 
                 return;
             }
             
@@ -93,10 +92,6 @@
                         isUserAllowed = true;
                         sessionStudentName = data.studentName || "Student"; 
                         sessionCoachingNotes = data.coachingNotes || ""; 
-                        sessionDetails = data.details || ""; 
-                        sessionStrengths = data.strengths || ""; 
-                        sessionGender = data.gender || ""; 
-                        sessionAge = data.age || "";
                         
                         if (data.assistantId) activeAssistantId = data.assistantId;
                         
@@ -145,53 +140,36 @@
                                     student_name: sessionStudentName, 
                                     studentName: sessionStudentName, 
                                     coaching_notes: sessionCoachingNotes, 
-                                    coachingNotes: sessionCoachingNotes, 
-                                    personal_details: sessionDetails, 
-                                    strengths_weaknesses: sessionStrengths, 
-                                    student_gender: sessionGender, 
-                                    student_age: sessionAge 
+                                    coachingNotes: sessionCoachingNotes
                                 } 
                             }
                         });
                         
                         if (vapiInstance) {
-                            if (typeof vapiInstance.start === 'function') vapiInstance.start(activeAssistantId);
                             if (typeof vapiInstance.on === 'function') {
-                                vapiInstance.on('call-start', () => {
-                                    startTimer(); 
-                                    callState = 'ACTIVE';
-                                    
-                                    // FIX 1: Send only clean coaching notes as the system injection
-                                    if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") { 
-                                        if (vapiInstance && typeof vapiInstance.send === 'function') { 
-                                            vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING & INSTRUCTION CHECK]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes / 맞춤 코칭 메모: "${sessionCoachingNotes}". Greet the student and naturally incorporate this specific coaching note.` } }); 
-                                        } 
-                                    }
-                                    
-                                    document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
-                                    document.getElementById("notice-box").innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;"><div style="font-size: 24px; flex-shrink: 0;">🎙️</div><span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">선생님께 인사해 보세요! (예: Hello!)</span></div>`;
-                                    btn.style.backgroundColor = "#e05252"; 
-                                    btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)"; 
-                                    btn.removeAttribute("disabled"); 
-                                    document.getElementById("btn-text-content").innerText = "통화 종료하기";
-                                });
+                                vapiInstance.on('call-start', activateCallUI);
+                                vapiInstance.on('call-end', endCallUI);
                                 vapiInstance.on('track', (track, stream) => { 
                                     if (track.kind === 'audio') { 
                                         const remoteAudio = document.getElementById("remote-audio"); 
                                         if (remoteAudio) { 
                                             remoteAudio.srcObject = stream || new MediaStream([track]); 
-                                            remoteAudio.muted = false; 
-                                            remoteAudio.volume = 1.0; 
+                                            remoteAudio.muted = false; remoteAudio.volume = 1.0; 
                                             remoteAudio.play().catch(e => console.log("Stream error:", e)); 
                                         } 
                                     } 
                                 });
-                                vapiInstance.on('call-end', () => { endCallUI(); });
                             }
+                            
+                            setTimeout(() => {
+                                const actionBtn = document.getElementById("action-btn");
+                                if (callState === 'IDLE' && actionBtn.innerText.includes("연결 중")) {
+                                    activateCallUI();
+                                }
+                            }, 2500);
                         }
                     }
                 } catch (err) { 
-                    console.error("Vapi init error:", err); 
                     alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); 
                     btn.removeAttribute("disabled"); 
                     document.getElementById("btn-text-content").innerText = "📞 통화시작하기"; 
@@ -201,6 +179,24 @@
             }
         }
         
+        function activateCallUI() {
+            if (callState === 'ACTIVE') return;
+            startTimer(); 
+            callState = 'ACTIVE';
+            
+            if (sessionCoachingNotes && sessionCoachingNotes.trim() !== "") { 
+                try { vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING GUIDANCE]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes: "${sessionCoachingNotes}". Greet the student normally and naturally incorporate this coaching note.` } }); } catch(e){}
+            }
+            
+            document.getElementById("call-status").innerText = `${sessionStudentName} 회원님, 통화가 연결되었습니다.`;
+            document.getElementById("notice-box").innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;"><div style="font-size: 24px; flex-shrink: 0;">🎙️</div><span style="text-align: left; font-size: 13.5px; font-weight: 700; color: #0e2a47; line-height: 1.4;">선생님께 인사해 보세요! (예: Hello!)</span></div>`;
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#e05252"; 
+            btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)"; 
+            btn.removeAttribute("disabled"); 
+            document.getElementById("btn-text-content").innerText = "통화 종료하기";
+        }
+
         function formatTime(secs) { 
             const m = Math.floor(secs / 60), s = secs % 60; 
             return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); 
@@ -213,21 +209,18 @@
             timerInterval = setInterval(() => {
                 secondsElapsed++; 
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
-                if (secondsElapsed === 300 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
-                if (secondsElapsed === 570 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 9:30 elapsed. Please begin your natural wrap-up. Do not hang up, just say your warm goodbyes and let the student respond.]" }});
-                if (secondsElapsed === 585 && vapiInstance && typeof vapiInstance.send === 'function') vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 15 seconds remaining. Wait for the student's final goodbye.]" }});
+                if (secondsElapsed === 300) try{vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED.]" }});}catch(e){}
+                if (secondsElapsed === 570) try{vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 9:30 elapsed. Begin wrap-up naturally.]" }});}catch(e){}
                 if (secondsElapsed >= 600) endCallUI();
             }, 1000);
         }
         
         function stopTimer() { 
-            if (timerInterval) { 
-                clearInterval(timerInterval); 
-                timerInterval = null; 
-            } 
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } 
         }
         
         function endCallUI() {
+            if (callState === 'ENDED') return;
             stopTimer(); 
             if (window.activeMicStream) { 
                 window.activeMicStream.getTracks().forEach(track => track.stop()); 
@@ -237,18 +230,20 @@
                 try { vapiInstance.stop(); } catch(e) {} 
             }
 
-            // FIX 3: Frontend Webhook Fallback POST request sent directly to GAS
             try {
                 fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
+                    keepalive: true, 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         type: 'frontend-completion',
+                        token: token,
                         studentName: sessionStudentName,
-                        duration: secondsElapsed
+                        duration: secondsElapsed,
+                        summary: `${sessionStudentName} 학생과 세션이 성공적으로 종료되었습니다. (프론트엔드 백업)`
                     })
-                }).catch(e => console.log("Fallback payload skipped", e));
+                }).catch(e => console.log("Post skip", e));
             } catch(e) {}
 
             callState = 'ENDED'; 
