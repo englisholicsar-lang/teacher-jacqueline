@@ -73,6 +73,7 @@
         
         let callState = 'IDLE', isUserAllowed = false, timerInterval = null, secondsElapsed = 0;
         let activeAssistantId = "53ed6c7f-9876-4daf-9f9f-d7181b72a626", sessionStudentName = "Student", sessionCoachingNotes = "";
+        let wakeLock = null;
         
         const urlParams = new URLSearchParams(window.location.search), token = urlParams.get('token');
         
@@ -120,6 +121,16 @@
                 });
         });
 
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) { console.error("Wake Lock error:", err); }
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
+        }
+
         async function handleMainAction() {
             if (!isUserAllowed) return;
             const remoteAudio = document.getElementById("remote-audio"); 
@@ -143,15 +154,12 @@
                         
                         if (vapiInstance) {
                             if (typeof vapiInstance.start === 'function') {
-                                // METADATA INJECTED HERE
+                                // METADATA & TOKEN INJECTED DIRECTLY INTO VARIABLES
                                 vapiInstance.start(activeAssistantId, { 
                                     variableValues: { 
                                         student_name: sessionStudentName, 
-                                        coaching_notes: sessionCoachingNotes 
-                                    },
-                                    metadata: {
-                                        studentName: sessionStudentName,
-                                        token: token
+                                        coaching_notes: sessionCoachingNotes,
+                                        token: token 
                                     }
                                 });
                             }
@@ -193,6 +201,7 @@
             if (callState === 'ACTIVE') return;
             callState = 'ACTIVE';
             
+            requestWakeLock();
             try { startTimer(); } catch(e) {}
             
             try {
@@ -239,7 +248,8 @@
         
         function endCallUI() {
             if (callState === 'ENDED') return;
-            stopTimer(); 
+            stopTimer();
+            releaseWakeLock(); 
             if (window.activeMicStream) { 
                 window.activeMicStream.getTracks().forEach(track => track.stop()); 
                 window.activeMicStream = null; 
