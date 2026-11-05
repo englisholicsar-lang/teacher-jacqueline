@@ -136,6 +136,7 @@
         </div>
 
         <div class="bottom-group">
+            <!-- Initial Speaker/Earphone Notice Box - Locked to 2 Lines -->
             <div id="notice-box" class="info-box" style="flex-direction: column; gap: 10px; padding: 15px 10px;">
                 <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
                     <span style="font-size: 18px;">🔊</span> 스피커폰으로 기본 설정되었습니다.
@@ -145,6 +146,7 @@
                 </div>
             </div>
 
+            <!-- Action Button -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -246,18 +248,8 @@
                 .catch(err => console.log("Background check skipped:", err));
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
-
-            // SAFE HARDWARE MICROPHONE PROMPT TRIGGERED BY USER TAP
-            try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    stream.getTracks().forEach(track => track.stop());
-                }
-            } catch (e) {
-                console.log("Mic prompt note:", e);
-            }
 
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
@@ -385,6 +377,7 @@
                     }
                 }
 
+                // Precise 9:30 wrap-up system alert trigger
                 if (secondsElapsed === 570) {  
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
