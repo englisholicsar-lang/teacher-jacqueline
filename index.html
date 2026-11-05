@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Teacher Jacqueline - Free Trial</title>
+    <title>Englisholic - 1:1 Free Trial</title>
     
-    <meta property="og:title" content="Teacher Jacqueline - Free Trial">
-    <meta property="og:description" content="재클린 선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
+    <meta property="og:title" content="Englisholic - 1:1 Free Trial">
+    <meta property="og:description" content="선생님과의 1:1 맞춤 영어회화 10분 무료 체험">
     <meta property="og:image" content="https://englisholicsar-lang.github.io/teacher-jacqueline/og_preview.png">
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
@@ -78,8 +78,8 @@
         .bottom-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
         .info-box { width: 100%; background-color: var(--box-bg); border: 1px solid var(--box-border); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(12, 42, 74, 0.03); }
         
-        .kakao-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
-        .kakao-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
+        .action-btn { width: 100%; background-color: var(--kakao-yellow); color: #000000; border: none; padding: 15px 18px; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 16px rgba(254, 229, 0, 0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; }
+        .action-btn:disabled { background-color: #a0aec0; box-shadow: none; cursor: not-allowed; color: #ffffff; }
 
         .shield-icon {
             width: 24px;
@@ -125,10 +125,10 @@
                 <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
             </div>
             <div class="avatar-container">
-                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+                <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" id="teacher-avatar" alt="Teacher">
             </div>
-            <h1 class="title">Teacher Jacqueline</h1>
-            <p id="call-status" class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+            <h1 class="title" id="teacher-title">Teacher Jacqueline</h1>
+            <p id="call-status" class="subtitle">선생님과의 1:1 맞춤 영어회화</p>
             
             <div id="timer-wrapper" class="timer-wrapper" style="display: none;">
                 <div id="timer" class="timer-display">⏱️ 00:00 / 10:00</div>
@@ -136,7 +136,6 @@
         </div>
 
         <div class="bottom-group">
-            <!-- Initial Speaker/Earphone Notice Box - Locked to 2 Lines -->
             <div id="notice-box" class="info-box" style="flex-direction: column; gap: 10px; padding: 15px 10px;">
                 <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
                     <span style="font-size: 18px;">🔊</span> 스피커폰으로 기본 설정되었습니다.
@@ -147,7 +146,7 @@
             </div>
 
             <!-- Action Button -->
-            <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
+            <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
@@ -158,38 +157,26 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbynScbuwTTLZYraXijDuNIlH7-ETq3cgwyuP2v9lggdayWpk_ewCHHUK8rbPlSFlM1c/exec";
-        const KAKAO_CLIENT_ID = "4800b51cb8a7d1862dc4b2725633ea69";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
-        const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
         let callState = 'IDLE'; 
-        let isUserAllowed = true; 
+        let isUserAllowed = false; 
         let timerInterval = null;
         let secondsElapsed = 0;
         
-        let cachedKakaoId = "N/A";
-        let cachedKakaoNickname = "Kakao User";
+        let sessionData = {
+            studentName: "Student",
+            teacher: "Jacqueline",
+            assistantId: "ab0d16c5-842d-40c6-8fa4-055fee015089",
+            coachingNotes: ""
+        };
 
-        function getDeviceHash() {
-            try {
-                let hash = localStorage.getItem("englisholic_device_hash");
-                if (!hash) {
-                    const rawString = [navigator.userAgent, navigator.language, screen.width + "x" + screen.height, screen.colorDepth, new Date().getTimezoneOffset()].join("|");
-                    let h = 0;
-                    for (let i = 0; i < rawString.length; i++) {
-                        h = (h << 5) - h + rawString.charCodeAt(i);
-                        h |= 0;
-                    }
-                    hash = "DEV-" + Math.abs(h).toString(16).toUpperCase();
-                    localStorage.setItem("englisholic_device_hash", hash);
-                }
-                return hash;
-            } catch (err) {
-                return "DEV-FALLBACK-" + Math.floor(Math.random() * 100000);
-            }
+        function getUrlToken() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("token") || "";
         }
 
-        function showLockoutUI() {
+        function showLockoutUI(message) {
             isUserAllowed = false;
             document.getElementById("main-container").innerHTML = `
                 <div class="upper-group" style="margin-top: 10px;">
@@ -197,18 +184,18 @@
                         <img src="https://englisholicsar-lang.github.io/teacher-jacqueline/logo.png" alt="Englisholic Logo" class="logo-img">
                     </div>
                     <div class="avatar-container">
-                        <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher Jacqueline">
+                        <img class="avatar-img" src="https://englisholicsar-lang.github.io/teacher-jacqueline/jacqueline.png" alt="Teacher">
                     </div>
-                    <h1 class="title">Teacher Jacqueline</h1>
-                    <p class="subtitle">재클린 선생님과의 1:1 맞춤 영어회화</p>
+                    <h1 class="title">Englisholic</h1>
+                    <p class="subtitle">1:1 맞춤 영어회화 무료 체험</p>
                 </div>
                 <div class="bottom-group" style="margin-top: 20px;">
                     <div class="info-box" style="padding: 16px; justify-content: center;">
-                        <span style="text-align: center; color: #0e2a47; white-space: nowrap; font-size: 13.5px;">
-                            🔒 무료 체험 수업은 1회만 가능합니다.
+                        <span style="text-align: center; color: #0e2a47; font-size: 13.5px; font-weight: 700;">
+                            🔒 ${message || "유효하지 않거나 이미 종료된 수업 링크입니다."}
                         </span>
                     </div>
-                    <button class="kakao-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #10b981; color: #ffffff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); justify-content: center;">
+                    <button class="action-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #10b981; color: #ffffff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); justify-content: center;">
                         <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
                         <span style="font-size: 17px;">고객센터 문의하기</span>
                     </button>
@@ -217,35 +204,44 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            try {
-                if (typeof Kakao !== "undefined" && !Kakao.isInitialized()) {
-                    Kakao.init(KAKAO_CLIENT_ID);
-                }
-            } catch (e) {
-                console.log("Kakao init warning:", e);
-            }
-
+            const token = getUrlToken();
             const btn = document.getElementById("action-btn");
 
-            setTimeout(() => {
-                btn.removeAttribute("disabled");
-                const iconWrapper = document.getElementById("btn-icon-wrapper");
-                if (iconWrapper) {
-                    iconWrapper.className = "";
-                    iconWrapper.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>`;
-                }
-                document.getElementById("btn-text-content").innerText = "카카오 로그인 및 통화 시작";
-            }, 400);
+            if (!token) {
+                showLockoutUI("접근 권한이 없습니다. 올바른 링크로 접속해 주세요.");
+                return;
+            }
 
-            const deviceHash = getDeviceHash();
-            fetch(`${GAS_URL}?action=checkUser&deviceHash=${deviceHash}&t=${Date.now()}`)
+            // Verify token against Code.gs doGet backend
+            fetch(`${GAS_URL}?token=${encodeURIComponent(token)}&t=${Date.now()}`)
                 .then(res => res.json())
                 .then(result => {
-                    if (result && result.allowed === false) {
-                        showLockoutUI();
+                    if (result && result.allowed === true) {
+                        isUserAllowed = true;
+                        sessionData.studentName = result.studentName;
+                        sessionData.teacher = result.teacher;
+                        sessionData.assistantId = result.assistantId;
+                        sessionData.coachingNotes = result.coachingNotes;
+
+                        // Update UI with assigned teacher name if needed
+                        document.getElementById("teacher-title").innerText = "Teacher " + sessionData.teacher;
+                        document.getElementById("call-status").innerText = sessionData.studentName + " 회원님, 환영합니다! ✨";
+
+                        btn.removeAttribute("disabled");
+                        const iconWrapper = document.getElementById("btn-icon-wrapper");
+                        if (iconWrapper) {
+                            iconWrapper.className = "";
+                            iconWrapper.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>`;
+                        }
+                        document.getElementById("btn-text-content").innerText = "무료 체험 수업 시작하기";
+                    } else {
+                        showLockoutUI(result.message || "만료되었거나 유효하지 않은 링크입니다.");
                     }
                 })
-                .catch(err => console.log("Background check skipped:", err));
+                .catch(err => {
+                    console.error("Token verification error:", err);
+                    showLockoutUI("서버 통신 중 오류가 발생했습니다.");
+                });
         });
 
         function handleMainAction() {
@@ -266,94 +262,14 @@
                         <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span id="btn-text-content">데이터베이스 확인 중...</span>
+                    <span id="btn-text-content">통화 연결 중...</span>
                 `;
 
-                if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
-                    alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
-                    btn.removeAttribute("disabled");
-                    return;
-                }
-
-                Kakao.Auth.login({
-                    success: function(authObj) {
-                        Kakao.API.request({
-                            url: '/v2/user/me',
-                            success: async function(res) {
-                                cachedKakaoId = res.id ? res.id.toString() : "N/A";
-                                if (res.properties && res.properties.nickname) {
-                                    cachedKakaoNickname = res.properties.nickname;
-                                }
-
-                                try {
-                                    const deviceHash = getDeviceHash();
-                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${Date.now()}`);
-                                    let text = await response.text();
-                                    let result;
-                                    try {
-                                        result = JSON.parse(text);
-                                    } catch(e) {
-                                        proceedWithCall();
-                                        return; 
-                                    }
-
-                                    if (result && result.allowed === false) {
-                                        showLockoutUI(); 
-                                    } else {
-                                        proceedWithCall(); 
-                                    }
-                                } catch(err) {
-                                    proceedWithCall();
-                                }
-                            },
-                            fail: function(error) {
-                                alert("카카오 프로필을 가져오지 못했습니다.");
-                                btn.removeAttribute("disabled");
-                                btn.innerHTML = `
-                                    <div class="shield-icon" id="btn-icon-wrapper">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                                    </div>
-                                    <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                                `;
-                            }
-                        });
-                    },
-                    fail: function(err) {
-                        btn.removeAttribute("disabled");
-                        btn.innerHTML = `
-                            <div class="shield-icon" id="btn-icon-wrapper">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                            </div>
-                            <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                        `;
-                    }
-                });
+                startVapiCall();
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
             }
-        }
-
-        function proceedWithCall() {
-            if (!isUserAllowed) return;
-            sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
-            startVapiCall();
-        }
-
-        function sendWebRegistration(kakaoId, nickname) {
-            const payload = {
-                type: "web-registration",
-                kakaoId: kakaoId,
-                kakaoNickname: nickname,
-                deviceHash: getDeviceHash()
-            };
-
-            fetch(GAS_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).catch(err => console.log("Web reg error:", err));
         }
 
         function formatTime(secs) {
@@ -377,16 +293,15 @@
                     }
                 }
 
-                // Precise 9:30 wrap-up system alert trigger
                 if (secondsElapsed === 570) {  
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION.]" }});
                     }
                 }
 
                 if (secondsElapsed === 585) {  
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN. DO NOT ANSWER ANY MORE QUESTIONS.]" }});
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN.]" }});
                     }
                 }
 
@@ -404,7 +319,7 @@
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
             if (sdk) {
                 vapiInstance = typeof sdk.run === 'function' 
-                    ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                    ? sdk.run({ apiKey: VAPI_KEY, assistant: sessionData.assistantId })
                     : new sdk(VAPI_KEY);
 
                 if (vapiInstance && typeof vapiInstance.on === 'function') {
@@ -433,23 +348,32 @@
                     });
 
                     vapiInstance.on('call-end', () => {
+                        sendFrontendCompletion(secondsElapsed);
                         endCallUI();
                     });
                 }
 
                 if (vapiInstance && typeof vapiInstance.start === 'function') {
-                    const now = new Date();
-                    const guamTime = new Intl.DateTimeFormat('en-US', { 
-                        timeZone: 'Pacific/Guam', 
-                        hour: 'numeric', 
-                        minute: '2-digit' 
-                    }).format(now);
-
-                    vapiInstance.start(VAPI_ASSISTANT_ID, {
+                    vapiInstance.start(sessionData.assistantId, {
+                        variableValues: {
+                            student_name: sessionData.studentName,
+                            teacher_name: sessionData.teacher,
+                            token: getUrlToken()
+                        },
                         metadata: {
-                            nickname: cachedKakaoNickname,
-                            deviceHash: getDeviceHash(),
-                            liveGuamTime: guamTime
+                            token: getUrlToken(),
+                            studentName: sessionData.studentName
+                        },
+                        // Injected dynamic system overrides with student profile + lesson notes
+                        assistantOverrides: {
+                            model: {
+                                messages: [
+                                    {
+                                        role: "system",
+                                        content: "You are " + sessionData.teacher + ", a certified native English instructor at Englisholic. You are conducting a 1:1 trial lesson with " + sessionData.studentName + ". Context/Notes for this student: " + sessionData.coachingNotes
+                                    }
+                                ]
+                            }
                         }
                     });
                 }
@@ -481,6 +405,21 @@
             }
         }
 
+        function sendFrontendCompletion(durationSec) {
+            const payload = {
+                type: "frontend-completion",
+                token: getUrlToken(),
+                studentName: sessionData.studentName,
+                duration: durationSec
+            };
+            fetch(GAS_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.log("Frontend completion sync error:", err));
+        }
+
         function endCallUI() {
             stopTimer();
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
@@ -492,7 +431,7 @@
             document.getElementById("notice-box").innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
                     <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🚀 무료 체험에 참여해 주셔서 감사합니다!</div>
-                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61;">수업 문의는 아래 통화 버튼을 눌러 주세요.</div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61;">수업 문의는 아래 고객센터 버튼을 눌러 주세요.</div>
                 </div>
             `;
             
