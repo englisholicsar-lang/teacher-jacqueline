@@ -160,6 +160,7 @@
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
+        // States: IDLE -> READY -> ACTIVE -> ENDED
         let callState = 'IDLE'; 
         let isUserAllowed = true; 
         let timerInterval = null;
@@ -168,7 +169,6 @@
         
         let cachedKakaoId = "N/A";
         let cachedKakaoNickname = "Kakao User";
-        let micStream = null;
 
         function getDeviceHash() {
             try {
@@ -248,94 +248,89 @@
                 .catch(err => console.log("Background check skipped:", err));
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
 
-            if (callState === 'ACTIVE') {
-                endCallUI();
-                return;
-            }
+            // STATE 1: IDLE (Tap to Login)
+            if (callState === 'IDLE') {
+                const btn = document.getElementById("action-btn");
+                btn.setAttribute("disabled", "true");
+                
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
+                        <circle cx="12" cy="12" r="12" fill="#60a5fa" />
+                        <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span id="btn-text-content">데이터베이스 확인 중...</span>
+                `;
 
-            const btn = document.getElementById("action-btn");
-            btn.setAttribute("disabled", "true");
-
-            // STEP 1: FORCE MICROPHONE PERMISSION SECURELY ON DIRECT USER TAP FIRST
-            try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
+                    alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
+                    resetToIdleUI(btn);
+                    return;
                 }
-            } catch (err) {
-                alert("원활한 진행을 위해 마이크 권한을 허용해 주세요.");
-                btn.removeAttribute("disabled");
-                return; // Stop execution if mic is blocked
-            }
 
-            const remoteAudio = document.getElementById("remote-audio");
-            if (remoteAudio) {
-                remoteAudio.volume = 1.0;
-                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
-            }
+                Kakao.Auth.login({
+                    success: function(authObj) {
+                        Kakao.API.request({
+                            url: '/v2/user/me',
+                            success: async function(res) {
+                                cachedKakaoId = res.id ? res.id.toString() : "N/A";
+                                if (res.properties && res.properties.nickname) {
+                                    cachedKakaoNickname = res.properties.nickname;
+                                }
 
-            // STEP 2: PROCEED WITH LOGIN AFTER MIC IS SECURED
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
-                    <circle cx="12" cy="12" r="12" fill="#60a5fa" />
-                    <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span id="btn-text-content">데이터베이스 확인 중...</span>
-            `;
-
-            if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
-                alert("카카오 연결에 실패했습니다. 페이지를 새로고침 해주세요.");
-                btn.removeAttribute("disabled");
-                return;
-            }
-
-            Kakao.Auth.login({
-                success: function(authObj) {
-                    Kakao.API.request({
-                        url: '/v2/user/me',
-                        success: async function(res) {
-                            cachedKakaoId = res.id ? res.id.toString() : "N/A";
-                            if (res.properties && res.properties.nickname) {
-                                cachedKakaoNickname = res.properties.nickname;
-                            }
-
-                            try {
-                                const deviceHash = getDeviceHash();
-                                let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${Date.now()}`);
-                                let text = await response.text();
-                                let result;
                                 try {
-                                    result = JSON.parse(text);
-                                } catch(e) {
-                                    proceedWithCall();
-                                    return; 
-                                }
+                                    const deviceHash = getDeviceHash();
+                                    let response = await fetch(`${GAS_URL}?action=checkUser&kakaoId=${cachedKakaoId}&deviceHash=${deviceHash}&t=${Date.now()}`);
+                                    let text = await response.text();
+                                    let result;
+                                    try {
+                                        result = JSON.parse(text);
+                                    } catch(e) {
+                                        setupReadyToCallUI();
+                                        return; 
+                                    }
 
-                                if (result && result.allowed === false) {
-                                    showLockoutUI(); 
-                                } else {
-                                    proceedWithCall(); 
+                                    if (result && result.allowed === false) {
+                                        showLockoutUI(); 
+                                    } else {
+                                        setupReadyToCallUI(); 
+                                    }
+                                } catch(err) {
+                                    setupReadyToCallUI();
                                 }
-                            } catch(err) {
-                                proceedWithCall();
+                            },
+                            fail: function(error) {
+                                alert("카카오 프로필을 가져오지 못했습니다.");
+                                resetToIdleUI(btn);
                             }
-                        },
-                        fail: function(error) {
-                            alert("카카오 프로필을 가져오지 못했습니다.");
-                            resetButtonUI(btn);
-                        }
-                    });
-                },
-                fail: function(err) {
-                    resetButtonUI(btn);
+                        });
+                    },
+                    fail: function(err) {
+                        resetToIdleUI(btn);
+                    }
+                });
+
+            // STATE 2: READY (Direct User Tap to trigger Hardware Mic)
+            } else if (callState === 'READY') {
+                const remoteAudio = document.getElementById("remote-audio");
+                if (remoteAudio) {
+                    remoteAudio.volume = 1.0;
+                    remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
                 }
-            });
+                
+                sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
+                startVapiCall();
+                
+            // STATE 3: ACTIVE (Tap to Hang Up)
+            } else if (callState === 'ACTIVE') {
+                endCallUI();
+            }
         }
 
-        function resetButtonUI(btn) {
+        function resetToIdleUI(btn) {
             btn.removeAttribute("disabled");
             btn.innerHTML = `
                 <div class="shield-icon" id="btn-icon-wrapper">
@@ -345,16 +340,31 @@
             `;
         }
 
-        function proceedWithCall() {
-            if (!isUserAllowed) return;
-            sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
+        function setupReadyToCallUI() {
+            callState = 'READY';
+            const btn = document.getElementById("action-btn");
+            btn.removeAttribute("disabled");
             
-            // Cleanup the manually requested mic stream just before starting Vapi to avoid conflicts
-            if (micStream) {
-                micStream.getTracks().forEach(track => track.stop());
-                micStream = null;
-            }
-            startVapiCall();
+            btn.style.backgroundColor = "#3b82f6";
+            btn.style.color = "#ffffff";
+            btn.style.boxShadow = "0 6px 16px rgba(59, 130, 246, 0.4)";
+            
+            btn.innerHTML = `
+                <div class="shield-icon" style="background-color: transparent; box-shadow: none;">
+                    <span style="font-size: 17px;">📞</span>
+                </div>
+                <span id="btn-text-content">통화 시작하기</span>
+            `;
+            
+            document.getElementById("call-status").innerText = "인증이 완료되었습니다.";
+            document.getElementById("notice-box").innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                    <div style="font-size: 24px; flex-shrink: 0;">👉</div>
+                    <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
+                        아래 <b>통화 시작하기</b> 버튼을 눌러주세요.
+                    </span>
+                </div>
+            `;
         }
 
         function sendWebRegistration(kakaoId, nickname) {
@@ -424,6 +434,7 @@
                     : new sdk(VAPI_KEY);
 
                 if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    
                     vapiInstance.on('call-start', () => {
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
@@ -435,7 +446,7 @@
 
                     vapiInstance.on('speech-start', () => {
                         if (!speechTriggered) {
-                            speechTriggered = true;
+                            speechTriggered = true; 
                             startTimer();
                             
                             document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
@@ -485,14 +496,13 @@
                 }
                 
                 callState = 'ACTIVE';
+                document.getElementById("call-status").innerText = "마이크 권한을 허용해 주세요...";
                 
-                // Show connecting UI state
-                document.getElementById("call-status").innerText = "통화 연결 중입니다...";
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
-                        <div style="font-size: 24px; flex-shrink: 0;">⏳</div>
+                        <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
                         <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
-                            잠시만 기다려 주세요.
+                            마이크 권한을 허용해 주세요.
                         </span>
                     </div>
                 `;
