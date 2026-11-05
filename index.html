@@ -136,7 +136,6 @@
         </div>
 
         <div class="bottom-group">
-            <!-- Initial Speaker/Earphone Notice Box - Locked to 2 Lines -->
             <div id="notice-box" class="info-box" style="flex-direction: column; gap: 10px; padding: 15px 10px;">
                 <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
                     <span style="font-size: 18px;">🔊</span> 스피커폰으로 기본 설정되었습니다.
@@ -146,7 +145,6 @@
                 </div>
             </div>
 
-            <!-- Action Button -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -166,6 +164,7 @@
         let isUserAllowed = true; 
         let timerInterval = null;
         let secondsElapsed = 0;
+        let speechTriggered = false; 
         
         let cachedKakaoId = "N/A";
         let cachedKakaoNickname = "Kakao User";
@@ -248,18 +247,8 @@
                 .catch(err => console.log("Background check skipped:", err));
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
-
-            // EXPLICIT MICROPHONE PERMISSION PROMPT TRIGGERED ON USER TAP
-            try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    stream.getTracks().forEach(track => track.stop());
-                }
-            } catch (err) {
-                console.log("Mic permission prompt note:", err);
-            }
 
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
@@ -417,6 +406,7 @@
                     : new sdk(VAPI_KEY);
 
                 if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    
                     vapiInstance.on('call-start', () => {
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
@@ -426,7 +416,24 @@
                         }
                     });
 
-                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+                    // Timer ONLY starts exactly when Jacqueline starts speaking.
+                    vapiInstance.on('speech-start', () => {
+                        if (!speechTriggered) {
+                            speechTriggered = true; // Lock so it only triggers once
+                            startTimer();
+                            
+                            // Change UI to final active state ONLY when speech begins
+                            document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                            document.getElementById("notice-box").innerHTML = `
+                                <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                                    <div style="font-size: 24px; flex-shrink: 0;">🗣️</div>
+                                    <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
+                                        선생님과 대화를 시작해 보세요.
+                                    </span>
+                                </div>
+                            `;
+                        }
+                    });
 
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
@@ -453,6 +460,7 @@
                         minute: '2-digit' 
                     }).format(now);
 
+                    // Allow Vapi's native connection and permission prompt to fire smoothly
                     vapiInstance.start(VAPI_ASSISTANT_ID, {
                         metadata: {
                             nickname: cachedKakaoNickname,
@@ -463,7 +471,7 @@
                 }
                 
                 callState = 'ACTIVE';
-                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                document.getElementById("call-status").innerText = "마이크 권한을 허용해 주세요...";
                 
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
