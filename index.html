@@ -160,7 +160,6 @@
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
         const VAPI_ASSISTANT_ID = "ab0d16c5-842d-40c6-8fa4-055fee015089";
 
-        // States: IDLE -> READY -> ACTIVE -> ENDED
         let callState = 'IDLE'; 
         let isUserAllowed = true; 
         let timerInterval = null;
@@ -169,6 +168,7 @@
         
         let cachedKakaoId = "N/A";
         let cachedKakaoNickname = "Kakao User";
+        let micStream = null;
 
         function getDeviceHash() {
             try {
@@ -248,7 +248,7 @@
                 .catch(err => console.log("Background check skipped:", err));
         });
 
-        function handleMainAction() {
+        async function handleMainAction() {
             if (!isUserAllowed) return;
 
             // STATE 1: IDLE (Tap to Login)
@@ -313,8 +313,22 @@
                     }
                 });
 
-            // STATE 2: READY (Direct User Tap to trigger Hardware Mic)
+            // STATE 2: READY (Direct User Tap to trigger Hardware Mic on Red Screen)
             } else if (callState === 'READY') {
+                const btn = document.getElementById("action-btn");
+                btn.setAttribute("disabled", "true");
+
+                // STEP 1: FORCE MICROPHONE PERMISSION SECURELY ON DIRECT USER TAP FIRST
+                try {
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    }
+                } catch (err) {
+                    alert("원활한 진행을 위해 마이크 권한을 허용해 주세요.");
+                    btn.removeAttribute("disabled");
+                    return; // Stop execution if mic is blocked
+                }
+
                 const remoteAudio = document.getElementById("remote-audio");
                 if (remoteAudio) {
                     remoteAudio.volume = 1.0;
@@ -322,6 +336,13 @@
                 }
                 
                 sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
+                
+                // Cleanup the manually requested mic stream just before starting Vapi to avoid conflicts
+                if (micStream) {
+                    micStream.getTracks().forEach(track => track.stop());
+                    micStream = null;
+                }
+                
                 startVapiCall();
                 
             // STATE 3: ACTIVE (Tap to Hang Up)
@@ -496,8 +517,9 @@
                 }
                 
                 callState = 'ACTIVE';
-                document.getElementById("call-status").innerText = "마이크 권한을 허용해 주세요...";
                 
+                // Show connecting UI state on the red button page while Vapi boots up
+                document.getElementById("call-status").innerText = "통화 연결 중입니다...";
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
