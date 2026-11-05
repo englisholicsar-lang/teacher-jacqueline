@@ -136,6 +136,7 @@
         </div>
 
         <div class="bottom-group">
+            <!-- Initial Speaker/Earphone Notice Box - Locked to 2 Lines -->
             <div id="notice-box" class="info-box" style="flex-direction: column; gap: 10px; padding: 15px 10px;">
                 <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
                     <span style="font-size: 18px;">🔊</span> 스피커폰으로 기본 설정되었습니다.
@@ -145,6 +146,7 @@
                 </div>
             </div>
 
+            <!-- Action Button -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -164,7 +166,6 @@
         let isUserAllowed = true; 
         let timerInterval = null;
         let secondsElapsed = 0;
-        let firstSpeechDetected = false;
         
         let cachedKakaoId = "N/A";
         let cachedKakaoNickname = "Kakao User";
@@ -247,18 +248,8 @@
                 .catch(err => console.log("Background check skipped:", err));
         });
 
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
-
-            // EXPLICIT MICROPHONE PERMISSION REQUEST ON USER GESTURE
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                // Stop tracks immediately after permission is granted so Vapi can claim them
-                stream.getTracks().forEach(track => track.stop());
-            } catch (err) {
-                alert("원활한 통화를 위해 마이크 권한 허용이 필요합니다.");
-                return;
-            }
 
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
@@ -317,12 +308,24 @@
                             },
                             fail: function(error) {
                                 alert("카카오 프로필을 가져오지 못했습니다.");
-                                resetActionBtn();
+                                btn.removeAttribute("disabled");
+                                btn.innerHTML = `
+                                    <div class="shield-icon" id="btn-icon-wrapper">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                                    </div>
+                                    <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
+                                `;
                             }
                         });
                     },
                     fail: function(err) {
-                        resetActionBtn();
+                        btn.removeAttribute("disabled");
+                        btn.innerHTML = `
+                            <div class="shield-icon" id="btn-icon-wrapper">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                            </div>
+                            <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
+                        `;
                     }
                 });
 
@@ -331,31 +334,9 @@
             }
         }
 
-        function resetActionBtn() {
-            const btn = document.getElementById("action-btn");
-            btn.removeAttribute("disabled");
-            btn.innerHTML = `
-                <div class="shield-icon" id="btn-icon-wrapper">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                </div>
-                <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-            `;
-        }
-
         function proceedWithCall() {
             if (!isUserAllowed) return;
             sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
-            
-            document.getElementById("call-status").innerText = "선생님을 호출하는 중입니다...";
-            document.getElementById("notice-box").innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
-                    <div style="font-size: 24px; flex-shrink: 0;">⏳</div>
-                    <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
-                        잠시만 기다려주세요. 통화 연결 중입니다...
-                    </span>
-                </div>
-            `;
-            
             startVapiCall();
         }
 
@@ -396,6 +377,7 @@
                     }
                 }
 
+                // Precise 9:30 wrap-up system alert trigger
                 if (secondsElapsed === 570) {  
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
@@ -420,36 +402,112 @@
 
         function startVapiCall() {
             const sdk = window.vapiSDK || window.vapi || (window.Vapi ? window.Vapi : null);
-            if (!sdk) {
-                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
-                return;
-            }
+            if (sdk) {
+                vapiInstance = typeof sdk.run === 'function' 
+                    ? sdk.run({ apiKey: VAPI_KEY, assistant: VAPI_ASSISTANT_ID })
+                    : new sdk(VAPI_KEY);
 
-            const now = new Date();
-            const guamTime = new Intl.DateTimeFormat('en-US', { 
-                timeZone: 'Pacific/Guam', 
-                hour: 'numeric', 
-                minute: '2-digit' 
-            }).format(now);
+                if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    vapiInstance.on('call-start', () => {
+                        startTimer();
+                        const remoteAudio = document.getElementById("remote-audio");
+                        if (remoteAudio) { 
+                            remoteAudio.muted = false;
+                            remoteAudio.volume = 1.0;
+                            remoteAudio.play().catch(e => console.log("Audio play", e)); 
+                        }
+                    });
 
-            const overrides = {
-                firstMessage: "Hello! Welcome to Englisholic. I'm Jacqueline, and I'm so excited to meet you! Are you ready to start our 10-minute trial lesson?",
-                metadata: {
-                    nickname: cachedKakaoNickname,
-                    deviceHash: getDeviceHash(),
-                    liveGuamTime: guamTime
+                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+
+                    vapiInstance.on('track', (track) => {
+                        if (track.kind === 'audio') {
+                            const remoteAudio = document.getElementById("remote-audio");
+                            if (remoteAudio) {
+                                remoteAudio.muted = false;
+                                remoteAudio.srcObject = new MediaStream([track]);
+                                remoteAudio.volume = 1.0;
+                                remoteAudio.play().catch(e => console.log("Stream play", e));
+                            }
+                        }
+                    });
+
+                    vapiInstance.on('call-end', () => {
+                        endCallUI();
+                    });
                 }
-            };
 
-            if (typeof sdk.run === 'function') {
-                vapiInstance = sdk.run({
-                    apiKey: VAPI_KEY,
-                    assistant: VAPI_ASSISTANT_ID,
-                    assistantOverrides: overrides
-                });
+                if (vapiInstance && typeof vapiInstance.start === 'function') {
+                    const now = new Date();
+                    const guamTime = new Intl.DateTimeFormat('en-US', { 
+                        timeZone: 'Pacific/Guam', 
+                        hour: 'numeric', 
+                        minute: '2-digit' 
+                    }).format(now);
+
+                    vapiInstance.start(VAPI_ASSISTANT_ID, {
+                        metadata: {
+                            nickname: cachedKakaoNickname,
+                            deviceHash: getDeviceHash(),
+                            liveGuamTime: guamTime
+                        }
+                    });
+                }
+                
+                callState = 'ACTIVE';
+                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                
+                document.getElementById("notice-box").innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                        <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                        <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
+                            마이크 권한을 허용해 주세요.
+                        </span>
+                    </div>
+                `;
+
+                const btn = document.getElementById("action-btn");
+                btn.style.backgroundColor = "#e05252";
+                btn.style.color = "#ffffff";
+                btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)";
+                btn.removeAttribute("disabled"); 
+                
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    <span id="btn-text-content">통화 종료하기</span>
+                `;
             } else {
-                vapiInstance = new sdk(VAPI_KEY);
-                vapiInstance.start(VAPI_ASSISTANT_ID, { assistantOverrides: overrides });
+                alert("Vapi SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
             }
+        }
 
-            if (vapi
+        function endCallUI() {
+            stopTimer();
+            if (vapiInstance && typeof vapiInstance.stop === 'function') {
+                try { vapiInstance.stop(); } catch(e) {}
+            }
+            callState = 'ENDED';
+            document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            
+            document.getElementById("notice-box").innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
+                    <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🚀 무료 체험에 참여해 주셔서 감사합니다!</div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1a3c61;">수업 문의는 아래 통화 버튼을 눌러 주세요.</div>
+                </div>
+            `;
+            
+            const btn = document.getElementById("action-btn");
+            btn.style.backgroundColor = "#10b981";
+            btn.style.color = "#ffffff";
+            btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
+            btn.removeAttribute("disabled");
+            btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
+            
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                <span id="btn-text-content" style="font-size: 17px;">고객센터 문의하기</span>
+            `;
+        }
+    </script>
+</body>
+</html>
