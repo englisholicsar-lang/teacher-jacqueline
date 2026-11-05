@@ -136,7 +136,6 @@
         </div>
 
         <div class="bottom-group">
-            <!-- Initial Speaker/Earphone Notice Box - Locked to 2 Lines -->
             <div id="notice-box" class="info-box" style="flex-direction: column; gap: 10px; padding: 15px 10px;">
                 <div style="font-size: 14px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;">
                     <span style="font-size: 18px;">🔊</span> 스피커폰으로 기본 설정되었습니다.
@@ -146,7 +145,6 @@
                 </div>
             </div>
 
-            <!-- Action Button -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -166,6 +164,7 @@
         let isUserAllowed = true; 
         let timerInterval = null;
         let secondsElapsed = 0;
+        let firstSpeechDetected = false;
         
         let cachedKakaoId = "N/A";
         let cachedKakaoNickname = "Kakao User";
@@ -308,24 +307,12 @@
                             },
                             fail: function(error) {
                                 alert("카카오 프로필을 가져오지 못했습니다.");
-                                btn.removeAttribute("disabled");
-                                btn.innerHTML = `
-                                    <div class="shield-icon" id="btn-icon-wrapper">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                                    </div>
-                                    <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                                `;
+                                resetActionBtn();
                             }
                         });
                     },
                     fail: function(err) {
-                        btn.removeAttribute("disabled");
-                        btn.innerHTML = `
-                            <div class="shield-icon" id="btn-icon-wrapper">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
-                            </div>
-                            <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
-                        `;
+                        resetActionBtn();
                     }
                 });
 
@@ -334,9 +321,31 @@
             }
         }
 
+        function resetActionBtn() {
+            const btn = document.getElementById("action-btn");
+            btn.removeAttribute("disabled");
+            btn.innerHTML = `
+                <div class="shield-icon" id="btn-icon-wrapper">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                </div>
+                <span id="btn-text-content">카카오 로그인 및 통화 시작</span>
+            `;
+        }
+
         function proceedWithCall() {
             if (!isUserAllowed) return;
             sendWebRegistration(cachedKakaoId, cachedKakaoNickname);
+            
+            document.getElementById("call-status").innerText = "마이크 권한을 허용해 주세요...";
+            document.getElementById("notice-box").innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                    <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
+                    <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
+                        통화를 위해 마이크 접근을 허용해 주세요.
+                    </span>
+                </div>
+            `;
+            
             startVapiCall();
         }
 
@@ -377,7 +386,6 @@
                     }
                 }
 
-                // Precise 9:30 wrap-up system alert trigger
                 if (secondsElapsed === 570) {  
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
@@ -408,8 +416,18 @@
                     : new sdk(VAPI_KEY);
 
                 if (vapiInstance && typeof vapiInstance.on === 'function') {
+                    
                     vapiInstance.on('call-start', () => {
-                        startTimer();
+                        document.getElementById("call-status").innerText = "⏳ 서버에 연결 중입니다...";
+                        document.getElementById("notice-box").innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                                <div style="font-size: 24px; flex-shrink: 0;">⏳</div>
+                                <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
+                                    선생님과 연결 중입니다. 잠시만 기다려주세요...
+                                </span>
+                            </div>
+                        `;
+                        
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
                             remoteAudio.muted = false;
@@ -418,7 +436,22 @@
                         }
                     });
 
-                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+                    vapiInstance.on('speech-start', () => { 
+                        if (!firstSpeechDetected) {
+                            firstSpeechDetected = true;
+                            startTimer(); 
+                            
+                            document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                            document.getElementById("notice-box").innerHTML = `
+                                <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
+                                    <div style="font-size: 24px; flex-shrink: 0;">🗣️</div>
+                                    <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
+                                        연결되었습니다! 선생님과 대화를 시작해 보세요.
+                                    </span>
+                                </div>
+                            `;
+                        }
+                    });
 
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
@@ -446,6 +479,9 @@
                     }).format(now);
 
                     vapiInstance.start(VAPI_ASSISTANT_ID, {
+                        assistant: {
+                            firstMessage: "Hello! Welcome to Englisholic. I'm Jacqueline, and I'm so excited to meet you! Are you ready to start our 10-minute trial lesson?"
+                        },
                         metadata: {
                             nickname: cachedKakaoNickname,
                             deviceHash: getDeviceHash(),
@@ -455,17 +491,6 @@
                 }
                 
                 callState = 'ACTIVE';
-                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
-                
-                document.getElementById("notice-box").innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
-                        <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
-                        <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
-                            마이크 권한을 허용해 주세요.
-                        </span>
-                    </div>
-                `;
-
                 const btn = document.getElementById("action-btn");
                 btn.style.backgroundColor = "#e05252";
                 btn.style.color = "#ffffff";
