@@ -146,7 +146,7 @@
                 </div>
             </div>
 
-            <!-- Action Button -->
+            <!-- Action Button (Initial state with plain blue shield) -->
             <button id="action-btn" class="kakao-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -371,26 +371,25 @@
                 secondsElapsed++;
                 document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
                 
-                if (secondsElapsed === 300) {  
+                if (secondsElapsed === 300) { 
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
                     }
                 }
 
-                // Precise 9:30 wrap-up system alert trigger
-                if (secondsElapsed === 570) {  
+                if (secondsElapsed === 540) { 
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 9 MINUTES ELAPSED. 1 MINUTE REMAINING. FOCUS ENTIRELY ON WRAPPING UP.]" }});
                     }
                 }
 
-                if (secondsElapsed === 585) {  
+                if (secondsElapsed === 585) { 
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN. DO NOT ANSWER ANY MORE QUESTIONS.]" }});
                     }
                 }
 
-                if (secondsElapsed >= 600) {  
+                if (secondsElapsed >= 600) { 
                     endCallUI();
                 }
             }, 1000);
@@ -457,6 +456,7 @@
                 callState = 'ACTIVE';
                 document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 
+                // Active Call Mic Permission Notice
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
