@@ -377,7 +377,6 @@
                     }
                 }
 
-                // Precise 9:30 wrap-up system alert trigger
                 if (secondsElapsed === 570) {  
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
                         vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION. DO NOT GUESS TIME.]" }});
@@ -409,7 +408,6 @@
 
                 if (vapiInstance && typeof vapiInstance.on === 'function') {
                     vapiInstance.on('call-start', () => {
-                        startTimer();
                         const remoteAudio = document.getElementById("remote-audio");
                         if (remoteAudio) { 
                             remoteAudio.muted = false;
@@ -418,7 +416,12 @@
                         }
                     });
 
-                    vapiInstance.on('speech-start', () => { if (!timerInterval) startTimer(); });
+                    // Timer starts precisely when Jacqueline begins speaking (speech-start)
+                    vapiInstance.on('speech-start', () => { 
+                        if (!timerInterval) {
+                            startTimer(); 
+                        }
+                    });
 
                     vapiInstance.on('track', (track) => {
                         if (track.kind === 'audio') {
