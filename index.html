@@ -249,15 +249,11 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // The PRO Fix: Structured Promise Chain
         function handleMainAction() {
             if (!isUserAllowed) return;
 
             const remoteAudio = document.getElementById("remote-audio");
-            if (remoteAudio) {
-                remoteAudio.volume = 1.0;
-                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
-            }
+            // Removing the premature play command to prevent Kakao browser confusion
 
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
@@ -315,10 +311,16 @@
                                             if (track.kind === 'audio') { 
                                                 const rAudio = document.getElementById("remote-audio"); 
                                                 if (rAudio) { 
+                                                    // FIX #8: Explicit stream binding and aggressive play
+                                                    console.log("Audio track received, forcing playback...");
                                                     rAudio.srcObject = stream || new MediaStream([track]); 
                                                     rAudio.muted = false; 
                                                     rAudio.volume = 1.0; 
-                                                    rAudio.play().catch(e => console.log("Stream error:", e)); 
+                                                    rAudio.play().then(() => {
+                                                        console.log("Audio successfully playing!");
+                                                    }).catch(e => {
+                                                        console.log("Browser blocked autoplay. Attemping manual bypass:", e);
+                                                    }); 
                                                 } 
                                             } 
                                         });
@@ -328,8 +330,8 @@
                         } catch (err) { 
                             console.error("Mic prompt denied or Vapi boot error:", err);
                         }
-                    }, 100); // 100ms buffer for red screen to render before native OS prompt blocks thread
-                }, 800); // 800ms natural gray loading state
+                    }, 100); 
+                }, 800); 
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
