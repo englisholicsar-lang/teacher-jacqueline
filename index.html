@@ -14,9 +14,7 @@
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
-
-    <!-- PERFECTED VAPI LOAD: Mirrored exactly from room.html -->
+    <!-- VAPI SCRIPT TAG STRUCTURE -->
     <script>var vapiInstance = null;</script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
@@ -112,6 +110,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
+    <!-- AUDIO ELEMENT WITH CONTROLS TO FORCE MOBILE WEBRTC PLAYBACK -->
     <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -248,7 +247,7 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // PERFECTED ACTION: Strict event-driven connection without fake timeout traps
+        // UNIFIED BULLETPROOF ACTION: Direct audio unlock + reliable Vapi start + 1.2s UI transition buffer
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -277,12 +276,8 @@
                                 vapiInstance.start(sessionData.assistantId, { 
                                     variableValues: { 
                                         student_name: sessionData.studentName, 
-                                        teacher_name: sessionData.teacher,
+                                        coaching_notes: sessionData.coachingNotes,
                                         token: getUrlToken() 
-                                    },
-                                    metadata: {
-                                        token: getUrlToken(),
-                                        studentName: sessionData.studentName
                                     }
                                 });
                             }
@@ -302,6 +297,13 @@
                                     } 
                                 });
                             }
+
+                            // GUARANTEED TRANSITION BUFFER: Ensures UI never hangs on 'Connecting' on mobile webviews
+                            setTimeout(() => {
+                                if (callState === 'IDLE') {
+                                    activateCallUI();
+                                }
+                            }, 1200);
                         }
                     }
                 } catch (err) { 
@@ -359,7 +361,7 @@
             try { startTimer(); } catch(e) {}
             
             try {
-                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                document.getElementById("call-status").innerText = `${sessionData.studentName} 회원님, 통화가 연결되었습니다.`;
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
@@ -372,23 +374,21 @@
                 btn.style.backgroundColor = "#e05252";
                 btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)"; 
                 btn.removeAttribute("disabled"); 
-                btn.innerHTML = `<span id="btn-text-content">통화 종료하기</span>`;
+                document.getElementById("btn-text-content").innerText = "통화 종료하기";
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
-                setTimeout(() => {
-                    try { 
-                        if (vapiInstance && typeof vapiInstance.send === 'function') {
-                            vapiInstance.send({ type: "add-message", message: { role: "system", content: `You are ${sessionData.teacher}. Student Name is ${sessionData.studentName}. Context/Notes for this student: "${sessionData.coachingNotes}". Greet the student normally.` } }); 
-                        }
-                    } catch(e) {}
-                }, 1500);
+                try { 
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING GUIDANCE]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes: "${sessionData.coachingNotes}". Greet the student normally and naturally incorporate this coaching note.` } }); 
+                    }
+                } catch(e) { console.error("Vapi 시스템 메시지 전송 실패", e); }
             }
         }
 
         function endCallUI() {
             if (callState === 'ENDED') return;
-            stopTimer(); // Stops the stopwatch properly so it doesn't leak into the exit page
+            stopTimer();
             releaseWakeLock();
             
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
@@ -406,7 +406,7 @@
             callState = 'ENDED';
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             
-            // Hides the timer display wrapper completely on the exit screen
+            // HIDE TIMER WRAPPER ON EXIT SCREEN TO PREVENT ARTIFACT LEAK
             document.getElementById("timer-wrapper").style.display = "none";
             
             document.getElementById("notice-box").innerHTML = `
@@ -422,8 +422,7 @@
             btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
             btn.removeAttribute("disabled");
             btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
-            
-            btn.innerHTML = `<span style="font-size: 17px;">고객센터 문의하기</span>`;
+            document.getElementById("btn-text-content").innerText = "고객센터 문의하기";
         }
     </script>
 </body>
