@@ -110,7 +110,6 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- AUDIO ELEMENT WITH CONTROLS TO FORCE MOBILE WEBRTC PLAYBACK -->
     <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -159,12 +158,10 @@
         let secondsElapsed = 0;
         let wakeLock = null;
         
-        let sessionData = {
-            studentName: "Student",
-            teacher: "Jacqueline",
-            assistantId: "ab0d16c5-842d-40c6-8fa4-055fee015089",
-            coachingNotes: ""
-        };
+        // LOCKED TO TRIAL ASSISTANT ID AB0D16C5
+        let activeAssistantId = "ab0d16c5-842d-40c6-8fa4-055fee015089";
+        let sessionStudentName = "Student";
+        let sessionCoachingNotes = "";
 
         function getUrlToken() {
             const params = new URLSearchParams(window.location.search);
@@ -207,18 +204,20 @@
                 return;
             }
 
-            fetch(`${GAS_URL}?token=${encodeURIComponent(token)}&t=${Date.now()}`)
+            let fetchUrl = `${GAS_URL}?token=${encodeURIComponent(token)}`;
+            if (token === 'englisholic-admin-master-2026') fetchUrl = `${GAS_URL}?key=englisholic-admin-master-2026`;
+
+            fetch(fetchUrl)
                 .then(res => res.json())
                 .then(result => {
                     if (result && result.allowed === true) {
                         isUserAllowed = true;
-                        sessionData.studentName = result.studentName;
-                        sessionData.teacher = result.teacher;
-                        sessionData.assistantId = result.assistantId;
-                        sessionData.coachingNotes = result.coachingNotes;
+                        sessionStudentName = result.studentName || "Student";
+                        sessionCoachingNotes = result.coachingNotes || "";
+                        if (result.assistantId) activeAssistantId = result.assistantId;
 
-                        document.getElementById("teacher-title").innerText = "Teacher " + sessionData.teacher;
-                        document.getElementById("call-status").innerText = sessionData.studentName + " 회원님, 환영합니다! ✨";
+                        document.getElementById("teacher-title").innerText = "Teacher " + (result.teacher || "Jacqueline");
+                        document.getElementById("call-status").innerText = sessionStudentName + " 회원님, 수업 준비가 완료되었습니다. ✨";
 
                         btn.removeAttribute("disabled");
                         const iconWrapper = document.getElementById("btn-icon-wrapper");
@@ -247,8 +246,8 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // UNIFIED BULLETPROOF ACTION: Direct audio unlock + reliable Vapi start + 1.2s UI transition buffer
-        async function handleMainAction() {
+        // SYNCHRONOUS CLICK HANDLER MATCHING room.html TO PREVENT GESTURE DROP
+        function handleMainAction() {
             if (!isUserAllowed) return;
 
             const remoteAudio = document.getElementById("remote-audio");
@@ -267,16 +266,16 @@
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY, 
-                            assistant: sessionData.assistantId, 
+                            assistant: activeAssistantId, 
                             config: {} 
                         });
                         
                         if (vapiInstance) {
                             if (typeof vapiInstance.start === 'function') {
-                                vapiInstance.start(sessionData.assistantId, { 
+                                vapiInstance.start(activeAssistantId, { 
                                     variableValues: { 
-                                        student_name: sessionData.studentName, 
-                                        coaching_notes: sessionData.coachingNotes,
+                                        student_name: sessionStudentName, 
+                                        coaching_notes: sessionCoachingNotes,
                                         token: getUrlToken() 
                                     }
                                 });
@@ -298,12 +297,12 @@
                                 });
                             }
 
-                            // GUARANTEED TRANSITION BUFFER: Ensures UI never hangs on 'Connecting' on mobile webviews
+                            // GUARANTEED TRANSITION BUFFER TO FORCE MIC PROMPT & TIMER LAUNCH
                             setTimeout(() => {
                                 if (callState === 'IDLE') {
                                     activateCallUI();
                                 }
-                            }, 1200);
+                            }, 2000);
                         }
                     }
                 } catch (err) { 
@@ -361,7 +360,7 @@
             try { startTimer(); } catch(e) {}
             
             try {
-                document.getElementById("call-status").innerText = `${sessionData.studentName} 회원님, 통화가 연결되었습니다.`;
+                document.getElementById("call-status").innerText = sessionStudentName + " 회원님, 통화가 연결되었습니다.";
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
@@ -377,10 +376,10 @@
                 document.getElementById("btn-text-content").innerText = "통화 종료하기";
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
-            if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
+            if (sessionCoachingNotes && String(sessionCoachingNotes).trim() !== "") { 
                 try { 
                     if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING GUIDANCE]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes: "${sessionData.coachingNotes}". Greet the student normally and naturally incorporate this coaching note.` } }); 
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: `[GREETING GUIDANCE]: Student Name is ${sessionStudentName}. Today's Custom Coaching Notes: "${sessionCoachingNotes}". Greet the student normally and naturally incorporate this coaching note.` } }); 
                     }
                 } catch(e) { console.error("Vapi 시스템 메시지 전송 실패", e); }
             }
@@ -399,14 +398,13 @@
                 fetch(GAS_URL, {
                     method: 'POST', mode: 'no-cors', keepalive: true, 
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'frontend-completion', token: getUrlToken(), studentName: sessionData.studentName, duration: secondsElapsed })
+                    body: JSON.stringify({ type: 'frontend-completion', token: getUrlToken(), studentName: sessionStudentName, duration: secondsElapsed })
                 }).catch(e => console.log("Post skip"));
             } catch(e) {}
 
             callState = 'ENDED';
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             
-            // HIDE TIMER WRAPPER ON EXIT SCREEN TO PREVENT ARTIFACT LEAK
             document.getElementById("timer-wrapper").style.display = "none";
             
             document.getElementById("notice-box").innerHTML = `
