@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- FORCE MOBILE MIC PERMISSIONS -->
     <meta http-equiv="Permissions-Policy" content="microphone=*">
     
     <title>Englisholic - 1:1 Free Trial</title>
@@ -147,7 +148,6 @@
                 </div>
             </div>
 
-            <!-- Action Button -->
             <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled>
                 <div class="shield-icon" id="btn-icon-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -158,6 +158,17 @@
     </div>
 
     <script>
+        // --- 1. KAKAO BROWSER BYPASS ---
+        // Forces KakaoTalk to explicitly open in the native OS browser (Safari/Chrome)
+        const userAgent = navigator.userAgent.toLowerCase();
+        if (userAgent.match(/kakaotalk/i)) {
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = 'kakaotalk://web/openExternal?url=' + currentUrl;
+            setTimeout(() => {
+                alert("카카오톡 브라우저에서는 마이크가 제한됩니다. 우측 상단/하단의 메뉴(⋮)를 눌러 '다른 브라우저로 열기(Safari/Chrome)'를 선택해 주세요.");
+            }, 600);
+        }
+
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxzTJczMGmbzHOb8J7MzvOPzcposU3eDlVuf6L-EsrCv9moOJrG2x_c7XDxpyO03kQc/exec";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
 
@@ -165,7 +176,6 @@
         let isUserAllowed = false; 
         let timerInterval = null;
         let secondsElapsed = 0;
-        let wakeLock = null;
         
         let sessionData = {
             studentName: "Student",
@@ -245,136 +255,107 @@
                 });
         });
 
-        async function requestWakeLock() {
-            if ('wakeLock' in navigator) {
-                try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
-            }
-        }
-
-        function releaseWakeLock() {
-            if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
-        }
-
-        async function handleMainAction() {
+        function handleMainAction() {
             if (!isUserAllowed) return;
-
-            const remoteAudio = document.getElementById("remote-audio");
-            if (remoteAudio) {
-                remoteAudio.volume = 1.0;
-                remoteAudio.play().catch(e => console.log("Audio unlock tap", e));
-            }
 
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
-                        <circle cx="12" cy="12" r="12" fill="#60a5fa" />
-                        <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span id="btn-text-content">통화 연결 중...</span>
-                `;
-                
-                try {
-                    if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
-                        vapiInstance = window.vapiSDK.run({
-                            apiKey: VAPI_KEY, 
-                            assistant: sessionData.assistantId, 
-                            config: {} 
-                        });
-                        
-                        if (vapiInstance) {
-                            if (typeof vapiInstance.start === 'function') {
-                                vapiInstance.start(sessionData.assistantId, { 
-                                    variableValues: { 
-                                        student_name: sessionData.studentName, 
-                                        teacher_name: sessionData.teacher,
-                                        token: getUrlToken() 
-                                    },
-                                    metadata: {
-                                        token: getUrlToken(),
-                                        studentName: sessionData.studentName
-                                    }
-                                });
-                            }
+                document.getElementById("btn-text-content").innerText = "마이크 권한 요청 중...";
 
-                            if (typeof vapiInstance.on === 'function') {
-                                vapiInstance.on('call-start', activateCallUI);
-                                vapiInstance.on('call-end', endCallUI);
-                                vapiInstance.on('track', (track, stream) => { 
-                                    if (track.kind === 'audio') { 
-                                        const remoteAudio = document.getElementById("remote-audio"); 
-                                        if (remoteAudio) { 
-                                            remoteAudio.srcObject = stream || new MediaStream([track]); 
-                                            remoteAudio.muted = false; 
-                                            remoteAudio.volume = 1.0; 
-                                            remoteAudio.play().catch(e => console.log("Stream error:", e)); 
-                                        } 
-                                    } 
-                                });
-                            }
-                            
-                            setTimeout(() => {
-                                const actionBtn = document.getElementById("action-btn");
-                                if (callState === 'IDLE' && actionBtn.innerText.includes("연결 중")) {
-                                    activateCallUI();
-                                }
-                            }, 2500);
-                        }
-                    }
-                } catch (err) { 
-                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); 
-                    const btn = document.getElementById("action-btn");
-                    btn.removeAttribute("disabled"); 
-                    document.getElementById("btn-text-content").innerText = "무료 체험 수업 시작하기"; 
+                const remoteAudio = document.getElementById("remote-audio");
+                if (remoteAudio) {
+                    remoteAudio.volume = 1.0;
+                    remoteAudio.play().catch(e => {});
                 }
+
+                // 2. EXPLICIT MIC REQUEST TO BLOCK UI FROM ADVANCING FALSELY
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then((stream) => {
+                        // Mic granted! Release hardware back to Vapi SDK
+                        stream.getTracks().forEach(track => track.stop());
+                        document.getElementById("btn-text-content").innerText = "통화 연결 중...";
+                        
+                        startVapiCall();
+                    })
+                    .catch((err) => {
+                        console.error("Mic access denied:", err);
+                        alert("원활한 수업을 위해 마이크 권한이 반드시 필요합니다. 브라우저 설정에서 마이크를 허용해 주세요.");
+                        btn.removeAttribute("disabled");
+                        document.getElementById("btn-text-content").innerText = "무료 체험 수업 시작하기";
+                    });
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
             }
         }
 
-        function formatTime(secs) {
-            const m = Math.floor(secs / 60);
-            const s = secs % 60;
-            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-        }
+        function startVapiCall() {
+            try {
+                if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                    vapiInstance = window.vapiSDK.run({
+                        apiKey: VAPI_KEY, 
+                        assistant: sessionData.assistantId, 
+                        config: {} 
+                    });
+                    
+                    if (vapiInstance) {
+                        if (typeof vapiInstance.start === 'function') {
+                            vapiInstance.start(sessionData.assistantId, { 
+                                variableValues: { 
+                                    student_name: sessionData.studentName, 
+                                    teacher_name: sessionData.teacher,
+                                    token: getUrlToken() 
+                                },
+                                metadata: {
+                                    token: getUrlToken(),
+                                    studentName: sessionData.studentName
+                                },
+                                assistantOverrides: {
+                                    model: {
+                                        messages: [
+                                            {
+                                                role: "system",
+                                                content: "You are " + sessionData.teacher + ", a certified native English instructor at Englisholic. You are conducting a 1:1 trial lesson with " + sessionData.studentName + ". Context/Notes for this student: " + sessionData.coachingNotes
+                                            }
+                                        ]
+                                    }
+                                }
+                            });
+                        }
 
-        function startTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            secondsElapsed = 0;
-            document.getElementById("timer-wrapper").style.display = "flex";
-
-            timerInterval = setInterval(() => {
-                secondsElapsed++;
-                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
-                
-                if (secondsElapsed === 300) {  
-                    if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        try{ vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED.]" }}); }catch(e){}
+                        if (typeof vapiInstance.on === 'function') {
+                            vapiInstance.on('call-start', activateCallUI);
+                            vapiInstance.on('call-end', endCallUI);
+                            vapiInstance.on('track', (track, stream) => { 
+                                if (track.kind === 'audio') { 
+                                    const remoteAudio = document.getElementById("remote-audio"); 
+                                    if (remoteAudio) { 
+                                        remoteAudio.srcObject = stream || new MediaStream([track]); 
+                                        remoteAudio.muted = false; 
+                                        remoteAudio.volume = 1.0; 
+                                        const playPromise = remoteAudio.play();
+                                        if (playPromise !== undefined) {
+                                            playPromise.catch(e => console.log("Stream play error:", e));
+                                        }
+                                    } 
+                                } 
+                            });
+                        }
                     }
                 }
-                if (secondsElapsed === 570) {  
-                    if (vapiInstance && typeof vapiInstance.send === 'function') {
-                        try{ vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM ALERT: 9:30 elapsed. Begin wrap-up naturally.]" }}); }catch(e){}
-                    }
-                }
-                if (secondsElapsed >= 600) {  
-                    endCallUI();
-                }
-            }, 1000);
-        }
-
-        function stopTimer() {
-            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            } catch (err) { 
+                alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); 
+                const btn = document.getElementById("action-btn");
+                btn.removeAttribute("disabled"); 
+                document.getElementById("btn-text-content").innerText = "무료 체험 수업 시작하기"; 
+            }
         }
 
         function activateCallUI() {
             if (callState === 'ACTIVE') return;
             callState = 'ACTIVE';
             
-            requestWakeLock();
             try { startTimer(); } catch(e) {}
             
             try {
@@ -396,43 +377,76 @@
                     <span id="btn-text-content">통화 종료하기</span>
                 `;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
+        }
 
-            // Dynamic System Prompt injection just like room.html
-            if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
-                setTimeout(() => {
-                    try { 
-                        if (vapiInstance && typeof vapiInstance.send === 'function') {
-                            vapiInstance.send({ type: "add-message", message: { role: "system", content: `You are ${sessionData.teacher}. Student Name is ${sessionData.studentName}. Context/Notes for this student: "${sessionData.coachingNotes}". Greet the student normally.` } }); 
-                        }
-                    } catch(e) {}
-                }, 1500);
-            }
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            secondsElapsed = 0;
+            document.getElementById("timer-wrapper").style.display = "flex";
+
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById("timer").innerText = "⏱️ " + formatTime(secondsElapsed) + " / 10:00";
+                
+                if (secondsElapsed === 300) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[SYSTEM TIME CHECK: 5 MINUTES ELAPSED. 5 MINUTES REMAINING.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 570) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 9:30 REACHED. YOU MUST IMMEDIATELY CEASE NEW TOPICS, DELIVER A WARM 50-WORD CLOSING, AND PREPARE TO END THE SESSION.]" }});
+                    }
+                }
+
+                if (secondsElapsed === 585) {  
+                    if (vapiInstance && typeof vapiInstance.send === 'function') {
+                        vapiInstance.send({ type: "add-message", message: { role: "system", content: "[CRITICAL SYSTEM ALERT: 10 MINUTES REACHED. YOU MUST IMMEDIATELY SAY GOODBYE AND EXECUTE THE end_tutoring_session TOOL IN YOUR VERY NEXT TURN.]" }});
+                    }
+                }
+
+                if (secondsElapsed >= 600) {  
+                    endCallUI();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        }
+
+        function sendFrontendCompletion(durationSec) {
+            const payload = {
+                type: "frontend-completion",
+                token: getUrlToken(),
+                studentName: sessionData.studentName,
+                duration: durationSec
+            };
+            fetch(GAS_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.log("Frontend completion sync error:", err));
         }
 
         function endCallUI() {
             if (callState === 'ENDED') return;
             stopTimer();
-            releaseWakeLock();
-            
-            if (window.activeMicStream) { 
-                window.activeMicStream.getTracks().forEach(track => track.stop()); 
-                window.activeMicStream = null; 
-            }
-            
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
                 try { vapiInstance.stop(); } catch(e) {}
             }
-            
-            // Backup webhook
-            try {
-                fetch(GAS_URL, {
-                    method: 'POST', mode: 'no-cors', keepalive: true, 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'frontend-completion', token: getUrlToken(), studentName: sessionData.studentName, duration: secondsElapsed })
-                }).catch(e => console.log("Post skip"));
-            } catch(e) {}
-
             callState = 'ENDED';
+            
+            // 3. TIMER CLEANUP: Hide the stopwatch cleanly
+            document.getElementById("timer-wrapper").style.display = "none";
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             
             document.getElementById("notice-box").innerHTML = `
