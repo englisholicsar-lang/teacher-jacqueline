@@ -152,7 +152,7 @@
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxzTJczMGmbzHOb8J7MOb8J7MzvOPzcposU3eDlVuf6L-EsrCv9moOJrG2x_c7XDxpyO03kQc/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxzTJczMGmbzHOb8J7MzvOPzcposU3eDlVuf6L-EsrCv9moOJrG2x_c7XDxpyO03kQc/exec";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
 
         let callState = 'IDLE'; 
@@ -319,7 +319,7 @@
                             <span id="btn-text-content">무료 체험 수업 시작하기</span>
                         `;
                     }
-                }, 400); // 400ms visual buffer for the connecting screen
+                }, 400);
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
@@ -388,7 +388,6 @@
                 `;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
-            // Dynamic System Prompt injection
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
                 setTimeout(() => {
                     try { 
@@ -414,7 +413,6 @@
                 try { vapiInstance.stop(); } catch(e) {}
             }
             
-            // Backup webhook
             try {
                 fetch(GAS_URL, {
                     method: 'POST', mode: 'no-cors', keepalive: true, 
