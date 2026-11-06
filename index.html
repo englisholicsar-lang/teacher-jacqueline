@@ -17,7 +17,7 @@
     <!-- Dormant Kakao SDK for future funnel integration -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 
-    <!-- PERFECTED VAPI LOAD -->
+    <!-- PERFECTED VAPI LOAD: Mirrored exactly from room.html -->
     <script>var vapiInstance = null;</script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
@@ -249,7 +249,7 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // FIX #2 APPLIED: Preserves async token validation scope while aligning Vapi initialization with room.html signature
+        // FIX #3 APPLIED: Explicit navigator.mediaDevices.getUserMedia call to force native OS mic prompt
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -272,6 +272,16 @@
                 `;
 
                 try {
+                    // FORCE NATIVE MICROPHONE PERMISSION PROMPT FIRST
+                    if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+                        try {
+                            const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            window.activeMicStream = micStream;
+                        } catch (micErr) {
+                            console.log("Mic prompt error or denied:", micErr);
+                        }
+                    }
+
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY, 
@@ -392,6 +402,7 @@
                 `;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
+            // Dynamic System Prompt injection just like room.html
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
                 setTimeout(() => {
                     try { 
@@ -417,6 +428,7 @@
                 try { vapiInstance.stop(); } catch(e) {}
             }
             
+            // Backup webhook
             try {
                 fetch(GAS_URL, {
                     method: 'POST', mode: 'no-cors', keepalive: true, 
