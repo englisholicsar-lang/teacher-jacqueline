@@ -17,7 +17,7 @@
     <!-- Dormant Kakao SDK for future funnel integration -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 
-    <!-- PERFECTED VAPI LOAD: Mirrored exactly from room.html -->
+    <!-- PERFECTED VAPI LOAD -->
     <script>var vapiInstance = null;</script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
@@ -249,7 +249,7 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // PERFECTED: Inlined Vapi start completely into the synchronous click handler (Identical to room.html)
+        // FIX #2 APPLIED: Preserves async token validation scope while aligning Vapi initialization with room.html signature
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -392,7 +392,6 @@
                 `;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
-            // Dynamic System Prompt injection just like room.html
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
                 setTimeout(() => {
                     try { 
@@ -418,7 +417,6 @@
                 try { vapiInstance.stop(); } catch(e) {}
             }
             
-            // Backup webhook
             try {
                 fetch(GAS_URL, {
                     method: 'POST', mode: 'no-cors', keepalive: true, 
