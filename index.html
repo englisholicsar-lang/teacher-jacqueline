@@ -249,7 +249,6 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // FIX #3 APPLIED: Explicit navigator.mediaDevices.getUserMedia call to force native OS mic prompt
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -262,6 +261,8 @@
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
+                
+                // PHASE 2: UI shifts to gray connecting state immediately
                 btn.innerHTML = `
                     <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
                         <circle cx="12" cy="12" r="12" fill="#60a5fa" />
@@ -272,16 +273,15 @@
                 `;
 
                 try {
-                    // FORCE NATIVE MICROPHONE PERMISSION PROMPT FIRST
+                    // PHASE 3: Hard Pause - Explicitly wait for microphone permissions to resolve
                     if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
-                        try {
-                            const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                            window.activeMicStream = micStream;
-                        } catch (micErr) {
-                            console.log("Mic prompt error or denied:", micErr);
-                        }
+                        const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        window.activeMicStream = micStream;
+                    } else {
+                        throw new Error("Microphone API not supported");
                     }
 
+                    // PHASE 4: Vapi Boot Sequence - Only executes AFTER user taps "Allow" on the mic prompt
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY, 
@@ -305,6 +305,7 @@
                             }
 
                             if (typeof vapiInstance.on === 'function') {
+                                // Red UI state transitions strictly on Vapi's true WebRTC connection
                                 vapiInstance.on('call-start', activateCallUI);
                                 vapiInstance.on('call-end', endCallUI);
                                 vapiInstance.on('track', (track, stream) => { 
@@ -319,20 +320,16 @@
                                     } 
                                 });
                             }
-                            
-                            setTimeout(() => {
-                                const actionBtn = document.getElementById("action-btn");
-                                if (callState === 'IDLE' && actionBtn.innerText.includes("연결 중")) {
-                                    activateCallUI();
-                                }
-                            }, 2500);
                         }
                     }
                 } catch (err) { 
-                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); 
-                    const btn = document.getElementById("action-btn");
+                    console.error("Mic prompt error or connection failure:", err);
+                    alert("마이크 권한이 필요하거나 연결에 실패했습니다. 다시 시도해 주세요.");
                     btn.removeAttribute("disabled"); 
-                    document.getElementById("btn-text-content").innerText = "무료 체험 수업 시작하기"; 
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                        <span id="btn-text-content">무료 체험 수업 시작하기</span>
+                    `;
                 }
 
             } else if (callState === 'ACTIVE') {
