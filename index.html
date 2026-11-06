@@ -14,7 +14,6 @@
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
-    <!-- Dormant Kakao SDK for future funnel integration -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 
     <!-- PERFECTED VAPI LOAD: Mirrored exactly from room.html -->
@@ -113,7 +112,6 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
-    <!-- AUDIO ELEMENT WITH CONTROLS TO FORCE MOBILE WEB RTC PLAYBACK -->
     <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -250,7 +248,7 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // STABLE ACTION WITH RESTORED VAPI AUDIO TRACK BINDING
+        // PERFECTED ACTION: Strict event-driven connection without fake timeout traps
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -292,7 +290,6 @@
                             if (typeof vapiInstance.on === 'function') {
                                 vapiInstance.on('call-start', activateCallUI);
                                 vapiInstance.on('call-end', endCallUI);
-                                // RESTORED AUDIO TRACK STREAM BINDING FOR JACKIE'S VOICE
                                 vapiInstance.on('track', (track, stream) => { 
                                     if (track.kind === 'audio') { 
                                         const rAudio = document.getElementById("remote-audio"); 
@@ -305,12 +302,6 @@
                                     } 
                                 });
                             }
-
-                            setTimeout(() => {
-                                if (callState === 'IDLE') {
-                                    activateCallUI();
-                                }
-                            }, 1500);
                         }
                     }
                 } catch (err) { 
@@ -368,7 +359,7 @@
             try { startTimer(); } catch(e) {}
             
             try {
-                document.getElementById("call-status").innerText = `${sessionData.studentName} 회원님, 통화가 연결되었습니다.`;
+                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
@@ -397,7 +388,7 @@
 
         function endCallUI() {
             if (callState === 'ENDED') return;
-            stopTimer();
+            stopTimer(); // Stops the stopwatch properly so it doesn't leak into the exit page
             releaseWakeLock();
             
             if (vapiInstance && typeof vapiInstance.stop === 'function') {
@@ -415,6 +406,9 @@
             callState = 'ENDED';
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
             
+            // Hides the timer display wrapper completely on the exit screen
+            document.getElementById("timer-wrapper").style.display = "none";
+            
             document.getElementById("notice-box").innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;">
                     <div style="font-size: 13.5px; font-weight: 800; color: #0e2a47;">🚀 무료 체험에 참여해 주셔서 감사합니다!</div>
@@ -428,6 +422,7 @@
             btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
             btn.removeAttribute("disabled");
             btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
+            
             btn.innerHTML = `<span style="font-size: 17px;">고객센터 문의하기</span>`;
         }
     </script>
