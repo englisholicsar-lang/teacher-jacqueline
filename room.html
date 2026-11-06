@@ -37,7 +37,6 @@
         .shield-badge { position: absolute; bottom: 0; right: 0; background: #2563eb; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
         .admin-box { width: 100%; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 8px 12px; font-size: 11.5px; color: #166534; text-align: left; line-height: 1.3; box-sizing: border-box; display: none; }
         
-        /* Vapi 기본 버튼 완벽히 숨기기 */
         iframe[title*="vapi"], iframe[src*="vapi"], .vapi-btn { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
@@ -45,7 +44,10 @@
     <svg class="bg-wave-top" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0H500V80C400 140 250 160 0 60V0Z" fill="#dbeafe" fill-opacity="0.7"/></svg>
     <svg class="bg-wave-bottom" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 200H500V120C350 180 150 140 0 200Z" fill="#dbeafe" fill-opacity="0.7"/></svg>
     <div class="dot-pattern-left"></div><div class="dot-pattern-right"></div>
+    
+    <!-- AUDIO ELEMENT WITH CONTROLS TO FORCE MOBILE WEBRTC PLAYBACK -->
     <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
+
     <div id="main-container" class="container">
         <div class="upper-group">
             <div class="logo-wrapper"><img src="logo.png" alt="Englisholic Logo" class="logo-img"></div>
@@ -59,7 +61,7 @@
         </div>
         <div class="bottom-group">
             <div id="notice-box" class="info-box" style="flex-direction: column; gap: 6px; padding: 10px 10px;">
-                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;"><span style="font-size: 15px;">🔊</span> 스피커폰으로 기본 설정됩니다.</div>
+                <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;"><span style="font-size: 15px;">🔊</span> 스피커폰으로 기본 설정되었습니다.</div>
                 <div style="font-size: 13px; font-weight: 800; color: #0c2a4a; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; white-space: nowrap; letter-spacing: -0.3px;"><span style="font-size: 15px;">🎧</span> 이어폰은 통화 시작 전 연결해 주세요!</div>
             </div>
             <button id="action-btn" class="action-btn" onclick="handleMainAction()" disabled><span id="btn-text-content">데이터 동기화 중...</span></button>
@@ -133,10 +135,12 @@
 
         async function handleMainAction() {
             if (!isUserAllowed) return;
+            
             const remoteAudio = document.getElementById("remote-audio"); 
             if (remoteAudio) { 
+                remoteAudio.muted = false;
                 remoteAudio.volume = 1.0; 
-                remoteAudio.play().catch(e => console.log("Audio tap", e)); 
+                remoteAudio.play().catch(e => console.log("Audio tap error", e)); 
             }
             
             if (callState === 'IDLE') {
@@ -154,7 +158,7 @@
                         
                         if (vapiInstance) {
                             if (typeof vapiInstance.start === 'function') {
-                                // METADATA & TOKEN INJECTED DIRECTLY INTO VARIABLES
+                                // MATCHING room.html EXACT START MAP (Variables clean, no breaking overrides)
                                 vapiInstance.start(activeAssistantId, { 
                                     variableValues: { 
                                         student_name: sessionStudentName, 
@@ -169,19 +173,20 @@
                                 vapiInstance.on('call-end', endCallUI);
                                 vapiInstance.on('track', (track, stream) => { 
                                     if (track.kind === 'audio') { 
-                                        const remoteAudio = document.getElementById("remote-audio"); 
-                                        if (remoteAudio) { 
-                                            remoteAudio.srcObject = stream || new MediaStream([track]); 
-                                            remoteAudio.muted = false; remoteAudio.volume = 1.0; 
-                                            remoteAudio.play().catch(e => console.log("Stream error:", e)); 
+                                        const rAudio = document.getElementById("remote-audio"); 
+                                        if (rAudio) { 
+                                            rAudio.srcObject = stream || new MediaStream([track]); 
+                                            rAudio.muted = false; 
+                                            rAudio.volume = 1.0; 
+                                            rAudio.play().catch(e => console.log("Stream play error:", e)); 
                                         } 
                                     } 
                                 });
                             }
                             
+                            // Safe fallback trigger matching room.html reliability
                             setTimeout(() => {
-                                const actionBtn = document.getElementById("action-btn");
-                                if (callState === 'IDLE' && actionBtn.innerText.includes("연결 중")) {
+                                if (callState === 'IDLE') {
                                     activateCallUI();
                                 }
                             }, 2500);
@@ -276,6 +281,10 @@
 
             callState = 'ENDED'; 
             document.getElementById("call-status").innerText = "통화가 종료되었습니다. 수고하셨습니다!";
+            
+            // HIDE TIMER WRAPPER ON EXIT SCREEN TO FIX ARTIFACT LEAK
+            document.getElementById("timer-wrapper").style.display = "none";
+
             document.getElementById("notice-box").innerHTML = `<div style="display: flex; flex-direction: column; gap: 6px; align-items: center; width: 100%; text-align: center;"><div style="font-size: 13.5px; font-weight: 700; color: #0e2a47;">🚀 세션에 참여해 주셔서 감사합니다!</div></div>`;
             const btn = document.getElementById("action-btn"); 
             btn.style.backgroundColor = "#10b981"; 
