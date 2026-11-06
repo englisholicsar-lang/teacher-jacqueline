@@ -189,7 +189,7 @@
                 <div class="bottom-group" style="margin-top: 20px;">
                     <div class="info-box" style="padding: 16px; justify-content: center;">
                         <span style="text-align: center; color: #0e2a47; font-size: 13.5px; font-weight: 700;">
-                            🔒 ${message || "유효하지 않거나 이미 종료된 수업 링크입니다."}
+                            🔒 ${message || "유효되었거나 이미 종료된 수업 링크입니다."}
                         </span>
                     </div>
                     <button class="action-btn" onclick="window.location.href='tel:1877-5079'" style="background-color: #10b981; color: #ffffff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); justify-content: center;">
@@ -249,7 +249,7 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // PERFECTED: Inlined Vapi start completely into the synchronous click handler (Identical to room.html)
+        // FORCED SYNCHRONOUS MIC PROMPT: Explicitly request audio stream synchronously on click
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -268,10 +268,16 @@
                         <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span id="btn-text-content">통화 연결 중...</span>
+                    <span id="btn-text-content">마이크 권한 요청 중...</span>
                 `;
 
                 try {
+                    // FORCE MOBILE MIC PROMPT SYNCHRONOUSLY
+                    const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    window.activeMicStream = micStream; // Keep track of it to stop later
+
+                    document.getElementById("btn-text-content").innerText = "통화 연결 중...";
+
                     if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
                         vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_KEY, 
@@ -309,20 +315,21 @@
                                     } 
                                 });
                             }
-                            
-                            setTimeout(() => {
-                                const actionBtn = document.getElementById("action-btn");
-                                if (callState === 'IDLE' && actionBtn.innerText.includes("연결 중")) {
-                                    activateCallUI();
-                                }
-                            }, 2500);
                         }
                     }
                 } catch (err) { 
-                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); 
+                    console.error("Mic permission denied or error:", err);
+                    alert("원활한 수업을 위해 마이크 권한이 반드시 필요합니다. 브라우저 설정에서 마이크를 허용해 주세요."); 
                     const btn = document.getElementById("action-btn");
                     btn.removeAttribute("disabled"); 
-                    document.getElementById("btn-text-content").innerText = "무료 체험 수업 시작하기"; 
+                    btn.style.backgroundColor = "var(--kakao-yellow)";
+                    btn.style.color = "#000000";
+                    btn.innerHTML = `
+                        <div class="shield-icon" id="btn-icon-wrapper">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <span id="btn-text-content">무료 체험 수업 시작하기</span>
+                    `;
                 }
 
             } else if (callState === 'ACTIVE') {
@@ -392,7 +399,6 @@
                 `;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
-            // Dynamic System Prompt injection just like room.html
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
                 setTimeout(() => {
                     try { 
@@ -418,7 +424,6 @@
                 try { vapiInstance.stop(); } catch(e) {}
             }
             
-            // Backup webhook
             try {
                 fetch(GAS_URL, {
                     method: 'POST', mode: 'no-cors', keepalive: true, 
