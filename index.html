@@ -152,7 +152,7 @@
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxzTJczMGmbzHOb8J7MzvOPzcposU3eDlVuf6L-EsrCv9moOJrG2x_c7XDxpyO03kQc/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxzTJczMGmbzHOb8J7MOb8J7MzvOPzcposU3eDlVuf6L-EsrCv9moOJrG2x_c7XDxpyO03kQc/exec";
         const VAPI_KEY = "6aeb4233-7c3c-48f6-90fe-ee5d7a40d2a3";
 
         let callState = 'IDLE'; 
@@ -252,14 +252,11 @@
         function handleMainAction() {
             if (!isUserAllowed) return;
 
-            const remoteAudio = document.getElementById("remote-audio");
-            // Removing the premature play command to prevent Kakao browser confusion
-
             if (callState === 'IDLE') {
                 const btn = document.getElementById("action-btn");
                 btn.setAttribute("disabled", "true");
                 
-                // Phase 2: Show Gray Connecting Screen immediately
+                // Show Gray Connecting Screen immediately
                 btn.innerHTML = `
                     <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
                         <circle cx="12" cy="12" r="12" fill="#60a5fa" />
@@ -269,69 +266,60 @@
                     <span id="btn-text-content">통화 연결 중...</span>
                 `;
 
-                // Phase 3: Pause briefly so the user sees the gray state, then transition to Red Active State
+                // Pause briefly to let UI render, then launch Vapi directly
                 setTimeout(async () => {
-                    // Instantly trigger Red UI + Timer
-                    activateCallUI();
+                    try {
+                        if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                            vapiInstance = window.vapiSDK.run({
+                                apiKey: VAPI_KEY, 
+                                assistant: sessionData.assistantId, 
+                                config: {} 
+                            });
+                            
+                            if (vapiInstance) {
+                                if (typeof vapiInstance.start === 'function') {
+                                    vapiInstance.start(sessionData.assistantId, { 
+                                        variableValues: { 
+                                            student_name: sessionData.studentName, 
+                                            teacher_name: sessionData.teacher,
+                                            coaching_notes: sessionData.coachingNotes,
+                                            token: getUrlToken() 
+                                        },
+                                        metadata: {
+                                            token: getUrlToken(),
+                                            studentName: sessionData.studentName
+                                        }
+                                    });
+                                }
 
-                    // Phase 4: Allow DOM to settle, then pop Mic Prompt and launch Vapi
-                    setTimeout(async () => {
-                        try {
-                            if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
-                                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                                window.activeMicStream = stream;
-                            }
-
-                            if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
-                                vapiInstance = window.vapiSDK.run({
-                                    apiKey: VAPI_KEY, 
-                                    assistant: sessionData.assistantId, 
-                                    config: {} 
-                                });
-                                
-                                if (vapiInstance) {
-                                    if (typeof vapiInstance.start === 'function') {
-                                        vapiInstance.start(sessionData.assistantId, { 
-                                            variableValues: { 
-                                                student_name: sessionData.studentName, 
-                                                teacher_name: sessionData.teacher,
-                                                coaching_notes: sessionData.coachingNotes,
-                                                token: getUrlToken() 
-                                            },
-                                            metadata: {
-                                                token: getUrlToken(),
-                                                studentName: sessionData.studentName
-                                            }
-                                        });
-                                    }
-
-                                    if (typeof vapiInstance.on === 'function') {
-                                        vapiInstance.on('call-end', endCallUI);
-                                        vapiInstance.on('track', (track, stream) => { 
-                                            if (track.kind === 'audio') { 
-                                                const rAudio = document.getElementById("remote-audio"); 
-                                                if (rAudio) { 
-                                                    // FIX #8: Explicit stream binding and aggressive play
-                                                    console.log("Audio track received, forcing playback...");
-                                                    rAudio.srcObject = stream || new MediaStream([track]); 
-                                                    rAudio.muted = false; 
-                                                    rAudio.volume = 1.0; 
-                                                    rAudio.play().then(() => {
-                                                        console.log("Audio successfully playing!");
-                                                    }).catch(e => {
-                                                        console.log("Browser blocked autoplay. Attemping manual bypass:", e);
-                                                    }); 
-                                                } 
+                                if (typeof vapiInstance.on === 'function') {
+                                    // UI shifts to Red active state only when Vapi confirms connection
+                                    vapiInstance.on('call-start', activateCallUI);
+                                    vapiInstance.on('call-end', endCallUI);
+                                    vapiInstance.on('track', (track, stream) => { 
+                                        if (track.kind === 'audio') { 
+                                            const rAudio = document.getElementById("remote-audio"); 
+                                            if (rAudio) { 
+                                                rAudio.srcObject = stream || new MediaStream([track]); 
+                                                rAudio.muted = false; 
+                                                rAudio.volume = 1.0; 
+                                                rAudio.play().catch(e => console.log("Stream error:", e)); 
                                             } 
-                                        });
-                                    }
+                                        } 
+                                    });
                                 }
                             }
-                        } catch (err) { 
-                            console.error("Mic prompt denied or Vapi boot error:", err);
                         }
-                    }, 100); 
-                }, 800); 
+                    } catch (err) { 
+                        console.error("Vapi boot error:", err);
+                        alert("연결에 실패했습니다. 다시 시도해 주세요.");
+                        btn.removeAttribute("disabled"); 
+                        btn.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#3A1D1D" style="flex-shrink:0;"><path d="M12 3c-5.52 0-10 3.58-10 8 0 2.61 1.54 4.92 3.86 6.36l-1.2 4.39c-.11.41.34.74.69.5l4.13-2.73c.8.22 1.65.34 2.52.34 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>
+                            <span id="btn-text-content">무료 체험 수업 시작하기</span>
+                        `;
+                    }
+                }, 400); // 400ms visual buffer for the connecting screen
 
             } else if (callState === 'ACTIVE') {
                 endCallUI();
