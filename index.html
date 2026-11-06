@@ -17,7 +17,7 @@
     <!-- Dormant Kakao SDK for future funnel integration -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 
-    <!-- PERFECTED VAPI LOAD: Mirrored exactly from room.html -->
+    <!-- PERFECTED VAPI LOAD -->
     <script>var vapiInstance = null;</script>
     <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
@@ -249,7 +249,7 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // FIX #3 APPLIED: Explicit navigator.mediaDevices.getUserMedia call to force native OS mic prompt
+        // SYNCHRONIZED FIX: UI shifts to active state (Image 2) FIRST, then getUserMedia and Vapi fire in sync
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
@@ -260,25 +260,17 @@
             }
 
             if (callState === 'IDLE') {
-                const btn = document.getElementById("action-btn");
-                btn.setAttribute("disabled", "true");
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
-                        <circle cx="12" cy="12" r="12" fill="#60a5fa" />
-                        <path d="M12 5.5l-5 2v4c0 3.5 2.2 6.8 5 8 2.8-1.2 5-4.5 5-8v-4l-5-2z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9.5 12l1.5 1.5 3.5-3.5" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span id="btn-text-content">통화 연결 중...</span>
-                `;
+                // Step 1: Instantly transition UI to active call state (Image 2) & start timer
+                activateCallUI();
 
                 try {
-                    // FORCE NATIVE MICROPHONE PERMISSION PROMPT FIRST
+                    // Step 2: Trigger native mic prompt and Vapi startup in sync with the active UI
                     if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
                         try {
-                            const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                            window.activeMicStream = micStream;
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            window.activeMicStream = stream;
                         } catch (micErr) {
-                            console.log("Mic prompt error or denied:", micErr);
+                            console.log("Mic prompt error:", micErr);
                         }
                     }
 
@@ -295,6 +287,7 @@
                                     variableValues: { 
                                         student_name: sessionData.studentName, 
                                         teacher_name: sessionData.teacher,
+                                        coaching_notes: sessionData.coachingNotes,
                                         token: getUrlToken() 
                                     },
                                     metadata: {
@@ -305,7 +298,6 @@
                             }
 
                             if (typeof vapiInstance.on === 'function') {
-                                vapiInstance.on('call-start', activateCallUI);
                                 vapiInstance.on('call-end', endCallUI);
                                 vapiInstance.on('track', (track, stream) => { 
                                     if (track.kind === 'audio') { 
@@ -319,20 +311,10 @@
                                     } 
                                 });
                             }
-                            
-                            setTimeout(() => {
-                                const actionBtn = document.getElementById("action-btn");
-                                if (callState === 'IDLE' && actionBtn.innerText.includes("연결 중")) {
-                                    activateCallUI();
-                                }
-                            }, 2500);
                         }
                     }
                 } catch (err) { 
-                    alert("통화 연결 중 오류가 발생했습니다. 다시 시도해 주세요."); 
-                    const btn = document.getElementById("action-btn");
-                    btn.removeAttribute("disabled"); 
-                    document.getElementById("btn-text-content").innerText = "무료 체험 수업 시작하기"; 
+                    console.error("Call initialization error:", err);
                 }
 
             } else if (callState === 'ACTIVE') {
@@ -388,7 +370,7 @@
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
                         <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
-                            마이크 권한을 허용해 주세요.
+                            선생님께 인사해 보세요! (예: Hello!)
                         </span>
                     </div>`;
                 
@@ -402,7 +384,6 @@
                 `;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
-            // Dynamic System Prompt injection just like room.html
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
                 setTimeout(() => {
                     try { 
@@ -428,7 +409,6 @@
                 try { vapiInstance.stop(); } catch(e) {}
             }
             
-            // Backup webhook
             try {
                 fetch(GAS_URL, {
                     method: 'POST', mode: 'no-cors', keepalive: true, 
