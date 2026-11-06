@@ -249,8 +249,8 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // SYNCHRONOUS CLICK HANDLER (Fix #1 Applied)
-        function handleMainAction() {
+        // PERFECTED: Inlined Vapi start completely into the synchronous click handler (Identical to room.html)
+        async function handleMainAction() {
             if (!isUserAllowed) return;
 
             const remoteAudio = document.getElementById("remote-audio");
@@ -392,6 +392,7 @@
                 `;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
+            // Dynamic System Prompt injection just like room.html
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
                 setTimeout(() => {
                     try { 
@@ -417,6 +418,7 @@
                 try { vapiInstance.stop(); } catch(e) {}
             }
             
+            // Backup webhook
             try {
                 fetch(GAS_URL, {
                     method: 'POST', mode: 'no-cors', keepalive: true, 
