@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- FORCE MOBILE MIC PERMISSIONS -->
     <meta http-equiv="Permissions-Policy" content="microphone=*">
     
     <title>Englisholic - 1:1 Free Trial</title>
@@ -13,6 +14,7 @@
     <meta property="og:url" content="https://englisholicsar-lang.github.io/teacher-jacqueline/">
     <meta property="og:type" content="website">
 
+    <!-- Dormant Kakao SDK for future funnel integration -->
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 
     <!-- PERFECTED VAPI LOAD: Mirrored exactly from room.html -->
@@ -111,6 +113,7 @@
     <div class="dot-pattern-left"></div>
     <div class="dot-pattern-right"></div>
 
+    <!-- AUDIO ELEMENT WITH CONTROLS TO FORCE MOBILE WEB RTC PLAYBACK -->
     <audio id="remote-audio" autoplay playsinline controls style="display: none;"></audio>
 
     <div id="main-container" class="container">
@@ -247,11 +250,10 @@
             if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
-        // UNIFIED STABLE ACTION: Exact SDK run sequence with proper audio playback promise handling
+        // STABLE ACTION WITH RESTORED VAPI AUDIO TRACK BINDING
         async function handleMainAction() {
             if (!isUserAllowed) return;
 
-            // Direct user gesture unlock for mobile audio context
             const remoteAudio = document.getElementById("remote-audio");
             if (remoteAudio) {
                 remoteAudio.muted = false;
@@ -290,6 +292,7 @@
                             if (typeof vapiInstance.on === 'function') {
                                 vapiInstance.on('call-start', activateCallUI);
                                 vapiInstance.on('call-end', endCallUI);
+                                // RESTORED AUDIO TRACK STREAM BINDING FOR JACKIE'S VOICE
                                 vapiInstance.on('track', (track, stream) => { 
                                     if (track.kind === 'audio') { 
                                         const rAudio = document.getElementById("remote-audio"); 
@@ -297,13 +300,12 @@
                                             rAudio.srcObject = stream || new MediaStream([track]); 
                                             rAudio.muted = false; 
                                             rAudio.volume = 1.0; 
-                                            rAudio.play().catch(e => console.log("Stream play error:", e)); 
+                                            rAudio.play().catch(e => console.log("Stream error:", e)); 
                                         } 
                                     } 
                                 });
                             }
 
-                            // Fallback sync to activate UI if SDK initialization takes a split second
                             setTimeout(() => {
                                 if (callState === 'IDLE') {
                                     activateCallUI();
@@ -366,12 +368,12 @@
             try { startTimer(); } catch(e) {}
             
             try {
-                document.getElementById("call-status").innerText = "📞 통화가 연결되었습니다.";
+                document.getElementById("call-status").innerText = `${sessionData.studentName} 회원님, 통화가 연결되었습니다.`;
                 document.getElementById("notice-box").innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 12px;">
                         <div style="font-size: 24px; flex-shrink: 0;">🎙️</div>
                         <span style="text-align: left; font-size: 15px; font-weight: 800; color: #0e2a47; line-height: 1.4;">
-                            마이크 권한을 허용해 주세요.
+                            선생님께 인사해 보세요! (예: Hello!)
                         </span>
                     </div>`;
                 
@@ -379,10 +381,7 @@
                 btn.style.backgroundColor = "#e05252";
                 btn.style.boxShadow = "0 6px 16px rgba(224, 82, 82, 0.35)"; 
                 btn.removeAttribute("disabled"); 
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                    <span id="btn-text-content">통화 종료하기</span>
-                `;
+                btn.innerHTML = `<span id="btn-text-content">통화 종료하기</span>`;
             } catch(e) { console.error("UI 변경 중 에러 발생", e); }
 
             if (sessionData.coachingNotes && String(sessionData.coachingNotes).trim() !== "") { 
@@ -429,11 +428,7 @@
             btn.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
             btn.removeAttribute("disabled");
             btn.onclick = function() { window.location.href = 'tel:1877-5079'; };
-            
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" style="flex-shrink:0;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                <span id="btn-text-content" style="font-size: 17px;">고객센터 문의하기</span>
-            `;
+            btn.innerHTML = `<span style="font-size: 17px;">고객센터 문의하기</span>`;
         }
     </script>
 </body>
